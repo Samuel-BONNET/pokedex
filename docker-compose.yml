@@ -1,4 +1,14 @@
 services:
+  app:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://admin:password@postgres:5432/appdb
+
   postgres:
     image: postgres:17
     restart: always
