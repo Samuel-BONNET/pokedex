@@ -6,7 +6,7 @@ RUN corepack enable
 
 ENV CI=true
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile
 
