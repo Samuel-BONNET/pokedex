@@ -16,6 +16,9 @@ RUN pnpm prisma generate
 
 RUN pnpm build
 
+COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh
+RUN chmod +x /app/scripts/entrypoint.sh
+
 EXPOSE 3000
 
-CMD ["node", ".output/server/index.mjs"]
+ENTRYPOINT ["/app/scripts/entrypoint.sh"]
