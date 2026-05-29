@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { prisma } from '../server/utils/prisma'
 
-async function fetchPokemon(id: number) {
+async function fetchPokemonApi(id: number) {
     return await fetch(
         `https://pokeapi.co/api/v2/pokemon/${id}`
     ).then(res => res.json())
@@ -15,7 +15,7 @@ async function main() {
     for (let id = 1; id <= 1025; id++) {
         console.log(`Importing #${id}`)
 
-        const pokemon = await fetchPokemon(id)
+        const pokemon = await fetchPokemonApi(id)
         await delay(150)
 
         const versions = pokemon.sprites?.versions ?? {}

@@ -1,4 +1,3 @@
-import { defineEventHandler, getHeader, getRequestURL, createError } from 'h3'
 import { verifyToken } from '../utils/jwt'
 
 export default defineEventHandler((event) => {
