@@ -32,6 +32,7 @@ model Pokemon {
     nameFr          String
     nameEn          String
     pokeNumber      Int     @unique
+    currentSprite   String
     availableGames  Json
     statuts         Statut[]
 }
