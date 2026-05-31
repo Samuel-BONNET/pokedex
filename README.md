@@ -1,75 +1,43 @@
-# Nuxt Minimal Starter
+# Pokedex
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Prérequis
 
-## Setup
+- Node.js 20+
+- pnpm
+- Docker + Docker Compose
 
-Make sure to install dependencies:
+## Setup local
 
 ```bash
-# npm
-npm install
-
-# pnpm
+# 1. Installer les dépendances
 pnpm install
 
-# yarn
-yarn install
+# 2. Démarrer PostgreSQL
+docker compose up -d postgres
 
-# bun
-bun install
-```
+# 3. Appliquer les migrations Prisma
+pnpm prisma:migrate
 
-## Development Server
+# 4. Générer le client Prisma
+pnpm prisma:generate
 
-Start the development server on `http://localhost:3000`:
+# 5. (Optionnel) Créer l'admin
+pnpm prisma:seed
 
-```bash
-# npm
-npm run dev
+# 6. (Optionnel) Importer les 1025 Pokémon depuis PokeAPI
+pnpm import:pokemon
 
-# pnpm
+# 7. Lancer le serveur de dev
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+Accès : http://localhost:3000
 
-Build the application for production:
+## Commandes utiles
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+| Commande | Description |
+|----------|-------------|
+| `pnpm dev` | Serveur de développement |
+| `pnpm build` | Build production |
+| `pnpm prisma:studio` | Interface Prisma Studio |
+| `pnpm import:pokemon` | Import des Pokémon depuis PokeAPI |

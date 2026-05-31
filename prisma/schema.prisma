@@ -4,11 +4,51 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id            Int         @id @default(autoincrement())
+  pseudo        String      @db.VarChar(50)
+  email         String      @db.VarChar(50) @unique
+  password      String
+  role          String
+  isActive      Boolean     @default(true)
+  preferences   Json        @db.JsonB
+  createdAt     DateTime    @default(now())
+  statuts       Statut[]
+}
+
+model Game {
+    id          Int       @id @default(autoincrement())
+    nameFr      String
+    nameEn      String
+    generation  Int
+    statuts     Statut[]
+}
+
+model Pokemon {
+    id              Int     @id @default(autoincrement())
+    nameFr          String
+    nameEn          String
+    pokeNumber      Int     @unique
+    currentSprite   String
+    availableGames  Json
+    statuts         Statut[]
+}
+
+model Statut {
+  idPokemon           Int
+  idUser              Int
+  idGameProvenance    Int
+
+  user                User        @relation(fields: [idUser], references: [id])
+  pokemon             Pokemon     @relation(fields: [idPokemon], references: [id])
+  game                Game        @relation(fields: [idGameProvenance], references: [id])
+
+  isOwned             Boolean
+  isShiny             Boolean
+  currentGeneration   Int
+
+  @@id([idPokemon, idUser, idGameProvenance])
 }
