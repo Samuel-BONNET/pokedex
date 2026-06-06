@@ -1,7 +1,10 @@
+import { defineEventHandler, getHeader, getRequestURL, createError } from 'h3'
 import { verifyToken } from '../utils/jwt'
 
 export default defineEventHandler((event) => {
-    if (!getRequestURL(event).pathname.startsWith('/api/user')) return
+    const pathname = getRequestURL(event).pathname
+
+    if (!pathname.startsWith('/api/user') && !pathname.startsWith('/api/statut')) return
 
     const header = getHeader(event, 'authorization')
 
@@ -11,11 +14,11 @@ export default defineEventHandler((event) => {
 
     const parts = header.split(' ')
 
-    if (parts.length !== 2 || !parts[1]) {
+    if (parts.length !== 2) {
         throw createError({ statusCode: 401, statusMessage: 'Malformed token' })
     }
 
-    const token = parts[1]
+    const token = parts[1]!
 
     try {
         const decoded = verifyToken(token)

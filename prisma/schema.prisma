@@ -12,7 +12,7 @@ model User {
   pseudo        String      @db.VarChar(50)
   email         String      @db.VarChar(50) @unique
   password      String
-  role          String
+  role          String      @db.VarChar(50)
   isActive      Boolean     @default(true)
   preferences   Json        @db.JsonB
   createdAt     DateTime    @default(now())
@@ -21,16 +21,16 @@ model User {
 
 model Game {
     id          Int       @id @default(autoincrement())
-    nameFr      String
-    nameEn      String
+    nameEn      String    @db.VarChar(50) @unique
     generation  Int
+    currentJaquette String
     statuts     Statut[]
 }
 
 model Pokemon {
     id              Int     @id @default(autoincrement())
-    nameFr          String
-    nameEn          String
+    nameFr          String  @db.VarChar(50)
+    nameEn          String  @db.VarChar(50)
     pokeNumber      Int     @unique
     currentSprite   String
     availableGames  Json
@@ -48,7 +48,7 @@ model Statut {
 
   isOwned             Boolean
   isShiny             Boolean
-  currentGeneration   Int
+  currentSprite       String
 
-  @@id([idPokemon, idUser, idGameProvenance])
+  @@id([idPokemon, idUser])
 }
