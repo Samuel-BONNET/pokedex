@@ -4,7 +4,7 @@ CREATE TABLE "User" (
     "pseudo" VARCHAR(50) NOT NULL,
     "email" VARCHAR(50) NOT NULL,
     "password" TEXT NOT NULL,
-    "role" TEXT NOT NULL,
+    "role" VARCHAR(50) NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "preferences" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -15,8 +15,9 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Game" (
     "id" SERIAL NOT NULL,
-    "nameFr" TEXT NOT NULL,
-    "nameEn" TEXT NOT NULL,
+    "nameEn" VARCHAR(50) NOT NULL,
+    "generation" INTEGER NOT NULL,
+    "currentJaquette" TEXT NOT NULL,
 
     CONSTRAINT "Game_pkey" PRIMARY KEY ("id")
 );
@@ -24,10 +25,10 @@ CREATE TABLE "Game" (
 -- CreateTable
 CREATE TABLE "Pokemon" (
     "id" SERIAL NOT NULL,
-    "nameFr" TEXT NOT NULL,
-    "nameEn" TEXT NOT NULL,
+    "nameFr" VARCHAR(50) NOT NULL,
+    "nameEn" VARCHAR(50) NOT NULL,
     "pokeNumber" INTEGER NOT NULL,
-    "curentSprite" TEXT NOT NULL,
+    "availableGames" JSONB NOT NULL,
 
     CONSTRAINT "Pokemon_pkey" PRIMARY KEY ("id")
 );
@@ -39,12 +40,16 @@ CREATE TABLE "Statut" (
     "idGameProvenance" INTEGER NOT NULL,
     "isOwned" BOOLEAN NOT NULL,
     "isShiny" BOOLEAN NOT NULL,
+    "currentSprite" TEXT NOT NULL,
 
-    CONSTRAINT "Statut_pkey" PRIMARY KEY ("idPokemon","idUser","idGameProvenance")
+    CONSTRAINT "Statut_pkey" PRIMARY KEY ("idPokemon","idUser")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Pokemon_pokeNumber_key" ON "Pokemon"("pokeNumber");
 
 -- AddForeignKey
 ALTER TABLE "Statut" ADD CONSTRAINT "Statut_idUser_fkey" FOREIGN KEY ("idUser") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
