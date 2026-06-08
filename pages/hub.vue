@@ -1,5 +1,8 @@
 <template>
   <h1>Hub</h1>
+  <NuxtLink to="/pokedex">
+    Pokedex
+  </NuxtLink>
   <Logout/>
 </template>
 
