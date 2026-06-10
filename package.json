@@ -12,7 +12,10 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:studio": "prisma studio",
-    "import:pokemon": "tsx scripts/import-pokemon.ts"
+    "import:pokemon": "tsx scripts/import-pokemon.ts pokemon",
+    "import:games": "tsx scripts/import-pokemon.ts games",
+    "import:status": "tsx scripts/import-pokemon.ts status",
+    "import:all": "tsx scripts/import-pokemon.ts all"
   },
   "dependencies": {
     "@nuxtjs/tailwindcss": "6.14.0",
