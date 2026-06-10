@@ -32,7 +32,6 @@ model Pokemon {
     nameFr          String  @db.VarChar(50)
     nameEn          String  @db.VarChar(50)
     pokeNumber      Int     @unique
-    currentSprite   String
     availableGames  Json
     statuts         Statut[]
 }
