@@ -9,7 +9,10 @@ export default defineEventHandler((event) => {
     const header = getHeader(event, 'authorization')
 
     if (!header) {
-        throw createError({ statusCode: 401, statusMessage: 'No token' })
+        if (pathname.startsWith('/api/user')) {
+            throw createError({ statusCode: 401, statusMessage: 'No token' })
+        }
+        return
     }
 
     const parts = header.split(' ')
@@ -24,6 +27,8 @@ export default defineEventHandler((event) => {
         const decoded = verifyToken(token)
         event.context.user = decoded
     } catch {
-        throw createError({ statusCode: 401, statusMessage: 'Invalid token' })
+        if (pathname.startsWith('/api/user')) {
+            throw createError({ statusCode: 401, statusMessage: 'Invalid token' })
+        }
     }
 })
