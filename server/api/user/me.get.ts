@@ -1,3 +1,7 @@
 export default defineEventHandler((event) => {
-    return event.context.user
+    const user = event.context.user
+
+    return {
+        userId: user?.userId ?? 0
+    }
 })
