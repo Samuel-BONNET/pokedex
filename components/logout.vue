@@ -9,10 +9,9 @@
 </style>
 
 <script setup lang="ts">
-const token = useCookie('token')
 
 async function logout() {
-  token.value = null
+  localStorage.removeItem('token')
   await navigateTo('/')
 }
 </script>

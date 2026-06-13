@@ -1,7 +1,18 @@
 <template>
+  <NuxtLink to="/hub">Hub</NuxtLink>
+  <br>
+  <NuxtLink to="/pokedex">Pokedex</NuxtLink>
   <div>
     {{ pokemon?.nameFr }}
-    <img :src="pokemon?.currentSprite ?? undefined" />
+    <img :src="pokemon?.currentSprite" />
+
+    <button @click="isOpen = !isOpen">
+      Sprite
+    </button>
+
+    <ul v-show="isOpen">
+      <LazySpriteChoose v-if="pokemon" :pokemon="pokemon" @saved="onSpriteSaved" />
+    </ul>
   </div>
 </template>
 
@@ -10,10 +21,25 @@
 </style>
 
 <script setup lang="ts">
+import type { AvailableGames } from "~/components/spriteChoose.vue";
+
 const route = useRoute()
 const id = route.params.id
-const { data: pokemon } = await useFetch<{
-  nameFr: string
-  currentSprite: string | null
-}>(`/api/pokemon/${id}`)
+const isOpen = ref(false)
+
+const { userId } = useUser()
+const { data: pokemon, refresh } = await useFetch<{
+  id: number,
+  nameFr: string,
+  currentSprite?: string,
+  idGameProvenance?: string,
+  availableGames: AvailableGames[],
+}>(`/api/pokemon/${id}`, {
+  query: { userId },
+})
+
+function onSpriteSaved() {
+  refresh()
+}
+
 </script>

@@ -22,7 +22,7 @@ model User {
 model Game {
     id          Int       @id @default(autoincrement())
     nameEn      String    @db.VarChar(50) @unique
-    generation  Int
+    generation  String
     currentJaquette String
     statuts     Statut[]
 }

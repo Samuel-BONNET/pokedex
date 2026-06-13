@@ -3,7 +3,7 @@
   <NuxtLink to="/pokedex">
     Pokedex
   </NuxtLink>
-  <Logout/>
+  <Logout />
 </template>
 
 <style scoped>
