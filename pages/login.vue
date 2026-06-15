@@ -30,10 +30,10 @@ async function login() {
     })
     console.log('TOKEN:', res)
     localStorage.setItem('token', (res as any).token)
-
-    await navigateTo('/hub')
   } catch (e: any) {
     error.value = e?.data?.message ?? 'Login Failed'
+    return
   }
+  navigateTo('/hub')
 }
 </script>

@@ -3,7 +3,7 @@
   <NuxtLink to="/login" v-if="isConnected()">
     Login
   </NuxtLink>
-  <Logout v-else>Log out</Logout>
+  <Logout v-else />
   <NuxtLink to="/register">
     Register
   </NuxtLink>
