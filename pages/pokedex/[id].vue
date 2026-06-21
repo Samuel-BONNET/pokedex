@@ -27,7 +27,7 @@ const route = useRoute()
 const id = route.params.id
 const isOpen = ref(false)
 
-const { userId } = useUser()
+const { user } = useAuth()
 const { data: pokemon, refresh } = await useFetch<{
   id: number,
   nameFr: string,
@@ -35,7 +35,7 @@ const { data: pokemon, refresh } = await useFetch<{
   idGameProvenance?: string,
   availableGames: AvailableGames[],
 }>(`/api/pokemon/${id}`, {
-  query: { userId },
+  query: { userId: user.value?.id },
 })
 
 function onSpriteSaved() {
