@@ -46,10 +46,12 @@ async function importGames() {
         for (const g of generation.version_groups) {
             await prisma.game.upsert({
                 where: { nameEn: g.name },
-                update: { generation: nb },
+                update: {
+                    generation: generation.name
+                },
                 create: {
                     nameEn: g.name,
-                    generation: nb,
+                    generation: generation.name,
                     currentJaquette: '',
                 },
             })
@@ -104,6 +106,14 @@ async function importPokemon(start: number, end: number) {
             }
         }
 
+        const enrichedGamesList = gamesList.map((item) => {
+            return {
+                generationName: item.generation,
+                game: item.game,
+                sprite: buildPokemonSpriteUrl(id, item.generation, item.game),
+            }
+        })
+
         let pokemonId: number
         if(MOD != "status"){
             const dbPokemon = await prisma.pokemon.upsert({
@@ -115,14 +125,14 @@ async function importPokemon(start: number, end: number) {
                     pokeNumber: id,
                     nameEn: pokemon.name,
                     nameFr: frenchName,
-                    availableGames: gamesList,
+                    availableGames: enrichedGamesList,
                 },
                 create: {
                     id: id,
                     pokeNumber: id,
                     nameEn: pokemon.name,
                     nameFr: frenchName,
-                    availableGames: gamesList,
+                    availableGames: enrichedGamesList,
                 },
             })
             pokemonId = dbPokemon.id

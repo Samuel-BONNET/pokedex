@@ -13,6 +13,9 @@
 
 <script setup lang="ts">
 
-const { data: pokemons } = await useFetch('/api/pokemon')
+const { userId } = useUser()
+const { data: pokemons } = await useFetch('/api/pokemon', {
+  query: { userId },
+})
 
 </script>

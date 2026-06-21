@@ -1,8 +1,9 @@
 <template>
   <h1>Welcome</h1>
-  <NuxtLink to="/login">
+  <NuxtLink to="/login" v-if="isConnected()">
     Login
   </NuxtLink>
+  <Logout v-else>Log out</Logout>
   <NuxtLink to="/register">
     Register
   </NuxtLink>
@@ -13,5 +14,10 @@
 </style>
 
 <script setup lang="ts">
-
+function isConnected(){
+  if (import.meta.client) {
+    return localStorage.getItem("token") !== null
+  }
+  return false
+}
 </script>
