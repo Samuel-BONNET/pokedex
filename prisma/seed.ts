@@ -20,6 +20,21 @@ async function main() {
             preferences: {},
         },
     })
+
+    await prisma.user.upsert({
+        where: {
+            id: 0
+        },
+        update: {},
+        create: {
+            id: 0,
+            email: "",
+            password: "",
+            role: "SYS",
+            pseudo: "System",
+            preferences: {},
+        }
+    })
 }
 
 main()
