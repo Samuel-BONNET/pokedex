@@ -9,10 +9,12 @@
 </style>
 
 <script setup lang="ts">
-const token = useCookie('token')
+import {useAuth} from "~/composables/useAuth";
+
+const { logout: authLogout } = useAuth()
 
 async function logout() {
-  token.value = null
-  await navigateTo('/')
+  await authLogout()
 }
+
 </script>
