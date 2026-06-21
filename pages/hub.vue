@@ -3,6 +3,7 @@
   <NuxtLink to="/pokedex">
     Pokedex
   </NuxtLink>
+  <NuxtLink to="/profil">Profil</NuxtLink>
   <Logout />
 </template>
 
@@ -12,4 +13,5 @@
 
 <script setup lang="ts">
 
+import Index from "./profil/index.vue";
 </script>
