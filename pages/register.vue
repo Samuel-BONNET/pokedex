@@ -1,11 +1,11 @@
 <template>
 
-  <form @submit.prevent="register">
-    <input v-model="email" type="email" name="email" placeholder="Email" />
-    <input v-model="pseudo" type="text" name="pseudo" placeholder="Pseudo" />
-    <input v-model="password" type="password" name="password" placeholder="Password" />
-    <input v-model="passwordConfirmation" type="password" name="passwordConfirmation" placeholder="Confirmation" />
-    <input v-model="secretToken" type="password" name="secretToken" placeholder="Secret Token" />
+  <form @submit.prevent="register" class="flex flex-col items-center justify-center">
+    <span>Email</span><input v-model="email" type="email" name="email" placeholder="Email" class="text-center m-1"/>
+    <span>Pseudo</span><input v-model="pseudo" type="text" name="pseudo" placeholder="Pseudo" class="text-center m-1"/>
+    <span>Password</span><input v-model="password" type="password" name="password" placeholder="Password" class="text-center m-1"/>
+    <span>Confirmation Password</span><input v-model="passwordConfirmation" type="password" name="passwordConfirmation" placeholder="Confirmation" class="text-center m-1"/>
+    <span>Token</span><input v-model="secretToken" type="password" name="secretToken" placeholder="Secret Token" class="text-center m-1" />
     <button type="submit">Register</button>
   </form>
   <p v-if="error">

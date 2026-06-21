@@ -8,19 +8,16 @@
 
 <script setup lang="ts">
 import Import from "~/pages/profil/import.vue";
+import {useAuth} from "~/composables/useAuth";
 
 async function getCSV() {
-  const token = localStorage.getItem('token')
+  const {isConnected, user} = useAuth()
 
-  if (!token) {
-    console.error('User not found')
+  if (!isConnected.value || !user.value) {
+    console.log('User not found')
     return
   }
 
-  const userData = await $fetch<{ userId: number }>('/api/user/me', {
-    headers: {Authorization: `Bearer ${token}`},
-  })
-
-  window.open(`/api/statut/export?userId=${userData.userId}`, '_blank')
+  window.open(`/api/statut/export?userId=${user.value.id}`, '_blank')
 }
 </script>
