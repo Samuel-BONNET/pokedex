@@ -9,9 +9,12 @@
 </style>
 
 <script setup lang="ts">
+import {useAuth} from "~/composables/useAuth";
+
+const { logout: authLogout } = useAuth()
 
 async function logout() {
-  localStorage.removeItem('token')
-  await navigateTo('/')
+  await authLogout()
 }
+
 </script>

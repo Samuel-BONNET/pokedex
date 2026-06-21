@@ -1,4 +1,5 @@
 import * as bcrypt from "bcrypt"
+import { setCookie } from 'h3'
 
 export default defineEventHandler(async (event) => {
 
@@ -26,7 +27,7 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    if (secretToken !== process.env.JWT_SECRET){
+    if (secretToken !== process.env.REGISTER_SECRET){
         throw createError({
             statusCode: 400,
             statusMessage: 'SecretToken doesn\'t match',
@@ -48,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             pseudo,
             email,
@@ -59,7 +60,16 @@ export default defineEventHandler(async (event) => {
         },
     })
 
-    return {
-        success: true,
-    }
+    const token = signToken({ userId: user.id, role: user.role })
+
+    setCookie(event, 'auth_token', token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 3600,
+        secure: process.env.NODE_ENV === 'production',
+    })
+
+    return { user: { id: user.id, email: user.email, role: user.role } }
+
 })

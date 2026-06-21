@@ -19,19 +19,13 @@
 const email = ref('');
 const password = ref('');
 const error = ref<string | null>(null);
+const { login: authLogin } = useAuth();
 
 async function login() {
   error.value = null
 
-  try{
-    const res =  await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: {
-        email: email.value,
-        password: password.value }
-    })
-    console.log('TOKEN:', res)
-    localStorage.setItem('token', (res as any).token)
+  try {
+    await authLogin(email.value, password.value)
   } catch (e: any) {
     error.value = e?.data?.message ?? 'Login Failed'
     return
