@@ -30,6 +30,6 @@ async function login() {
     error.value = e?.data?.message ?? 'Login Failed'
     return
   }
-  navigateTo('/hub')
+  navigateTo('/')
 }
 </script>
