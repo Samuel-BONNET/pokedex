@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink to="/hub">Hub</NuxtLink>
+  <NuxtLink to="/pages/welcome">Hub</NuxtLink>
   <br>
   <NuxtLink to="/pokedex">Pokedex</NuxtLink>
   <div>

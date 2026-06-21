@@ -9,6 +9,8 @@
 
 <script setup lang="ts">
 
+import {useAuth} from "~/composables/useAuth";
+
 export type AvailableGames = {
   game: string
   generationName: string
@@ -28,6 +30,9 @@ const emit = defineEmits<{ saved: [] }>()
 const spriteTarget = ref<string | null>(null)
 const gameTarget = ref<string | null>(null)
 
+const { isConnected, user } = useAuth()
+
+
 function selectSprite(sprite: string, game: string) {
   spriteTarget.value = sprite
   gameTarget.value = game
@@ -35,19 +40,7 @@ function selectSprite(sprite: string, game: string) {
 
 async function changeSprite() {
   if (spriteTarget.value !== null && gameTarget.value !== null) {
-    const token = localStorage.getItem('token')
-    let currentIdUser = 1
-
-    if (token) {
-      try {
-        const userData = await $fetch<{ userId: number }>('/api/user/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        currentIdUser = userData.userId ?? 1
-      } catch {
-        console.warn('Failed to fetch user, saving as guest')
-      }
-    }
+    const currentIdUser = isConnected.value && user.value ? user.value.id : 1
 
     await $fetch(`/api/statut/${props.pokemon.id}`, {
       method: 'POST',
