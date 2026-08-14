@@ -3,6 +3,17 @@
     <h1 class="text-4xl font-bold mb-4">
       Pokedex
     </h1>
+
+    <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" />
+    <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" />
+    <input placeholder="Rechercher un numéro de pokedex" v-model="pokeNumberSearchQuery" />
+    <select  v-model="generationSearchQuery">
+      <option :value="all" selected>Toutes</option>
+      <option v-for="index in genBound.length" :value="index">{{ index }}</option>
+    </select>
+        <option :value="0" selected>Toutes</option>
+        <option v-for="gen in genBound.length - 1" :key="gen" :value="gen">{{ gen }}</option>
+
       <div>
         <span class="m-2">page</span>
         <select v-model="cardNumber" class="m-2">
@@ -42,6 +53,30 @@
 
 <script setup lang="ts">
 
+const frenchSearchQuery = ref('')
+const englishSearchQuery = ref('')
+const pokeNumberSearchQuery = ref('')
+const generationSearchQuery = ref(0)
+const genBound = [0, 151, 251, 386, 493, 649, 721, 809, 905, 1025]
+const getGeneration = (n: number) => genBound.findIndex(bound => n <= bound)
+
+const filteredPokemons = computed(() => {
+  const fr = frenchSearchQuery.value.trim().toLowerCase()
+  const en = englishSearchQuery.value.trim().toLowerCase()
+  const nb = pokeNumberSearchQuery.value.trim()
+  const gen = generationSearchQuery.value
+
+  return (pokemons.value ?? []).filter(p => {
+    if (fr && !p.nameFr.toLowerCase().includes(fr)) return false
+    if (en && !p.nameEn.toLowerCase().includes(en)) return false
+    if (nb && p.pokeNumber !== Number(nb)) return false
+    if (gen && getGeneration(p.pokeNumber) !== gen) return false
+    return true
+  })
+})
+
+watch([frenchSearchQuery, englishSearchQuery, pokeNumberSearchQuery, generationSearchQuery], () => { currentPage.value = 1 })
+
 const { user } = useAuth()
 const { data: pokemons } = await useFetch('/api/pokemon', {
   query: { userId: user.value?.id },
@@ -65,10 +100,9 @@ const gridClass = computed(() => {
 })
 
 const displayPokemons = computed(() => {
-  const start = ( currentPage.value - 1 ) * cardNumber.value
+  const start = (currentPage.value - 1) * cardNumber.value
   const end = currentPage.value * cardNumber.value
-
-  return pokemons.value?.slice(start, end) ?? []
+  return filteredPokemons.value.slice(start, end)
 })
 
 </script>
