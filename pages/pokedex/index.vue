@@ -1,47 +1,55 @@
 <template>
-  <section class="flex flex-col text-center mb-12">
-    <h1 class="text-4xl font-bold mb-4">
+  <section class="flex flex-col text-center mb-12 px-4 sm:px-8 bg-slate-50 min-h-screen">
+    <h1 class="text-4xl font-bold mb-6">
       Pokedex
     </h1>
 
-    <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" />
-    <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" />
-    <input placeholder="Rechercher un numéro de pokedex" v-model="pokeNumberSearchQuery" />
-    <select  v-model="generationSearchQuery">
-      <option :value="all" selected>Toutes</option>
-      <option v-for="index in genBound.length" :value="index">{{ index }}</option>
-    </select>
+    <div class="flex flex-wrap gap-2 justify-center mb-3">
+      <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
+      <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
+      <input placeholder="Numéro pokedex" v-model="pokeNumberSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
+      <select v-model="generationSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
         <option :value="0" selected>Toutes</option>
         <option v-for="gen in genBound.length - 1" :key="gen" :value="gen">{{ gen }}</option>
+      </select>
+    </div>
 
-      <div>
-        <span class="m-2">page</span>
-        <select v-model="cardNumber" class="m-2">
-          <option :value="25">25</option>
+    <div class="flex flex-wrap gap-2 justify-center mb-3">
+      <label class="flex items-center gap-1 text-sm text-slate-600">
+        page
+        <select v-model="cardNumber" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
           <option :value="50">50</option>
-          <option :value="75">75</option>
-          <option :value="100">100</option>
+          <option :value="200">200</option>
+          <option :value="500">500</option>
+          <option :value="1025">1025</option>
         </select>
+      </label>
 
-        <span class="m-2">nb Poke per page</span>
-        <select v-model="cardsPerRow" class="m-2">
-          <option :value="3">3</option>
-          <option :value="4">4</option>
+      <label class="flex items-center gap-1 text-sm text-slate-600">
+        nb Poke par page
+        <select v-model="cardsPerRow" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
           <option :value="5">5</option>
+          <option :value="7">7</option>
+          <option :value="9">9</option>
         </select>
+      </label>
+    </div>
 
-      </div>
-      <div>
-        <button class="m-2" @click="currentPage=1">1</button>
-        <button class="m-2" @click="currentPage=2">2</button>
-        <button class="m-2" @click="currentPage=3">3</button>
-        <button class="m-2" @click="currentPage=4">4</button>
-      </div>
-    <div class="grid w-fit mx-auto gap-5" :class="gridClass">
-      <div v-for="p in displayPokemons" :key="p.pokeNumber">
-        <NuxtLink  :to="`/pokedex/${p.pokeNumber}`">
-          <PokemonCard :pokemon="p" />
-        </NuxtLink>
+    <div class="flex flex-wrap gap-2 justify-center mb-6">
+      <button v-for="n in 4" :key="n" @click="currentPage = n"
+        class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200"
+        :class="currentPage === n ? 'bg-slate-800 text-white border-slate-800' : 'bg-white'">
+        {{ n }}
+      </button>
+    </div>
+
+    <div class="w-full mx-auto" :style="{ maxWidth: gridMaxWidth }">
+      <div class="flex flex-wrap justify-center gap-4">
+        <div v-for="p in displayPokemons" :key="p.pokeNumber" class="shrink-0">
+          <NuxtLink class="block" :to="`/pokedex/${p.pokeNumber}`">
+            <PokemonCard :pokemon="p" />
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </section>
@@ -82,21 +90,15 @@ const { data: pokemons } = await useFetch('/api/pokemon', {
   query: { userId: user.value?.id },
 })
 
-const cardsPerRow = ref(3)
+const cardsPerRow = ref(5)
 const cardNumber = ref(50)
 const currentPage = ref(1)
 
-const gridClass = computed(() => {
-  switch (cardsPerRow.value) {
-    case 3:
-      return 'grid-cols-3'
-    case 4:
-      return 'grid-cols-4'
-    case 5:
-      return 'grid-cols-5'
-    default:
-      return 'grid-cols-4'
-  }
+const CARD_WIDTH = 144
+const GRID_GAP = 16
+const gridMaxWidth = computed(() => {
+  const n = cardsPerRow.value
+  return `${n * CARD_WIDTH + (n - 1) * GRID_GAP}px`
 })
 
 const displayPokemons = computed(() => {
