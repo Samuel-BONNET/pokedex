@@ -1,6 +1,8 @@
 import 'dotenv/config'
 import { prisma } from '../server/utils/prisma'
 import { buildPokemonSpriteUrl } from '../server/utils/sprite'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 
 const MOD: string = process.argv[2]!
 const GENERATION_CIBLE: number | undefined = process.argv[3] ? Number(process.argv[3]) : undefined
@@ -37,6 +39,18 @@ function getFrenchName(species: any): string {
     return species.names?.find((n: any) => n.language.name === 'fr')?.name ?? species.name
 }
 
+const JQ_DIR =  join(process.cwd(), 'public', 'img', 'games', 'fr')
+
+function loadJaquette(nomEn: string): string {
+
+    for(const file of [`${nomEn}1.png`, `${nomEn}.png`]){
+        if (existsSync(join(JQ_DIR, file))) {
+            return `/img/games/fr/${file}`
+        }
+    }
+    return ''
+}
+
 async function importGames() {
     console.log('Importing games...')
     for (let nb = 1; nb <= 9; nb++) {
@@ -47,12 +61,13 @@ async function importGames() {
             await prisma.game.upsert({
                 where: { nameEn: g.name },
                 update: {
-                    generation: generation.name
+                    generation: generation.name,
+                    currentJaquette: loadJaquette(g.name),
                 },
                 create: {
                     nameEn: g.name,
                     generation: generation.name,
-                    currentJaquette: '',
+                    currentJaquette: loadJaquette(g.name),
                 },
             })
         }
