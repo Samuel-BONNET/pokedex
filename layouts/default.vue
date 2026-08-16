@@ -7,6 +7,7 @@
     <nav class="flex justify-center gap-2 m-4 col-span-3">
       <NuxtLink to="/">Accueil</NuxtLink>
       <NuxtLink to="/pokedex">Pokedex</NuxtLink>
+      <NuxtLink to="/games">Jeux</NuxtLink>
       <NuxtLink to="#">next one</NuxtLink>
     </nav>
     <main class="col-span-3 m-4">
