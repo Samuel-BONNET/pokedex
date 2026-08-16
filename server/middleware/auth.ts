@@ -9,7 +9,7 @@ export default defineEventHandler((event) => {
     const token = getCookie(event, 'auth_token')
 
     if (!token) {
-        if (pathname.startsWith('/api/user')) {
+        if (pathname.startsWith('/api/user') || pathname.startsWith('/api/game')) {
             throw createError({ statusCode: 401, statusMessage: 'No token' })
         }
         return
