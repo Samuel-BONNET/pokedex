@@ -17,14 +17,29 @@ model User {
   preferences   Json        @db.JsonB
   createdAt     DateTime    @default(now())
   statuts       Statut[]
+  GameSaves     GameSave[]
 }
 
 model Game {
-    id          Int       @id @default(autoincrement())
-    nameEn      String    @db.VarChar(50) @unique
+    id          Int         @id @default(autoincrement())
+    nameEn      String      @db.VarChar(50) @unique
     generation  String
     currentJaquette String
     statuts     Statut[]
+    gameSaves   GameSave[]
+}
+
+model GameSave {
+    id          Int         @id @default(autoincrement())
+    idGame      Int
+    idUser      Int
+    file        Bytes       @db.ByteA
+    fileName    String
+    size        Int
+    updatedAt   DateTime    @updatedAt
+    game        Game        @relation(fields: [idGame], references: [id])
+    user        User        @relation(fields: [idUser], references: [id])
+    @@unique([idGame, idUser])
 }
 
 model Pokemon {
