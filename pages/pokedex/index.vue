@@ -4,6 +4,8 @@
       Pokedex
     </h1>
 
+    <PokedexToolBar :selection-mode="selectionMode" :selected-pokemons="selectedPokemons" @update:selection-mode="selectionMode = $event" @saved="refresh" />
+
     <div class="flex flex-wrap gap-2 justify-center mb-3">
       <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
       <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
@@ -46,7 +48,10 @@
     <div class="w-full mx-auto" :style="{ maxWidth: gridMaxWidth }">
       <div class="flex flex-wrap justify-center gap-4">
         <div v-for="p in displayPokemons" :key="p.pokeNumber" class="shrink-0">
-          <NuxtLink class="block" :to="`/pokedex/${p.pokeNumber}`">
+          <div v-if="selectionMode" class="cursor-pointer" @click="toggleSelection(p.pokeNumber)">
+            <PokemonCard :pokemon="p" :selected="selectedPokemons.includes(p.pokeNumber)" />
+          </div>
+          <NuxtLink v-else class="block" :to="`/pokedex/${p.pokeNumber}`">
             <PokemonCard :pokemon="p" />
           </NuxtLink>
         </div>
@@ -86,8 +91,8 @@ const filteredPokemons = computed(() => {
 watch([frenchSearchQuery, englishSearchQuery, pokeNumberSearchQuery, generationSearchQuery], () => { currentPage.value = 1 })
 
 const { user } = useAuth()
-const { data: pokemons } = await useFetch('/api/pokemon', {
-  query: { userId: user.value?.id },
+const { data: pokemons, refresh } = await useFetch('/api/pokemon', {
+  query: { userId: user.value?.id ?? 1 },
 })
 
 const cardsPerRow = ref(5)
@@ -106,5 +111,18 @@ const displayPokemons = computed(() => {
   const end = currentPage.value * cardNumber.value
   return filteredPokemons.value.slice(start, end)
 })
+
+const selectionMode = ref(false)
+const selectedPokemons = ref<number[]>([])
+
+watch(selectionMode, (val) => {
+  if (!val) selectedPokemons.value = []
+})
+
+function toggleSelection(n: number) {
+  const idx = selectedPokemons.value.indexOf(n)
+  if (idx >= 0) selectedPokemons.value.splice(idx, 1)
+  else selectedPokemons.value.push(n)
+}
 
 </script>
