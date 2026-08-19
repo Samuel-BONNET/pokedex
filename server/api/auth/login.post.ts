@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcrypt'
 import { signToken } from '../../utils/jwt'
 import { prisma } from '../../utils/prisma'
+import { setCookie } from 'h3'
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
@@ -39,12 +40,14 @@ export default defineEventHandler(async (event) => {
         role: user.role,
     })
 
-    return {
-        token,
-        user: {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-        },
-    }
+    setCookie(event, 'auth_token', token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 3600,
+        secure: process.env.NODE_ENV === 'production',
+    })
+
+    return { user: { id: user.id, email: user.email, role: user.role } }
+
 })
