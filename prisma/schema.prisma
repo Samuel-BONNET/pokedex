@@ -62,7 +62,7 @@ model Statut {
 
   isOwned             Boolean
   isShiny             Boolean
-  currentSprite       String
+  currentSprite       String?
 
   @@id([idPokemon, idUser])
 }

@@ -130,7 +130,7 @@ async function importPokemon(start: number, end: number) {
         })
 
         let pokemonId: number
-        if(MOD != "status"){
+        if(MOD != "statut"){
             const dbPokemon = await prisma.pokemon.upsert({
                 where: {
                     pokeNumber: id
@@ -196,7 +196,7 @@ async function importPokemon(start: number, end: number) {
 async function main() {
     switch(MOD){
         case "pokemon":
-        case "status":
+        case "statut":
             if(GENERATION_CIBLE === undefined) {
                 await importPokemon(1,9)
             }
