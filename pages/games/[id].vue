@@ -10,7 +10,13 @@
   </section>
 
   <section class="flex flex-col items-center gap-4 mb-12 text-center">
-    <img :src="game?.currentJaquette" />
+    <img v-if="game" :src="game?.currentSprite ?? '/img/defaultJaquette.png'" />
+
+    <button @click="isOpen = !isOpen">Sprites</button>
+
+    <ul v-show="isOpen">
+      <LazySpriteChoose v-if="game" :game="game" :available-jaquettes="game.availableJaquettes" @saved="onSpriteSaved" />
+    </ul>
 
     <input type="file" accept=".sav" @change="onFileChange" :disabled="!user" />
     <a v-if="url" :href="url" download>Télécharger</a>
@@ -30,13 +36,17 @@ const gameId =  String(route.params.id)
 const url = ref<string | null>(null)
 const result = ref<string | null>(null)
 const file = ref<File | null>(null)
+const isOpen = ref(false)
 
-const { data: game } = await useFetch<{
+const { data: game, refresh } = await useFetch<{
   id: number
   nameEn: string
   generation: string
-  currentJaquette: string
-}>(`/api/games/${gameId}`)
+  currentSprite: string | null
+  availableJaquettes: { name: string, sprite: string }[]
+}>(`/api/games/${gameId}`, {
+  query: { userId: user.value?.id }
+})
 
 function onFileChange(e: Event) {
   file.value = (e.target as HTMLInputElement).files?.[0] ?? null
@@ -71,6 +81,10 @@ async function remove() {
 }
 
 download()
+
+function onSpriteSaved() {
+  refresh()
+}
 
 </script>
 
