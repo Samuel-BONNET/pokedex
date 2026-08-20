@@ -36,8 +36,6 @@ async function importCSV(event: Event) {
       idUser: Number(r.idUser),
       isOwned: r.isOwned === 'true',
       isShiny: r.isShiny === 'true',
-      currentSprite: r.currentSprite,
-      idGameProvenance: Number(r.idGameProvenance),
     }))
 
     const res = await $fetch('/api/statut/import', {
