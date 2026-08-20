@@ -1,8 +1,5 @@
 <template>
-  <NuxtLink to="/pages/welcome">Hub</NuxtLink>
-  <br>
-  <NuxtLink to="/pokedex">Pokedex</NuxtLink>
-  <div>
+  <div class="flex flex-col items-center bg-white ">
     {{ pokemon?.nameFr }}
     <img :src="pokemon?.currentSprite" />
 
@@ -31,8 +28,7 @@ const { user } = useAuth()
 const { data: pokemon, refresh } = await useFetch<{
   id: number,
   nameFr: string,
-  currentSprite?: string,
-  idGameProvenance?: string,
+  currentSprite: string,
   availableGames: AvailableGames[],
 }>(`/api/pokemon/${id}`, {
   query: { userId: user.value?.id },
