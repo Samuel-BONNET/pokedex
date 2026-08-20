@@ -17,16 +17,17 @@ model User {
   preferences   Json        @db.JsonB
   createdAt     DateTime    @default(now())
   statuts       Statut[]
-  GameSaves     GameSave[]
+  gameSaves     GameSave[]
+  pokemonPreferences PokemonPreferences[]
+  gamePreferences   GamePreferences[]
 }
 
 model Game {
     id          Int         @id @default(autoincrement())
     nameEn      String      @db.VarChar(50) @unique
     generation  String
-    currentJaquette String
-    statuts     Statut[]
     gameSaves   GameSave[]
+    gamePreferences GamePreferences[]
 }
 
 model GameSave {
@@ -49,20 +50,43 @@ model Pokemon {
     pokeNumber      Int     @unique
     availableGames  Json
     statuts         Statut[]
+    pokemonPreferences PokemonPreferences[]
 }
 
 model Statut {
-  idPokemon           Int
-  idUser              Int
-  idGameProvenance    Int
+    idPokemon           Int
+    idUser              Int
 
-  user                User        @relation(fields: [idUser], references: [id])
-  pokemon             Pokemon     @relation(fields: [idPokemon], references: [id])
-  game                Game        @relation(fields: [idGameProvenance], references: [id])
+    user                User        @relation(fields: [idUser], references: [id])
+    pokemon             Pokemon     @relation(fields: [idPokemon], references: [id])
 
-  isOwned             Boolean
-  isShiny             Boolean
-  currentSprite       String?
+    isOwned             Boolean
+    isShiny             Boolean
 
-  @@id([idPokemon, idUser])
+    @@id([idPokemon, idUser])
+}
+
+model PokemonPreferences {
+    idPokemon           Int
+    idUser              Int
+
+    pokemon             Pokemon    @relation(fields: [idPokemon], references: [id])
+    user                User       @relation(fields: [idUser], references: [id])
+
+    currentSprite       String
+
+    @@id([idPokemon, idUser])
+}
+
+model GamePreferences {
+    idGame              Int
+    idUser              Int
+
+    game              Game       @relation(fields: [idGame], references: [id])
+    user              User       @relation(fields: [idUser], references: [id])
+
+
+    currentSprite       String
+
+    @@id([idGame, idUser])
 }
