@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
         ...pokemon,
         isOwned: pokemon.statuts.find(s => s.idUser === idUser)?.isOwned ?? false,
         isShiny: pokemon.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
-        currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? pokemon.pokemonPreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
+        currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
         statuts: undefined,
     }
 })
