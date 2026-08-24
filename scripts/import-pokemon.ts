@@ -108,28 +108,25 @@ async function importPokemon(start: number, end: number) {
         ])
 
         const versions: Record<string, Record<string, any>> = pokemon.sprites?.versions ?? {}
-
-        const firstVersion: string = Object.keys(versions)[0] ?? ''
-        const firstVersionGames = firstVersion ? versions[firstVersion] : undefined
-        const firstGame: string = firstVersionGames ? Object.keys(firstVersionGames)[0] ?? '' : ''
-
-        const defaultSprite = buildPokemonSpriteUrl(id, firstVersion, firstGame)
         const frenchName = getFrenchName(species)
 
         const gamesList: { generation: string; game: string }[] = []
         for (const generation in versions) {
             for (const game in versions[generation]) {
+                if (!versions[generation][game]?.front_default) continue
                 gamesList.push({ generation, game })
             }
         }
 
-        const enrichedGamesList = gamesList.map((item) => {
-            return {
-                generationName: item.generation,
-                game: item.game,
-                sprite: buildPokemonSpriteUrl(id, item.generation, item.game),
-            }
-        })
+        const enrichedGamesList = gamesList.map((item) => ({
+            generationName: item.generation,
+            game: item.game,
+            sprite: buildPokemonSpriteUrl(id, item.generation, item.game),
+        }))
+
+
+        const defaultSprite = enrichedGamesList[0]?.sprite ?? pokemon.sprites.front_default ?? ''
+
 
         let pokemonId: number
         if(MOD != "statut"){
