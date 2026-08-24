@@ -38,7 +38,7 @@
     </div>
 
     <div class="flex flex-wrap gap-2 justify-center mb-6">
-      <button v-for="n in 4" :key="n" @click="currentPage = n"
+      <button v-for="n in totalPages" :key="n" @click="currentPage = n"
         class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200"
         :class="currentPage === n ? 'bg-slate-800 text-white border-slate-800' : 'bg-white'">
         {{ n }}
@@ -95,9 +95,7 @@ const { data: pokemons, refresh } = await useFetch('/api/pokemon', {
   query: { userId: user.value?.id ?? 1 },
 })
 
-const cardsPerRow = ref(5)
-const cardNumber = ref(50)
-const currentPage = ref(1)
+const { cardsPerRow, cardNumber, currentPage } = usePokedexPrefs()
 
 const CARD_WIDTH = 144
 const GRID_GAP = 16
@@ -110,6 +108,14 @@ const displayPokemons = computed(() => {
   const start = (currentPage.value - 1) * cardNumber.value
   const end = currentPage.value * cardNumber.value
   return filteredPokemons.value.slice(start, end)
+})
+
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(filteredPokemons.value.length / cardNumber.value))
+)
+
+watch(totalPages, (pages) => {
+  if (currentPage.value > pages) currentPage.value = pages
 })
 
 const selectionMode = ref(false)
