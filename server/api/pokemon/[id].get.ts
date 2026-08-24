@@ -1,7 +1,8 @@
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
-    const idUser = Number(getQuery(event).userId ?? 0)
     const idUser = Number(getQuery(event).userId ?? 1)
+
+    const orderedNames = await getOrderedGameNames(idUser)
 
     const pokemon = await prisma.pokemon.findUnique({
         where: { pokeNumber: id },
