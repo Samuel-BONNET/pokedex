@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
     const idGame = Number(getRouterParam(event, 'id'))
-    const userId = event.context.user?.userId
+    const userId = event.context.user?.userId ?? 0
 
     const save = await prisma.gameSave.findUnique({
         where: { idGame_idUser: { idGame, idUser: userId } },
