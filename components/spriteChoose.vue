@@ -1,14 +1,14 @@
 <template>
-  <div style="display:flex">
-    <li v-for="gamesData in props.pokemon.availableGames" :key="gamesData.game">
-      <img :src="gamesData.sprite" loading="lazy" @click="selectSprite(gamesData.sprite, gamesData.game)" />
+  <div class="flex justify-center items-center w-full">
+    <li v-for="item in spriteList" :key="item.game">
+      <img :src="item.sprite" loading="lazy" @click="selectSprite(item.sprite, item.game)" class="h-16 w-auto object-contain" />
     </li>
   </div>
-  <button @click="changeSprite">Sauvegarder</button>
+  <button v-if="pokemon" @click="changeSpritePoke">Sauvegarder</button>
+  <button v-if="game" @click="changeSpriteGame">Sauvegarder</button>
 </template>
 
 <script setup lang="ts">
-
 import {useAuth} from "~/composables/useAuth";
 
 export type AvailableGames = {
@@ -19,11 +19,14 @@ export type AvailableGames = {
 }
 
 const props = defineProps<{
-  pokemon: {
-    id: number
-    availableGames: AvailableGames[]
-  }
+  pokemon?: { id: number, availableGames: AvailableGames[] },
+  game?: { id: number }
+  availableJaquettes?: { name: string, sprite: string }[]
 }>()
+
+const spriteList = computed(() =>
+  props.availableJaquettes?.map(j => ({ ...j, game: j.name})) ?? props.pokemon?.availableGames?.map(g => ({ sprite: g.sprite, name: g.game, game: g.game })) ?? []
+)
 
 const emit = defineEmits<{ saved: [] }>()
 
@@ -32,25 +35,37 @@ const gameTarget = ref<string | null>(null)
 
 const { isConnected, user } = useAuth()
 
-
-function selectSprite(sprite: string, game: string) {
-  spriteTarget.value = sprite
-  gameTarget.value = game
+function selectSprite(sprite?: string, game?: string) {
+  spriteTarget.value = sprite ?? null
+  gameTarget.value = game ?? null
 }
 
-async function changeSprite() {
-  if (spriteTarget.value !== null && gameTarget.value !== null) {
+async function changeSpritePoke() {
+  if (spriteTarget.value !== null && gameTarget.value !== null && props.pokemon) {
     const currentIdUser = isConnected.value && user.value ? user.value.id : 1
 
-    await $fetch(`/api/statut/${props.pokemon.id}`, {
+    await $fetch(`/api/preferences/pokemon/${props.pokemon.id}`, {
       method: 'POST',
       body: {
         currentSprite: spriteTarget.value,
         idUser: currentIdUser,
-        gameName: gameTarget.value,
       }
     })
+    emit('saved')
+  }
+}
 
+async function changeSpriteGame() {
+  if (spriteTarget.value !== null && gameTarget.value !== null && props.game) {
+    const currentIdUser = isConnected.value && user.value ? user.value.id : 1
+
+    await $fetch(`/api/preferences/game/${props.game.id}`, {
+      method: 'POST',
+      body: {
+        currentSprite: spriteTarget.value,
+        idUser: currentIdUser,
+      }
+    })
     emit('saved')
   }
 }

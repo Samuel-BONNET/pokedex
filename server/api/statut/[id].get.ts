@@ -9,9 +9,6 @@ export default defineEventHandler(async (event) => {
         },
         orderBy: {
             idUser: 'desc'
-        },
-        select: {
-            currentSprite: true
         }
     })
 })

@@ -4,8 +4,6 @@ export default defineEventHandler(async (event) => {
         idUser: number,
         isOwned: boolean,
         isShiny: boolean,
-        currentSprite: string,
-        idGameProvenance: number,
     }> }>(event)
 
     let count = 0
@@ -20,16 +18,12 @@ export default defineEventHandler(async (event) => {
             update: {
                 isOwned: statut.isOwned,
                 isShiny: statut.isShiny,
-                currentSprite: statut.currentSprite,
-                idGameProvenance: statut.idGameProvenance,
             },
             create: {
                 idPokemon: statut.idPokemon,
                 idUser: statut.idUser,
                 isOwned: statut.isOwned,
                 isShiny: statut.isShiny,
-                currentSprite: statut.currentSprite,
-                idGameProvenance: statut.idGameProvenance,
             }
         })
         count++

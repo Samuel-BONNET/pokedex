@@ -5,10 +5,10 @@ export default defineEventHandler(async (event) => {
         where: { idUser },
     })
 
-    const headers = ['idPokemon', 'idUser', 'isOwned', 'isShiny', 'currentSprite', 'idGameProvenance']
+    const headers = ['idPokemon', 'idUser', 'isOwned', 'isShiny']
     const csvRows = [
         headers.join(','),
-        ...statuts.map(s => [s.idPokemon, s.idUser, s.isOwned, s.isShiny, s.currentSprite, s.idGameProvenance].join(','))
+        ...statuts.map(s => [s.idPokemon, s.idUser, s.isOwned, s.isShiny].join(','))
     ]
 
     setHeader(event, 'Content-Type', 'text/csv')

@@ -58,17 +58,24 @@ async function importGames() {
         const generation = await fetchGenerationApi(nb)
 
         for (const g of generation.version_groups) {
-            await prisma.game.upsert({
+            const game = await prisma.game.upsert({
                 where: { nameEn: g.name },
-                update: {
-                    generation: generation.name,
-                    currentJaquette: loadJaquette(g.name),
-                },
+                update: { generation: generation.name },
                 create: {
                     nameEn: g.name,
                     generation: generation.name,
-                    currentJaquette: loadJaquette(g.name),
                 },
+            })
+            await prisma.gamePreferences.upsert({
+                where: {
+                    idGame_idUser: { idGame: game.id, idUser: 0 }
+                },
+                update: { currentSprite: loadJaquette(g.name) },
+                create: {
+                    idGame: game.id,
+                    idUser: 0,
+                    currentSprite: loadJaquette(g.name),
+                }
             })
         }
         await delay(300)
@@ -101,33 +108,25 @@ async function importPokemon(start: number, end: number) {
         ])
 
         const versions: Record<string, Record<string, any>> = pokemon.sprites?.versions ?? {}
-
-        const firstVersion: string = Object.keys(versions)[0] ?? ''
-        const firstVersionGames = firstVersion ? versions[firstVersion] : undefined
-        const firstGame: string = firstVersionGames ? Object.keys(firstVersionGames)[0] ?? '' : ''
-        const idGame: number | undefined = gameMap.get(firstGame)
-
-        if (!idGame) {
-            console.warn(`  Warning: no game found for "${firstGame}", skipping statut game provenance`)
-        }
-
-        const defaultSprite = buildPokemonSpriteUrl(id, firstVersion, firstGame)
         const frenchName = getFrenchName(species)
 
         const gamesList: { generation: string; game: string }[] = []
         for (const generation in versions) {
             for (const game in versions[generation]) {
+                if (!versions[generation][game]?.front_default) continue
                 gamesList.push({ generation, game })
             }
         }
 
-        const enrichedGamesList = gamesList.map((item) => {
-            return {
-                generationName: item.generation,
-                game: item.game,
-                sprite: buildPokemonSpriteUrl(id, item.generation, item.game),
-            }
-        })
+        const enrichedGamesList = gamesList.map((item) => ({
+            generationName: item.generation,
+            game: item.game,
+            sprite: buildPokemonSpriteUrl(id, item.generation, item.game),
+        }))
+
+
+        const defaultSprite = enrichedGamesList[0]?.sprite ?? pokemon.sprites.front_default ?? ''
+
 
         let pokemonId: number
         if(MOD != "statut"){
@@ -170,19 +169,34 @@ async function importPokemon(start: number, end: number) {
             update: {
                 idPokemon: pokemonId,
                 idUser: 0,
-                idGameProvenance: idGame ?? 1,
                 isOwned: false,
                 isShiny: false,
-                currentSprite: defaultSprite,
             },
             create: {
                 idPokemon: pokemonId,
                 idUser: 0,
-                idGameProvenance: idGame ?? 1,
                 isOwned: false,
                 isShiny: false,
-                currentSprite: defaultSprite,
             },
+        })
+
+        await prisma.pokemonPreferences.upsert({
+            where: {
+                idPokemon_idUser: {
+                    idPokemon: pokemonId,
+                    idUser: 0,
+                }
+            },
+            update: {
+                currentSprite: defaultSprite,
+                idPokemon: pokemonId,
+                idUser: 0,
+            },
+            create: {
+                currentSprite: defaultSprite,
+                idPokemon: pokemonId,
+                idUser: 0,
+            }
         })
 
 

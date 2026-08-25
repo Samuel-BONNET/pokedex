@@ -8,6 +8,7 @@
       <NuxtLink to="/">Accueil</NuxtLink>
       <NuxtLink to="/pokedex">Pokedex</NuxtLink>
       <NuxtLink to="/games">Jeux</NuxtLink>
+      <NuxtLink to="/preferences">Préférences</NuxtLink>
       <NuxtLink to="#">next one</NuxtLink>
     </nav>
     <main class="col-span-3 m-4">

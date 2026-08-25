@@ -24,8 +24,11 @@
 </template>
 
 <script setup lang="ts">
-const { data: games } = await useFetch('/api/games')
-const filteredGames = computed(() => (games.value ?? []).filter(g => g.currentJaquette))
+const { user } = useAuth()
+const { data: games } = await useFetch('/api/games', {
+  query: { userId: user.value?.id }
+})
+const filteredGames = computed(() => (games.value ?? []).filter(g => g.currentSprite))
 </script>
 
 <style scoped>

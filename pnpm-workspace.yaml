@@ -1,6 +1,6 @@
 allowBuilds:
-  '@parcel/watcher': set this to true or false
-  '@prisma/engines': set this to true or false
-  bcrypt: set this to true or false
-  esbuild: set this to true or false
-  prisma: set this to true or false
+  '@parcel/watcher': false
+  '@prisma/engines': false
+  bcrypt: false
+  esbuild: false
+  prisma: false
