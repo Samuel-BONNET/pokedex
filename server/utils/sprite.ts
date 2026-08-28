@@ -42,3 +42,9 @@ export function findSpriteByOrder(availableGames: unknown, orderedNames: string[
     }
     return null
 }
+
+export function shinyUrl(url: string) {
+    if(url.includes('red-blue') || url.includes('yellow')) return url
+    const lastSlash = url.lastIndexOf('/')
+    return url.slice(0, lastSlash) + '/shiny' + url.slice(lastSlash)
+}
