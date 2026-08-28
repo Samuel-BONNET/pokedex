@@ -1,8 +1,8 @@
 <template>
   <div class="flex justify-center items-center w-full">
-    <li v-for="item in spriteList" :key="item.game">
+    <ul v-for="item in spriteList" :key="item.game">
       <img :src="item.sprite" loading="lazy" @click="selectSprite(item.sprite, item.game)" class="h-16 w-auto object-contain" />
-    </li>
+    </ul>
   </div>
   <button v-if="pokemon" @click="changeSpritePoke">Sauvegarder</button>
   <button v-if="game" @click="changeSpriteGame">Sauvegarder</button>
