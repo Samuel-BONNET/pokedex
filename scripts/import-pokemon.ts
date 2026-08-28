@@ -88,7 +88,6 @@ async function importPokemon(start: number, end: number) {
         prisma.game.findMany(),
         prisma.user.findUnique({ where: { id: 0 } }),
     ])
-    const gameMap = new Map(games.map(g => [g.nameEn, g.id]))
 
     if (games.length === 0) {
         console.error('  Aucun jeu en base. Exécute d\'abord: pnpm import:games')
@@ -124,9 +123,11 @@ async function importPokemon(start: number, end: number) {
             sprite: buildPokemonSpriteUrl(id, item.generation, item.game),
         }))
 
+        const types = (pokemon.types ?? []).map((type: any) => type.type.name)
+
+        const stats = (pokemon.stats ?? []).map((stat: any) => ({ name: stat.stat.name, value: stat.base_stat }))
 
         const defaultSprite = enrichedGamesList[0]?.sprite ?? pokemon.sprites.front_default ?? ''
-
 
         let pokemonId: number
         if(MOD != "statut"){
@@ -139,6 +140,10 @@ async function importPokemon(start: number, end: number) {
                     pokeNumber: id,
                     nameEn: pokemon.name,
                     nameFr: frenchName,
+                    height: pokemon.height,
+                    weight: pokemon.weight,
+                    stats: stats,
+                    types: types,
                     availableGames: enrichedGamesList,
                 },
                 create: {
@@ -146,6 +151,10 @@ async function importPokemon(start: number, end: number) {
                     pokeNumber: id,
                     nameEn: pokemon.name,
                     nameFr: frenchName,
+                    height: pokemon.height,
+                    weight: pokemon.weight,
+                    stats: stats,
+                    types: types,
                     availableGames: enrichedGamesList,
                 },
             })
@@ -198,6 +207,21 @@ async function importPokemon(start: number, end: number) {
                 idUser: 0,
             }
         })
+
+
+        if (MOD !== "statut" && species?.evolves_from_species) {
+            const fromId = Number(species.evolves_from_species.url.split("/").filter(Boolean).pop())
+            const exists = await prisma.pokemon.count({ where: { id: { in: [fromId, pokemonId] } } })
+            if (exists === 2) {
+                await prisma.evolution.upsert({
+                    where: { fromPokemonId_toPokemonId: { fromPokemonId: fromId, toPokemonId: pokemonId } },
+                    update: {},
+                    create: { fromPokemonId: fromId, toPokemonId: pokemonId },
+                })
+            }
+        }
+
+
 
 
         if (id % BATCH_SIZE === 0 && id < end) {

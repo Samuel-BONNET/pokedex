@@ -1,3 +1,5 @@
+import {getFullEvolutionChain} from "#server/utils/evolution";
+
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
     const idUser = Number(getQuery(event).userId ?? 1)
@@ -25,6 +27,7 @@ export default defineEventHandler(async (event) => {
         isOwned: pokemon.statuts.find(s => s.idUser === idUser)?.isOwned ?? false,
         isShiny: pokemon.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
         currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
+        evolutionChain: await getFullEvolutionChain(id, idUser),
         statuts: undefined,
     }
 })

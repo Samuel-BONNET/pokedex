@@ -89,7 +89,7 @@ async function update() {
   if (!user.value) return
   await $fetch(`/api/prefrences/pokemon/order`, {
     method: 'POST',
-    body: { order: orederGames.value.map(g => g.id ), idUser: user.value.id }
+    body: { order: orderedGames.value.map(g => g.id ), idUser: user.value.id }
   })
 }
 

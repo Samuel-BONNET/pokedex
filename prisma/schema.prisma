@@ -48,9 +48,27 @@ model Pokemon {
     nameFr          String  @db.VarChar(50)
     nameEn          String  @db.VarChar(50)
     pokeNumber      Int     @unique
+$   types           Json?
+    height          Int?
+    weight          Int?
+    stats           Json?
     availableGames  Json
     statuts         Statut[]
+    evolutionsFrom  Evolution[] @relation("EvolutionFrom")
+    evolutionsTo    Evolution[] @relation("EvolutionTo")
     pokemonPreferences PokemonPreferences[]
+}
+
+model Evolution {
+    id              Int            @id @default(autoincrement())
+
+    fromPokemonId       Int
+    toPokemonId   Int
+
+    pokemon         Pokemon        @relation("EvolutionFrom", fields: [fromPokemonId], references: [id])
+    nextPokemon     Pokemon        @relation("EvolutionTo", fields: [toPokemonId], references: [id])
+
+    @@unique([fromPokemonId, toPokemonId])
 }
 
 model Statut {
