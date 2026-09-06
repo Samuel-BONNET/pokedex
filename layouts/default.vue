@@ -11,7 +11,7 @@
       <NuxtLink to="/preferences">Préférences</NuxtLink>
       <NuxtLink to="#">next one</NuxtLink>
     </nav>
-    <main class="col-span-3 m-4">
+    <main class="col-span-3">
       <slot />
     </main>
   </div>
