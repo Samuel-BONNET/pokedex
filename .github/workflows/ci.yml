@@ -1,7 +1,9 @@
-name: CI
+name: CI & Deploy
 
 on:
-  # temporairement désactivé
+  push:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -31,3 +33,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t pokedex-app:latest .
+
+  deploy:
+    runs-on: self-hosted
+    needs: docker-build
+
+    steps:
+      - name: Deploy latest master
+        run: |
+          cd ~/projects/pokedex
+          git fetch origin master
+          git reset --hard origin/master
+          docker compose up -d --build
