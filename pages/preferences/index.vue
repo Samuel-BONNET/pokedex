@@ -1,5 +1,5 @@
 <template>
-  <section class="flex flex-col text-center mb-12 px-4 sm:px-8 bg-slate-50 min-h-screen">
+  <section class="flex flex-col text-center mb-12 px-4 sm:px-8 bg-slate-50 min-h-screen gap-4">
     <h1 class="text-4xl font-bold mb-6">
       Préférences
     </h1>
@@ -8,16 +8,19 @@
       Choisissez votre ordre de sprites de jeux préférés
     </p>
 
-    <ul class="flex justify-center gap-2">
-      <li v-for="(g, i) in orderedGames" :key="g.id"
-          draggable="true" @dragstart="onDragStart(i)" @dragover.prevent="onDragOver(i)" @drop="onDrop(i)" @dragend="onDragEnd">
-        <div v-if="overIndex === i && dragIndex !== null" class="h-20 w-14 border-2 border-dashed rounded" />
-        <img v-else :src="g.currentSprite ?? '/img/games/defaultJaquette.png'" class="h-20 w-auto object-contain" :class="{ 'opacity-30': i === dragIndex }" />
-      </li>
+    <ul v-for="(tierName, t) in TIER_NAMES" :key="tierName" class="flex gap-2 p-2 bg-black/80" @dragover.prevent="onTierDragOver(t)" @drop="onTierDrop(t)">
+      <div class="flex flex-row gap-2">
+        <span class="flex flex-row justify-center bg-black/40 items-center text-white text-xl font-bold w-32 min-h-28">
+            {{ tierName }}
+        </span>
+        <li v-for="(g, i) in tierGames[t]" :key="g.id" draggable="true" @dragstart="onDragStart(t, i)" @dragover.prevent.stop="onDragOver(t, i)" @drop="onDrop(t, i)" @dragend="onDragEnd">
+          <div v-if="overTier === t && overIndex === i && dragTier !== null" class="h-28 w-14 border-2 border-dashed rounded" />
+          <img v-else :src="g.currentSprite ?? '/img/games/defaultJaquette.png'" class="h-28 w-auto object-contain" :class="{ 'opacity-30': dragTier === t && dragIndex === i }" />
+        </li>
+      </div>
     </ul>
 
     <button @click="save" :disabled="!user">Sauvegarder</button>
-    <button @click="update" :disabled="!user">Update Sprite</button>
     <p v-if="message">{{ message }}</p>
 
   </section>
@@ -48,30 +51,111 @@ const rank = new Map((prefs.value?.gameOrder ?? []).map((id, i) => [id, i]))
 
 orderedGames.value.sort((a, b) => ((rank.get(a.id) ?? games.value!.length) - (rank.get(b.id) ?? games.value!.length)) || a.id - b.id)
 
-let dragIndex: number | null = null
-const overIndex = ref<number | null>(null)
 
-function onDragStart(i: number) {
-  dragIndex = i
+const TIER_NAMES = ['Favori', "J'aime beaucoup", "J'apprécie", 'Neutre', 'Peu utilisé']
+
+const defaultSizes = computed(() => {
+  const n = orderedGames.value.length
+  const base = Math.floor(n / TIER_NAMES.length)
+  const rest = n % TIER_NAMES.length
+  return TIER_NAMES.map((_, i) => base + (i < rest ? 1 : 0))
+})
+
+const tierSizes = ref<number[]>(defaultSizes.value)
+
+const tierGames = computed(() => {
+  const result: GameRow[][] = []
+  let offset = 0
+  for (let t = 0; t < TIER_NAMES.length; t++) {
+    const size = tierSizes.value[t] ?? 0
+    const end = Math.min(offset + size, orderedGames.value.length)
+    result.push(orderedGames.value.slice(offset, end))
+    offset = end
+  }
+  while (offset < orderedGames.value.length) {
+    const game = orderedGames.value[offset]
+    if (game && result.length) {
+      result[result.length - 1]!.push(game)
+    }
+    offset++
+  }
+  return result
+})
+
+const dragTier = ref<number | null>(null)
+const dragIndex = ref<number | null>(null)
+const overIndex = ref<number | null>(null)
+const overTier = ref<number | null>(null)
+
+function onDragStart(tier: number, index: number) {
+  dragTier.value = tier
+  dragIndex.value = index
 }
 
-function onDragOver(i: number) {
-  overIndex.value = i
+function onDragOver(tier: number, index: number) {
+  overTier.value = tier
+  overIndex.value = index
 }
 
 function onDragEnd() {
-  dragIndex = null
+  dragTier.value = null
+  dragIndex.value = null
+  overTier.value = null
   overIndex.value = null
 }
 
-function onDrop(i: number) {
-  const form = dragIndex
-  dragIndex = null
-  overIndex.value = null
-  if (form === null || form === i) return
-  const [moved] = orderedGames.value.splice(form, 1)
+function toGlobal(tier: number, index: number): number {
+  let offset = 0
+  for (let t = 0; t < tier; t++) {
+    offset += tierSizes.value[t] ?? 0
+  }
+  return offset + index
+}
+
+function onDrop(toTier: number, toIndex: number) {
+  if (dragTier.value === null || dragIndex.value === null) return
+  const from = dragTier.value
+  const fromIdx = dragIndex.value
+  if (from === toTier && fromIdx === toIndex) return
+
+  const fromGlobal = toGlobal(from, fromIdx)
+  const [moved] = orderedGames.value.splice(fromGlobal, 1)
   if (moved === undefined) return
-  orderedGames.value.splice(i, 0, moved)
+
+  if (from !== toTier) {
+    tierSizes.value[from] = (tierSizes.value[from] ?? 0) - 1
+    tierSizes.value[toTier] = (tierSizes.value[toTier] ?? 0) + 1
+  }
+
+  const insertGlobal = toGlobal(toTier, toIndex)
+
+  orderedGames.value.splice(insertGlobal, 0, moved)
+  onDragEnd()
+}
+
+function onTierDragOver(tier: number) {
+  overTier.value = tier
+  overIndex.value = tierGames.value[tier]?.length ?? 0
+}
+
+function onTierDrop(tier: number) {
+  if (dragTier.value === null || dragIndex.value === null) return
+  const from = dragTier.value
+  const fromIdx = dragIndex.value
+  if (from === tier) return
+
+  const fromGlobal = toGlobal(from, fromIdx)
+  const [moved] = orderedGames.value.splice(fromGlobal, 1)
+  if (moved === undefined) return
+
+  tierSizes.value[from] = (tierSizes.value[from] ?? 0) - 1
+
+  const targetLen = tierSizes.value[tier] ?? 0
+  const insertGlobal = toGlobal(tier, targetLen)
+  orderedGames.value.splice(insertGlobal, 0, moved)
+
+  tierSizes.value[tier] = targetLen + 1
+  onDragEnd()
 }
 
 const message = ref('')
@@ -83,14 +167,6 @@ async function save() {
     body: { order: orderedGames.value.map(g => g.id ), idUser: user.value.id }
   })
   message.value = 'Ordre enregistré'
-}
-
-async function update() {
-  if (!user.value) return
-  await $fetch(`/api/prefrences/pokemon/order`, {
-    method: 'POST',
-    body: { order: orderedGames.value.map(g => g.id ), idUser: user.value.id }
-  })
 }
 
 </script>

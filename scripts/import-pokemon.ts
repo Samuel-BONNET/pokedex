@@ -127,8 +127,6 @@ async function importPokemon(start: number, end: number) {
 
         const stats = (pokemon.stats ?? []).map((stat: any) => ({ name: stat.stat.name, value: stat.base_stat }))
 
-        const defaultSprite = enrichedGamesList[0]?.sprite ?? pokemon.sprites.front_default ?? ''
-
         let pokemonId: number
         if(MOD != "statut"){
             const dbPokemon = await prisma.pokemon.upsert({
@@ -189,25 +187,6 @@ async function importPokemon(start: number, end: number) {
             },
         })
 
-        await prisma.pokemonPreferences.upsert({
-            where: {
-                idPokemon_idUser: {
-                    idPokemon: pokemonId,
-                    idUser: 0,
-                }
-            },
-            update: {
-                currentSprite: defaultSprite,
-                idPokemon: pokemonId,
-                idUser: 0,
-            },
-            create: {
-                currentSprite: defaultSprite,
-                idPokemon: pokemonId,
-                idUser: 0,
-            }
-        })
-
 
         if (MOD !== "statut" && species?.evolves_from_species) {
             const fromId = Number(species.evolves_from_species.url.split("/").filter(Boolean).pop())
@@ -221,8 +200,15 @@ async function importPokemon(start: number, end: number) {
             }
         }
 
+        const gameWithJaquette = await prisma.game.findMany({
+            where: { gamePreferences: { some: { idUser: 0, currentSprite: { not: '' } } } },
+            orderBy: { id: 'asc' },
+        })
 
-
+        await prisma.user.update({
+            where: { id: 0 },
+            data: { preferences: { gameOrder: gameWithJaquette.map(g => g.id) } }
+        })
 
         if (id % BATCH_SIZE === 0 && id < end) {
             console.log(`  Batch complete, waiting ${DELAY_BETWEEN_BATCHES}ms...`)

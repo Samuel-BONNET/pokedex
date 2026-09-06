@@ -7,7 +7,7 @@ const adapter = new PrismaPg(process.env.DATABASE_URL!)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-    const hashedPassword = await bcrypt.hash('@dmin123', 10)
+    const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD!, 10)
 
     await prisma.user.upsert({
         where: {
@@ -45,7 +45,7 @@ async function main() {
         },
         update: {},
         create: {
-            email: 'admin@admin.com',
+            email: process.env.ADMIN_EMAIL!,
             password: hashedPassword,
             role: 'ADMIN',
             pseudo: 'admin',

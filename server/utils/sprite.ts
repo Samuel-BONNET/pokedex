@@ -18,17 +18,23 @@ const SPRITE_ALIASES: Record<string, string[]> = {
 
 export async function getOrderedGameNames(idUser: number): Promise<string[]> {
     if (!idUser) return []
-    const user = await prisma.user.findUnique({
-        where: { id: idUser },
-        select: { preferences: true },
+    const users = await prisma.user.findMany({
+        where: { id: { in: [idUser, 0] } },
+        select: { id: true, preferences: true },
     })
-    const gameOrder = (user?.preferences as Record<string, number[]>)?.gameOrder ?? []
-    if (!gameOrder.length) return []
+    const self = users.find(u => u.id === idUser)
+    const system = users.find(u => u.id === 0)
+
+    const selfOrder = (self?.preferences as Record<string, number[]>)?.gameOrder ?? []
+    const systemOrder = (system?.preferences as Record<string, number[]>)?.gameOrder ?? []
+
+    const gameOrder = selfOrder.length ? selfOrder : (systemOrder ?? [])
 
     const games = await prisma.game.findMany({
         where: { id: { in: gameOrder } },
         select: { id: true, nameEn: true },
     })
+
     const nameById = new Map(games.map(g => [g.id, g.nameEn]))
     return gameOrder.map(id => nameById.get(id)).filter((n): n is string => !!n)
 }
