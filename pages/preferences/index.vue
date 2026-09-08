@@ -8,17 +8,19 @@
       Choisissez votre ordre de sprites de jeux préférés
     </p>
 
-    <ul v-for="(tierName, t) in TIER_NAMES" :key="tierName" class="flex gap-2 p-2 bg-black/80" @dragover.prevent="onTierDragOver(t)" @drop="onTierDrop(t)">
-      <div class="flex flex-row gap-2">
-        <span class="flex flex-row justify-center bg-black/40 items-center text-white text-xl font-bold w-32 min-h-28">
-            {{ tierName }}
-        </span>
-        <li v-for="(g, i) in tierGames[t]" :key="g.id" draggable="true" @dragstart="onDragStart(t, i)" @dragover.prevent.stop="onDragOver(t, i)" @drop="onDrop(t, i)" @dragend="onDragEnd">
-          <div v-if="overTier === t && overIndex === i && dragTier !== null" class="h-28 w-14 border-2 border-dashed rounded" />
-          <img v-else :src="g.currentSprite ?? '/img/games/defaultJaquette.png'" class="h-28 w-auto object-contain" :class="{ 'opacity-30': dragTier === t && dragIndex === i }" />
-        </li>
-      </div>
-    </ul>
+    <div class="flex flex-col ">
+      <ul v-for="(tierName, t) in TIER_NAMES" :key="tierName" class="flex gap-2 p-2" :class="TIER_NAMES.indexOf(tierName) % 2 === 0 ? 'bg-black/80' : 'bg-black/70'" @dragover.prevent="onTierDragOver(t)" @drop="onTierDrop(t)">
+        <div class="flex flex-row gap-2">
+          <span class="flex flex-row justify-center bg-black/80 items-center text-white text-xl font-bold w-32 min-h-28">
+              {{ tierName }}
+          </span>
+          <li v-for="(g, i) in tierGames[t]" :key="g.id" draggable="true" @dragstart="onDragStart(t, i)" @dragover.prevent.stop="onDragOver(t, i)" @drop="onDrop(t, i)" @dragend="onDragEnd">
+            <div v-if="overTier === t && overIndex === i && dragTier !== null" class="h-28 w-14 border-2 border-dashed rounded" />
+            <img v-else :src="g.currentSprite ?? '/img/games/defaultJaquette.png'" class="h-28 w-auto object-contain" :class="{ 'opacity-30': dragTier === t && dragIndex === i }" />
+          </li>
+        </div>
+      </ul>
+    </div>
 
     <button @click="save" :disabled="!user">Sauvegarder</button>
     <p v-if="message">{{ message }}</p>
@@ -50,7 +52,6 @@ const orderedGames = ref((games.value ?? []).filter(g => g.availableJaquettes.le
 const rank = new Map((prefs.value?.gameOrder ?? []).map((id, i) => [id, i]))
 
 orderedGames.value.sort((a, b) => ((rank.get(a.id) ?? games.value!.length) - (rank.get(b.id) ?? games.value!.length)) || a.id - b.id)
-
 
 const TIER_NAMES = ['Favori', "J'aime beaucoup", "J'apprécie", 'Neutre', 'Peu utilisé']
 

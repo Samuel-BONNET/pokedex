@@ -18,7 +18,6 @@
     "import:all": "tsx scripts/import-pokemon.ts all"
   },
   "dependencies": {
-    "@nuxtjs/tailwindcss": "6.14.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcrypt": "^6.0.0",
@@ -33,6 +32,7 @@
     "vue-router": "^5.0.7"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/express": "^5.0.6",
@@ -41,6 +41,7 @@
     "@types/pg": "^8.20.0",
     "dotenv": "^17.4.2",
     "prisma": "^7.8.0",
+    "tailwindcss": "^4.3.3",
     "tsx": "^4.22.3"
   },
   "prisma": {
