@@ -32,9 +32,9 @@ jobs:
     needs: build-app
 
     steps:
-      - name: Deploy latest master
+      - name: Deploy latest dev
         run: |
           cd ~/projects/pokedex
-          git fetch origin master
-          git reset --hard origin/master
+          git fetch origin dev
+          git reset --hard origin/dev
           docker compose up -d --build

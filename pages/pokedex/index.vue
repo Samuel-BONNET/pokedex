@@ -1,5 +1,5 @@
 <template>
-  <section class="flex flex-col text-center mb-12 px-4 sm:px-8 bg-slate-50 min-h-screen">
+  <section class="flex flex-col text-center mb-12 px-4 sm:px-8  min-h-screen">
     <h1 class="text-4xl font-bold mb-6">
       Pokedex
     </h1>
@@ -38,26 +38,42 @@
 
     </div>
 
-    <div class="flex flex-wrap gap-2 justify-center mb-6">
-      <button v-for="n in totalPages" :key="n" @click="currentPage = n"
-        class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200"
-        :class="currentPage === n ? 'bg-slate-800 text-white border-slate-800' : 'bg-white'">
-        {{ n }}
-      </button>
-    </div>
+    <div v-for="position in (cardNumber > 50 ? 2 : 1)" :key="position">
+      <div class="flex flex-wrap gap-2 justify-center mb-6">
+        <button v-if="totalPages > 2" @click="currentPage = 1" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+          <<
+        </button>
+        <button v-if="totalPages > 1" @click="currentPage > 1 && currentPage--" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+          <
+        </button>
+        <button v-for="n in visiblePages" :key="n" @click="currentPage = n"
+          class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200 hover:text-green-800"
+          :class="currentPage === n ? 'bg-green-600 text-white border-green-800 hover:border-green-600' : 'bg-white'">
+          {{ n }}
+        </button>
+        <button v-if="totalPages > 1" @click="currentPage < totalPages && currentPage++" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+          >
+        </button>
+        <button v-if="totalPages > 2" @click="currentPage = totalPages" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+          >>
+        </button>
+      </div>
 
-    <div class="flex flex-row gap-2 justify-center mb-6">
-      <PokedexToolBar v-if="toolbarEnable" :selection-mode="selectionMode" :selected-pokemons="selectedPokemons" :rangeSelectionMode="rangeSelectionMode" @update:selection-mode="selectionMode = $event" @update:rangeSelectionMode="rangeSelectionMode = $event" @saved="refresh" />
+      <div class="flex flex-row gap-2 justify-center mb-6" v-if="position === 1">
+        <div class="flex justify-between">
+          <PokedexToolBar v-if="toolbarEnable" :selection-mode="selectionMode" :selected-pokemons="selectedPokemons" :rangeSelectionMode="rangeSelectionMode" @update:selection-mode="selectionMode = $event" @update:rangeSelectionMode="rangeSelectionMode = $event" @saved="refresh" />
+        </div>
 
-      <div class="w-full mx-auto" :style="{ maxWidth: gridMaxWidth }">
-        <div class="flex flex-wrap justify-center gap-4">
-          <div v-for="p in displayPokemons" :key="p.pokeNumber" class="shrink-0">
-            <div v-if="selectionMode || rangeSelectionMode" class="cursor-pointer" @click="toggleSelection(p.pokeNumber)" @contextmenu.prevent @click.right.prevent="deselectPokemon(p.pokeNumber)">
-              <PokemonCard :pokemon="p" :selected="selectedPokemons.includes(p.pokeNumber)" :range-start-end="p.pokeNumber === rangeStart || p.pokeNumber === rangeEnd" />
+        <div class="w-full mx-auto" :style="{ maxWidth: gridMaxWidth }">
+          <div class="flex flex-wrap justify-center gap-3">
+            <div v-for="p in displayPokemons" :key="p.pokeNumber" class="shrink-0">
+              <div v-if="selectionMode || rangeSelectionMode" class="cursor-pointer" @click="toggleSelection(p.pokeNumber)" @contextmenu.prevent @click.right.prevent="deselectPokemon(p.pokeNumber)">
+                <PokemonCard :pokemon="p" :selected="selectedPokemons.includes(p.pokeNumber)" :range-start-end="p.pokeNumber === rangeStart || p.pokeNumber === rangeEnd" />
+              </div>
+              <NuxtLink v-else class="block" :to="`/pokedex/${p.pokeNumber}`">
+                <PokemonCard :pokemon="p" />
+              </NuxtLink>
             </div>
-            <NuxtLink v-else class="block" :to="`/pokedex/${p.pokeNumber}`">
-              <PokemonCard :pokemon="p" />
-            </NuxtLink>
           </div>
         </div>
       </div>
@@ -183,5 +199,15 @@ function deselectPokemon(n: number) {
   const id = selectedPokemons.value.indexOf(n)
   if (id >= 0) selectedPokemons.value.splice(id, 1)
 }
+
+const visiblePages = computed<number[]>(() => {
+  const maxVisiblePages = 5
+  const total = totalPages.value
+  const current = currentPage.value
+
+  const start = Math.max(1, Math.min(current - Math.floor(maxVisiblePages / 2), total - maxVisiblePages + 1))
+  const end = Math.min(total, start + maxVisiblePages - 1)
+  return Array.from( {length: Math.max(0, end - start + 1) }, (_, index) => start + index)
+})
 
 </script>
