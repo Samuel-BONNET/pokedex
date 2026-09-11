@@ -13,7 +13,7 @@
 
 
   <div v-if="filteredGames.length" class="relative">
-    <button @click="scrollPrev" class="z-10 absolute top-1/2 -translate-y-1/2 left-2 rounded-lg bg-blue-300 hover:bg-blue-500 px-5 py-4 shadow"><ChevronLeft class="text-white" /></button>
+    <button @click="scrollPrev" class="z-10 absolute top-1/2 -translate-y-1/2 left-2 rounded-lg bg-transparent border border-transparent hover:border-green-500 hover:text-green-500 px-5 py-4 shadow"><ChevronLeft class="hover:text-black" /></button>
 
     <div ref="emblaRef" class="overflow-hidden">
       <div class="flex gap-[2vw]">
@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <button @click="scrollNext" class="z-10 absolute top-1/2 -translate-y-1/2 right-2 rounded-lg bg-blue-300 hover:bg-blue-500 px-5 py-4 shadow"><ChevronRight class="text-white" /></button>
+    <button @click="scrollNext" class="z-10 absolute top-1/2 -translate-y-1/2 right-2 rounded-lg bg-transparent border border-transparent hover:border-green-500 hover:text-green-500 px-5 py-4 shadow"><ChevronRight class="hover:text-black" /></button>
 
     <p v-if="selectedGame" class="text-center text-2xl mt-8">
       {{ selectedGame.nameEn }}

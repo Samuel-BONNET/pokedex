@@ -11,10 +11,6 @@
     </section>
 
     <section class="mb-8">
-      <h2 class="text-2xl font-semibold mb-4">
-        Cliquer pour accéder à :
-      </h2>
-
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <NuxtLink to="/pokedex"
                   class="group flex flex-col items-center gap-2 p-6 bg-white rounded-2xl border border-slate-200
