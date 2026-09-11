@@ -1,11 +1,15 @@
 <template>
-  <section class="flex flex-row items-center justify-center min-h-auto">
-    <div class="w-full max-w-2xl rounded-2xl bg-white shadow-lg overflow-hidden">
+  <section class="flex w-full min-h-screen bg-slate-900">
+    <div class="w-1/2">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWyHNCgCGuEzU6twdUIHgZtdvN_qiEFlXIIYqbIDfjtqdHN9X2oD8YBfKc&s=10" alt="Login" class="w-full h-full object-cover" />
+    </div>
+
+    <div class="w-1/2 bg-white flex items-center justify-center p-8" :class="{ 'order-1': mode === 'register' }">
       <div class="stage">
+        <NuxtLink to="/" class="absolute m-2 top-0 right-0">Hub</NuxtLink>
         <div class="panel panel-login" :class="{ 'is-active': mode === 'login' }">
           <div class="panel-inner">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWyHNCgCGuEzU6twdUIHgZtdvN_qiEFlXIIYqbIDfjtqdHN9X2oD8YBfKc&s=10" alt="Login" class="panel-img" />
-            <form @submit.prevent="login" class="flex flex-col flex-1 items-center">
+            <form @submit.prevent="login" class="flex flex-col items-center w-full">
             <h2 class="text-2xl text-center mb-4">Connexion</h2>
             <input v-model="email" placeholder="Email" type="email" name="email" class="text-center m-1 border rounded-lg p-2 w-full" />
             <input v-model="password" placeholder="Password" type="password" name="password" class="text-center m-1 border rounded-lg p-2 w-full" />
@@ -29,8 +33,7 @@
 
         <div class="panel panel-register" :class="{ 'is-active': mode === 'register' }">
           <div class="panel-inner">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWyHNCgCGuEzU6twdUIHgZtdvN_qiEFlXIIYqbIDfjtqdHN9X2oD8YBfKc&s=10" alt="Login" class="panel-img" />
-            <form @submit.prevent="register" class="flex flex-col flex-1 items-center">
+            <form @submit.prevent="register" class="flex flex-col items-center w-full">
             <h2 class="text-2xl text-center mb-4">Inscription</h2>
             <input v-model="regEmail" type="email" name="email" placeholder="Email" class="text-center m-1 border rounded-lg p-2 w-full" />
             <input v-model="regPseudo" type="text" name="pseudo" placeholder="Pseudo" class="text-center m-1 border rounded-lg p-2 w-full" />
@@ -51,6 +54,8 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: false })
+
 const route = useRoute()
 
 const mode = ref<'login' | 'register'>(route.query.mode === 'register' ? 'register' : 'login')
@@ -109,23 +114,15 @@ async function register() {
 .stage {
   display: grid;
   overflow: hidden;
+  width: 100%;
+  max-width: 420px;
 }
 
 .panel {
   grid-area: 1 / 1;
-  padding: 1.25rem 1.5rem 1.5rem;
   background: white;
   transition: transform 0.55s ease, opacity 0.55s ease;
   pointer-events: none;
-  display: flex;
-  justify-content: center;
-}
-
-.panel-inner {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1.5rem;
 }
 
 .panel.is-active {
@@ -140,14 +137,9 @@ async function register() {
   opacity: 0;
 }
 
-.panel-img {
-  width: 50%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  flex-shrink: 0;
-  border: 4px solid #e2e8f0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+.panel-inner {
+  display: flex;
+  justify-content: center;
 }
 
 </style>
