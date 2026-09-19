@@ -1,11 +1,9 @@
 <template>
   <div v-if="route.path === '/'">
     <div class="flex flex-col items-center justify-center">
-      <NuxtLink to="/">
-        <img class="max-w-xl" src="/logo.png" />
-      </NuxtLink>
+      <poke-logo />
     </div>
-    <div class="flex flex-row items-center justify-center">
+    <div class="flex flex-row flex-wrap items-center justify-center gap-x-4">
       <Navbar />
       <Login />
     </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-center items-center">
-    <nav class="flex justify-center w-fit 2 m-4">
+    <nav class="flex justify-center w-fit flex-wrap m-4">
       <NuxtLink class="p-3" :class="currentPage === 0 ? 'bg-white' : 'bg-green-500 text-white'" to="/">Accueil</NuxtLink>
       <NuxtLink class="p-3" :class="currentPage === 1 ? 'bg-white' : 'bg-green-500 text-white'" to="/pokedex">Pokedex</NuxtLink>
       <NuxtLink class="p-3" :class="currentPage === 2 ? 'bg-white' : 'bg-green-500 text-white'" to="/games">Jeux</NuxtLink>
