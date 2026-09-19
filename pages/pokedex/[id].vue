@@ -1,5 +1,5 @@
 <template>
-  <section class="flex flex-col items-center bg-slate-50 min-h-screen px- py-8 font-pixel">
+  <section class="flex flex-col items-center  min-h-screen px- py-8 font-pixel">
     <div class="flex justify-between gap-20 bg-red-600 p-6 rounded-lg">
       <div class="flex flex-col justify-between">
 
