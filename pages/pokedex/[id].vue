@@ -12,7 +12,7 @@
           </div>
         </div>
 
-        <div class="bg-slate-400 rounded-xl p-8 m-2 [clip-path:polygon(0_0,100%_0,100%_100%,9%_100%,0_88%)]">
+        <div class="bg-slate-400 rounded-xl p-8 m-2 [clip-path:polygon(0_0,100%_0,100%_100%,9%_100%,0_88%)] drop-shadow-lg  shadow-lg shadow">
           <div class="flex flex-col justify-center bg-white p-4 px-12 drop-shadow-lg  shadow-lg">
             <span class=" absolute flex justify-end text-yellow-400 top-0 right-0">
               <img src="/img/diverse/sparkles.png" class="object-contain relative w-10 p-1" :class="pokemon?.isShiny ? 'opacity-100' : 'opacity-0'" />
@@ -20,11 +20,11 @@
 
             <img v-if="!isOpen" :src="pokemon?.isShiny && pokemon?.currentSprite ? shinyUrl(pokemon?.currentSprite) ?? undefined : pokemon?.currentSprite ?? undefined" :alt="pokemon?.nameFr" :class="!pokemon?.isShiny && !pokemon?.isOwned ? 'grayscale' : ''" class="w-48 h-48 object-contain mt-5" draggable="false" />
 
-            <div v-show="isOpen" class="h-48 w-48 flex items-center justify-center">
-              <LazySpriteChoose v-if="pokemon" :pokemon="pokemon" @saved="onSpriteSaved" />
+            <div v-show="isOpen" class="h-48 w-48 flex items-center justify-center object-contain mt-5">
+              <LazySpriteChoose v-if="pokemon" :pokemon="pokemon" @saved="onSpriteSaved" @close="isOpen = false" />
             </div>
 
-            <div class="flex flex-row justify-items-start items-center gap-4 w-full max-w-48 pt-1 bg-slate-100 mt-3">
+            <div class="flex flex-row justify-items-start items-center gap-4 w-full max-w-48 pt-1 mt-3">
               <span class="flex justify-end text-xs text-black">
                 #{{ pokemon?.pokeNumber }}
               </span>

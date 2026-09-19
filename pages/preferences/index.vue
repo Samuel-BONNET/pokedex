@@ -23,7 +23,7 @@
     </div>
 
     <div class="flex flex-col justify-between items-center">
-      <button @click="save" :disabled="!user" class="px-2 py-1 text-sm border border-slate-300 rounded transition-colors hover:bg-slate-200 hover:border-green-600 hover:text-green-800 action:bg-green-300 action:text-white">Sauvegarder</button>
+      <button @click="save" :disabled="!user" class="px-4 py-2 text-sm border border-slate-300 rounded transition-colors hover:bg-slate-200 hover:border-green-600 hover:text-green-800 action:bg-green-300 action:text-white">Sauvegarder</button>
       <p v-if="message">{{ message }}</p>
     </div>
 
