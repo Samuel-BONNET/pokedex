@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
 
     return {
         ...game,
+        total: await prisma.game.count(),
         currentSprite: game.gamePreferences.find(s => s.idUser === idUser)?.currentSprite ?? game.gamePreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
         gamePreferences: undefined,
         availableJaquettes,

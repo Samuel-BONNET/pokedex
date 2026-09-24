@@ -6,7 +6,7 @@
     <section class="flex flex-col lg:flex-row gap-4 lg:gap-2 mb-8">
 
       <div class="hidden lg:flex w-80 flex-shrink-0 justify-center absolute -top-30 -left-30 pointer-events-none -z-0">
-        <img src="/img/diverse/lugia.png" class="pointer-events-none object-contain w-full h-auto -scale-x-100" alt="Lugia" />
+        <img src="/img/diverse/pokemon/lugia.png" class="pointer-events-none object-contain w-full h-auto -scale-x-100" alt="Lugia" />
       </div>
 
       <div class="rounded-md px-3 w-full lg:w-2/3">

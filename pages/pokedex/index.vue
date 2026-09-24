@@ -5,9 +5,18 @@
     </h1>
 
     <div class="flex flex-wrap gap-2 justify-center mb-3">
-      <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
-      <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
-      <input placeholder="Numéro pokedex" v-model="pokeNumberSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
+      <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <input placeholder="Numéro pokedex" v-model="pokeNumberSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <details class="dropdown-checkbox">
+        <summary>Types</summary>
+          <div class="absolute bg-white z-10 option-list flex flex-col max-h-100 px-2 overflow-y-auto">
+            <label v-for="f in typeFiles">
+              <input name="couleur[]" v-model="selectedTypes" :value="f.replace('.png', '')" type="checkbox" class="peer sr-only" />
+              <img :src="`/img/types/${f}`" class="max-h-15 peer-checked:opacity-50 peer-checked:ring-3 peer-checked:ring-blue-500 peer-checked:rounded" />
+            </label>
+          </div>
+      </details>
       <select v-model="generationSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
         <option :value="0" selected>Toutes</option>
         <option v-for="gen in genBound.length - 1" :key="gen" :value="gen">{{ gen }}</option>
@@ -94,23 +103,31 @@ const generationSearchQuery = ref(0)
 const genBound = [0, 151, 251, 386, 493, 649, 721, 809, 905, 1025]
 const getGeneration = (n: number) => genBound.findIndex(bound => n <= bound)
 const toolbarEnable = ref(true)
+const selectedTypes = ref<string[]>([])
+
+const { data: typeFiles } = useFetch<string[]>('/api/types')
 
 const filteredPokemons = computed(() => {
   const fr = frenchSearchQuery.value.trim().toLowerCase()
   const en = englishSearchQuery.value.trim().toLowerCase()
   const nb = pokeNumberSearchQuery.value.trim()
   const gen = generationSearchQuery.value
+  const types = selectedTypes.value
 
   return (pokemons.value ?? []).filter(p => {
     if (fr && !p.nameFr.toLowerCase().includes(fr)) return false
     if (en && !p.nameEn.toLowerCase().includes(en)) return false
     if (nb && p.pokeNumber !== Number(nb)) return false
     if (gen && getGeneration(p.pokeNumber) !== gen) return false
+    if (types.length > 0) {
+      const pokeTypes = (p.types ?? []) as string[]
+      if (!types.some(t => pokeTypes.includes(t))) return false
+    }
     return true
   })
 })
 
-watch([frenchSearchQuery, englishSearchQuery, pokeNumberSearchQuery, generationSearchQuery], () => { currentPage.value = 1 })
+watch([frenchSearchQuery, englishSearchQuery, pokeNumberSearchQuery, generationSearchQuery, selectedTypes], () => { currentPage.value = 1 })
 
 const { user } = useAuth()
 const { data: pokemons, refresh } = await useFetch('/api/pokemon', {
