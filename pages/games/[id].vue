@@ -12,12 +12,10 @@
     <div class="flex flex-col md:flex-row items-center justify-center gap-8">
       <div class="flex flex-col items-center gap-4">
         <img v-if="game" :src="game?.currentSprite ?? '/img/games/defaultJaquette.png'" :alt="game.nameEn"
-             class="w-72 h-96 object-contain select-none" draggable="false" />
+             class="h-110 object-contain select-none" draggable="false" />
       </div>
 
-
-
-      <div v-if="game" class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col items-center justify-between">
+      <div v-if="game" class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col items-center justify-between w-100">
         <div class="flex flex-col items-center gap-4 mb-6 mt-2 w-full">
 
           <div class="flex flex-col items-center gap-1">
@@ -33,8 +31,7 @@
           </button>
           </div>
 
-          <label
-            class="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm border border-slate-300 rounded-lg text-slate-600 cursor-pointer transition-colors hover:bg-slate-50">
+          <label class="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm border border-slate-300 rounded-lg text-slate-600 cursor-pointer transition-colors hover:bg-slate-50">
             <FileText class="w-4 h-4 shrink-0" />
             <span class="truncate">{{ file ? file.name : 'Choisir un fichier .sav' }}</span>
             <input type="file" accept=".sav" class="hidden" @change="onFileChange" :disabled="!user" />
