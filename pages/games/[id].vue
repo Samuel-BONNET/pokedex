@@ -1,35 +1,72 @@
 <template>
-  <section class="text-center mb-12">
-    <h1 class="text-4xl font-bold mb-4">
-      Games
-    </h1>
+  <section class="max-w-5xl mx-auto px-4 py-10">
+    <header class="text-center mb-10">
+      <h1 class="text-3xl font-bold text-slate-800">
+        {{ game?.nameEn }}
+      </h1>
+      <p v-if="game" class="text-slate-500 mt-2">
+        Génération {{ game.generation }}
+      </p>
+    </header>
 
-    <p class="text-lg">
-      Gérez vos sauvegardes ici
-    </p>
-  </section>
+    <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+      <div class="flex flex-col items-center gap-4">
+        <img v-if="game" :src="game?.currentSprite ?? '/img/games/defaultJaquette.png'" :alt="game.nameEn"
+             class="h-110 object-contain select-none" draggable="false" />
+      </div>
 
-  <section class="flex flex-col items-center gap-4 mb-12 text-center">
-    <img v-if="game" :src="game?.currentSprite ?? '/img/defaultJaquette.png'" />
+      <div v-if="game" class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col items-center justify-between w-100">
+        <div class="flex flex-col items-center gap-4 mb-6 mt-2 w-full">
 
-    <button @click="isOpen = !isOpen">Sprites</button>
+          <div class="flex flex-col items-center gap-1">
 
-    <ul v-show="isOpen">
-      <LazySpriteChoose v-if="game" :game="game" :available-jaquettes="game.availableJaquettes" @saved="onSpriteSaved" />
-    </ul>
+          <div v-show="isOpen">
+            <LazySpriteChoose v-if="game" :game="game" :available-jaquettes="game.availableJaquettes"
+                              :current-sprite="game.currentSprite" @saved="onSpriteSaved" @close="isOpen = false" />
+          </div>
 
-    <input type="file" accept=".sav" @change="onFileChange" :disabled="!user" />
-    <a v-if="url" :href="url" download>Télécharger</a>
-    <div class="flex gap-5">
-      <button @click="upload" :disabled="!user">Sauvegarder</button>
-      <button @click="remove" :disabled="!user">Supprimer</button>
+          <button @click="isOpen = !isOpen" :disabled="!user"
+                  class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 transition-colors hover:bg-slate-50 hover:border-green-600 hover:text-green-700 disabled:opacity-40 disabled:cursor-not-allowed">
+            {{ isOpen ? 'Fermer' : 'Changer la jaquette' }}
+          </button>
+          </div>
+
+          <label class="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm border border-slate-300 rounded-lg text-slate-600 cursor-pointer transition-colors hover:bg-slate-50">
+            <FileText class="w-4 h-4 shrink-0" />
+            <span class="truncate">{{ file ? file.name : 'Choisir un fichier .sav' }}</span>
+            <input type="file" accept=".sav" class="hidden" @change="onFileChange" :disabled="!user" />
+          </label>
+
+          <a v-if="url !== null" :href="url" download
+             class="text-sm text-green-700 hover:underline inline-flex items-center justify-center gap-1">
+            <Download class="w-4 h-4" /> Télécharger
+          </a>
+        </div>
+
+        <div class="flex flex-col items-center gap-3 w-full">
+          <div class="flex w-full gap-3">
+            <button @click="upload" :disabled="!user"
+                    class="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg bg-green-600 text-white transition-colors hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed">
+              Sauvegarder
+            </button>
+            <button @click="remove" :disabled="!user"
+                    class="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-slate-300 text-slate-700 transition-colors hover:border-red-400 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed">
+              Supprimer
+            </button>
+          </div>
+
+          <p v-if="result" class="text-sm text-slate-600">
+            {{ result }}
+          </p>
+        </div>
+      </div>
     </div>
-
-    <p>{{ result }}</p>
   </section>
 </template>
 
 <script setup lang="ts">
+import { Download, FileText } from 'lucide-vue-next'
+
 const { user } = useAuth()
 const route = useRoute()
 const gameId =  String(route.params.id)

@@ -1,13 +1,22 @@
 <template>
-  <section class="flex flex-col text-center mb-12 px-4 sm:px-8 bg-slate-50 min-h-screen">
+  <section class="flex flex-col text-center mb-12 px-4 sm:px-8  min-h-screen">
     <h1 class="text-4xl font-bold mb-6">
       Pokedex
     </h1>
 
     <div class="flex flex-wrap gap-2 justify-center mb-3">
-      <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
-      <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
-      <input placeholder="Numéro pokedex" v-model="pokeNumberSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm" />
+      <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <input placeholder="Numéro pokedex" v-model="pokeNumberSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <details class="dropdown-checkbox">
+        <summary>Types</summary>
+          <div class="absolute bg-white z-10 option-list flex flex-col max-h-100 px-2 overflow-y-auto">
+            <label v-for="f in typeFiles">
+              <input name="couleur[]" v-model="selectedTypes" :value="f.replace('.png', '')" type="checkbox" class="peer sr-only" />
+              <img :src="`/img/types/${f}`" class="max-h-15 peer-checked:opacity-50 peer-checked:ring-3 peer-checked:ring-blue-500 peer-checked:rounded" />
+            </label>
+          </div>
+      </details>
       <select v-model="generationSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
         <option :value="0" selected>Toutes</option>
         <option v-for="gen in genBound.length - 1" :key="gen" :value="gen">{{ gen }}</option>
@@ -38,26 +47,42 @@
 
     </div>
 
-    <div class="flex flex-wrap gap-2 justify-center mb-6">
-      <button v-for="n in totalPages" :key="n" @click="currentPage = n"
-        class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200"
-        :class="currentPage === n ? 'bg-slate-800 text-white border-slate-800' : 'bg-white'">
-        {{ n }}
-      </button>
-    </div>
+    <div v-for="position in (cardNumber > 50 ? 2 : 1)" :key="position">
+      <div class="flex flex-wrap gap-2 justify-center mb-6">
+        <button v-if="totalPages > 2" @click="currentPage = 1" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+          <<
+        </button>
+        <button v-if="totalPages > 1" @click="currentPage > 1 && currentPage--" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+          <
+        </button>
+        <button v-for="n in visiblePages" :key="n" @click="currentPage = n"
+          class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200 hover:text-green-800"
+          :class="currentPage === n ? 'bg-green-600 text-white border-green-800 hover:border-green-600' : 'bg-white'">
+          {{ n }}
+        </button>
+        <button v-if="totalPages > 1" @click="currentPage < totalPages && currentPage++" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+          >
+        </button>
+        <button v-if="totalPages > 2" @click="currentPage = totalPages" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+          >>
+        </button>
+      </div>
 
-    <div class="flex flex-row gap-2 justify-center mb-6">
-      <PokedexToolBar v-if="toolbarEnable" :selection-mode="selectionMode" :selected-pokemons="selectedPokemons" :rangeSelectionMode="rangeSelectionMode" @update:selection-mode="selectionMode = $event" @update:rangeSelectionMode="rangeSelectionMode = $event" @saved="refresh" />
+      <div class="flex flex-row gap-2 justify-center mb-6" v-if="position === 1">
+        <div class="flex justify-between">
+          <PokedexToolBar v-if="toolbarEnable" :selection-mode="selectionMode" :selected-pokemons="selectedPokemons" :rangeSelectionMode="rangeSelectionMode" @update:selection-mode="selectionMode = $event" @update:rangeSelectionMode="rangeSelectionMode = $event" @saved="refresh" />
+        </div>
 
-      <div class="w-full mx-auto" :style="{ maxWidth: gridMaxWidth }">
-        <div class="flex flex-wrap justify-center gap-4">
-          <div v-for="p in displayPokemons" :key="p.pokeNumber" class="shrink-0">
-            <div v-if="selectionMode || rangeSelectionMode" class="cursor-pointer" @click="toggleSelection(p.pokeNumber)" @contextmenu.prevent @click.right.prevent="deselectPokemon(p.pokeNumber)">
-              <PokemonCard :pokemon="p" :selected="selectedPokemons.includes(p.pokeNumber)" :range-start-end="p.pokeNumber === rangeStart || p.pokeNumber === rangeEnd" />
+        <div class="w-full mx-auto" :style="{ maxWidth: gridMaxWidth }">
+          <div class="flex flex-wrap justify-center gap-3">
+            <div v-for="p in displayPokemons" :key="p.pokeNumber" class="shrink-0">
+              <div v-if="selectionMode || rangeSelectionMode" class="cursor-pointer" @click="toggleSelection(p.pokeNumber)" @contextmenu.prevent @click.right.prevent="deselectPokemon(p.pokeNumber)">
+                <PokemonCard :pokemon="p" :selected="selectedPokemons.includes(p.pokeNumber)" :range-start-end="p.pokeNumber === rangeStart || p.pokeNumber === rangeEnd" />
+              </div>
+              <NuxtLink v-else class="block" :to="`/pokedex/${p.pokeNumber}`">
+                <PokemonCard :pokemon="p" />
+              </NuxtLink>
             </div>
-            <NuxtLink v-else class="block" :to="`/pokedex/${p.pokeNumber}`">
-              <PokemonCard :pokemon="p" />
-            </NuxtLink>
           </div>
         </div>
       </div>
@@ -78,23 +103,31 @@ const generationSearchQuery = ref(0)
 const genBound = [0, 151, 251, 386, 493, 649, 721, 809, 905, 1025]
 const getGeneration = (n: number) => genBound.findIndex(bound => n <= bound)
 const toolbarEnable = ref(true)
+const selectedTypes = ref<string[]>([])
+
+const { data: typeFiles } = useFetch<string[]>('/api/types')
 
 const filteredPokemons = computed(() => {
   const fr = frenchSearchQuery.value.trim().toLowerCase()
   const en = englishSearchQuery.value.trim().toLowerCase()
   const nb = pokeNumberSearchQuery.value.trim()
   const gen = generationSearchQuery.value
+  const types = selectedTypes.value
 
   return (pokemons.value ?? []).filter(p => {
     if (fr && !p.nameFr.toLowerCase().includes(fr)) return false
     if (en && !p.nameEn.toLowerCase().includes(en)) return false
     if (nb && p.pokeNumber !== Number(nb)) return false
     if (gen && getGeneration(p.pokeNumber) !== gen) return false
+    if (types.length > 0) {
+      const pokeTypes = (p.types ?? []) as string[]
+      if (!types.some(t => pokeTypes.includes(t))) return false
+    }
     return true
   })
 })
 
-watch([frenchSearchQuery, englishSearchQuery, pokeNumberSearchQuery, generationSearchQuery], () => { currentPage.value = 1 })
+watch([frenchSearchQuery, englishSearchQuery, pokeNumberSearchQuery, generationSearchQuery, selectedTypes], () => { currentPage.value = 1 })
 
 const { user } = useAuth()
 const { data: pokemons, refresh } = await useFetch('/api/pokemon', {
@@ -183,5 +216,15 @@ function deselectPokemon(n: number) {
   const id = selectedPokemons.value.indexOf(n)
   if (id >= 0) selectedPokemons.value.splice(id, 1)
 }
+
+const visiblePages = computed<number[]>(() => {
+  const maxVisiblePages = 5
+  const total = totalPages.value
+  const current = currentPage.value
+
+  const start = Math.max(1, Math.min(current - Math.floor(maxVisiblePages / 2), total - maxVisiblePages + 1))
+  const end = Math.min(total, start + maxVisiblePages - 1)
+  return Array.from( {length: Math.max(0, end - start + 1) }, (_, index) => start + index)
+})
 
 </script>

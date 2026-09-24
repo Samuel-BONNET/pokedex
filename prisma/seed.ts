@@ -45,6 +45,7 @@ async function main() {
         },
         update: {},
         create: {
+            id: 2,
             email: process.env.ADMIN_EMAIL!,
             password: hashedPassword,
             role: 'ADMIN',

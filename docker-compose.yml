@@ -9,10 +9,14 @@ services:
     environment:
       DATABASE_URL: postgresql://admin:password@postgres:5432/appdb
       JWT_SECRET: supersecretkey
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
 
   postgres:
     image: postgres:17
     restart: always
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password

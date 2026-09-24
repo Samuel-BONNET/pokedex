@@ -1,7 +1,10 @@
-name: CI
+name: CI & Deploy
 
 on:
-  # temporairement désactivé
+  push:
+    branches:
+      - dev
+
   workflow_dispatch:
 
 jobs:
@@ -24,10 +27,14 @@ jobs:
       - run: pnpm prisma generate
       - run: pnpm build
 
-  docker-build:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: self-hosted
     needs: build-app
 
     steps:
-      - uses: actions/checkout@v4
-      - run: docker build -t pokedex-app:latest .
+      - name: Deploy latest dev
+        run: |
+          cd ~/projects/pokedex
+          git fetch origin dev
+          git reset --hard origin/dev
+          docker compose up -d --build

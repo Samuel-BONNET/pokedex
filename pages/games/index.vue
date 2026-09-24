@@ -13,7 +13,7 @@
 
 
   <div v-if="filteredGames.length" class="relative">
-    <button @click="scrollPrev" class="z-10 absolute top-1/2 -translate-y-1/2 left-2 rounded-lg bg-blue-300 hover:bg-blue-500 px-5 py-4 shadow"><ChevronLeft class="text-white" /></button>
+    <button @click="scrollPrev" class="z-10 absolute top-1/2 -translate-y-1/2 left-2 rounded-lg bg-transparent border border-transparent hover:border-green-500 hover:text-green-500 px-5 py-4 shadow"><ChevronLeft class="hover:text-black" /></button>
 
     <div ref="emblaRef" class="overflow-hidden">
       <div class="flex gap-[2vw]">
@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <button @click="scrollNext" class="z-10 absolute top-1/2 -translate-y-1/2 right-2 rounded-lg bg-blue-300 hover:bg-blue-500 px-5 py-4 shadow"><ChevronRight class="text-white" /></button>
+    <button @click="scrollNext" class="z-10 absolute top-1/2 -translate-y-1/2 right-2 rounded-lg bg-transparent border border-transparent hover:border-green-500 hover:text-green-500 px-5 py-4 shadow"><ChevronRight class="hover:text-black" /></button>
 
     <p v-if="selectedGame" class="text-center text-2xl mt-8">
       {{ selectedGame.nameEn }}
@@ -83,9 +83,9 @@ function blurClass(index: number) {
   const sel = selectedIndex.value % len
   const pos = index % len
   const d = Math.min((pos - sel + len) % len, (sel - pos + len) % len)
-  if (d === 1) return 'blur-light opacity-90 scale-95'
-  if (d === 2) return 'blur-strong opacity-70 scale-90'
-  if (d > 2) return 'blur-extrem opacity-60 scale-90'
+  if (d === 1) return 'blur-light scale-95'
+  if (d === 2) return 'blur-strong scale-90'
+  if (d > 2) return 'blur-extrem scale-90'
   return ''
 }
 

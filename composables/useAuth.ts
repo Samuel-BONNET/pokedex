@@ -2,6 +2,7 @@ import { useState, computed } from '#imports'
 
 export const useAuth = () => {
     const user = useState<{ id: number } | null>('auth:user', () => null)
+    const guest = useState<{ id: number } | null>('auth:guest', () => null)
     const loading = useState<boolean>('auth:loading', () => true)
 
     async function fetchUser() {
@@ -14,6 +15,11 @@ export const useAuth = () => {
         } finally {
             loading.value = false
         }
+    }
+
+    function setGuest() {
+        guest.value = { id: 1 }
+        navigateTo('/')
     }
 
     async function login(email: string, password: string) {
@@ -33,5 +39,5 @@ export const useAuth = () => {
 
     const isConnected = computed(() => user.value !== null)
 
-    return { user, loading, isConnected, fetchUser, login, logout }
+    return { user, loading, isConnected, fetchUser, login, logout, guest, setGuest }
 }

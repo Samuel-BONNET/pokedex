@@ -48,7 +48,7 @@ model Pokemon {
     nameFr          String  @db.VarChar(50)
     nameEn          String  @db.VarChar(50)
     pokeNumber      Int     @unique
-$   types           Json?
+    types           Json?
     height          Int?
     weight          Int?
     stats           Json?

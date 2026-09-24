@@ -1,5 +1,5 @@
 <template>
-  <button @click="getCSV()">Export CSV</button>
+  <button class="bg-white text-slate-800 border-slate-800" @click="getCSV()">Export CSV</button>
 </template>
 
 <style scoped>
@@ -7,7 +7,6 @@
 </style>
 
 <script setup lang="ts">
-import Import from "~/pages/profil/import.vue";
 import {useAuth} from "~/composables/useAuth";
 
 async function getCSV() {

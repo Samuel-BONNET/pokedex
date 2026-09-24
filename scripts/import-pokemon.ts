@@ -233,7 +233,12 @@ async function main() {
             break;
         case "all":
             await importGames()
-            await importPokemon(GENERATION_CIBLE!,GENERATION_CIBLE!+1)
+            if(GENERATION_CIBLE === undefined) {
+                await importPokemon(1,9)
+            }
+            else {
+                await importPokemon(GENERATION_CIBLE, GENERATION_CIBLE+1)
+            }
             break;
     }
     console.log('\nImport completed successfully!')
