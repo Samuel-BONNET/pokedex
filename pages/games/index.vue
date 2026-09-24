@@ -83,9 +83,9 @@ function blurClass(index: number) {
   const sel = selectedIndex.value % len
   const pos = index % len
   const d = Math.min((pos - sel + len) % len, (sel - pos + len) % len)
-  if (d === 1) return 'blur-light opacity-90 scale-95'
-  if (d === 2) return 'blur-strong opacity-70 scale-90'
-  if (d > 2) return 'blur-extrem opacity-60 scale-90'
+  if (d === 1) return 'blur-light scale-95'
+  if (d === 2) return 'blur-strong scale-90'
+  if (d > 2) return 'blur-extrem scale-90'
   return ''
 }
 

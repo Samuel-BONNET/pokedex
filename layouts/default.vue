@@ -1,5 +1,7 @@
+<script setup lang="ts">
+</script>
 <template>
-  <img src="/background.png" class="absolute inset-0 w-full h-full object-cover -z-10" />
+  <div class="fixed inset-0 -z-10 bg-[url('/background.png')] bg-repeat-y bg-[length:100%_auto]" />
 
   <Header class="relative z-10" />
 

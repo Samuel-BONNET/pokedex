@@ -17,7 +17,7 @@
               <div>
                 <a class="flex flex-row justify-center cursor-pointer" @click.prevent="guestLogin" >
                   <p class="mx-2 text-sm text-slate-500 hover:text-green-600 transition-colors flex items-center">Continuer en tant qu'invité</p>
-                  <img class="h-10 w-10 object-contain" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvEeN2h0HFHcqNI0vx1x00SjDFo2GZAS89gnBc6YVFfK_jj2guBuolKyIL&s=10" />
+                  <img class="h-10 w-10 object-contain rounded-full border-2 border-blue-400 bg-blue-200" src="/img/diverse/pokemon/qulbutoke.png" />
                 </a>
               </div>
 
