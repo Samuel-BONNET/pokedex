@@ -56,6 +56,7 @@ export const useLang = () => {
     }
 
     return {
+        meta: lang.meta,
         img: lang.img,
         text: lang.text,
         themes: THEME_NAMES,

@@ -96,6 +96,7 @@
       }
     },
     "remote": {
+      "pokeApi": "https://pokeapi.co",
       "pokeApiSprites": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions",
       "loadingPage": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
       "loginWallpaper": "https://wallpapercave.com/wp/wp2860892.jpg",
@@ -272,6 +273,16 @@
     "updates": {
       "patchNote": "Patch Note",
       "version": "Version"
+    },
+    "footer": {
+      "tagline": "Suivi d'un Living Dex Shiny",
+      "credits": "Crédits",
+      "dataSource": "Données PokeAPI",
+      "builtBy": "Built by Twist",
+      "nonOfficial": "Site de fans non officiel",
+      "trademark": "Pokémon et ses logos sont des marques de Nintendo, Creatures Inc. et GAME FREAK Inc.",
+      "disclaimer": "Ce site n'est pas approuvé par Nintendo, Creatures Inc. ni GAME FREAK Inc.",
+      "copyright": "© {year} PokeMind"
     },
     "alt": {
       "logo": "PokeMind",
