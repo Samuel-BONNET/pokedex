@@ -6,13 +6,11 @@ RUN corepack enable
 
 ENV CI=true
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts ./
 
 RUN pnpm install --frozen-lockfile
 
 COPY . .
-
-RUN pnpm prisma generate
 
 RUN pnpm build
 

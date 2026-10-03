@@ -7,7 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "prisma generate && nuxt prepare",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts",
@@ -18,18 +18,18 @@
     "import:all": "tsx scripts/import-pokemon.ts all"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "embla-carousel-vue": "^8.6.0",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-vue-next": "^1.0.0",
-    "nuxt": "^4.4.6",
-    "pg": "^8.21.0",
-    "vue": "^3.5.34",
-    "vue-router": "^5.0.7"
+    "nuxt": "^4.5.2",
+    "pg": "^8.23.0",
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -37,12 +37,12 @@
     "@types/bcryptjs": "^3.0.0",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.9.1",
-    "@types/pg": "^8.20.0",
+    "@types/node": "^25.9.8",
+    "@types/pg": "^8.23.1",
     "dotenv": "^17.4.2",
-    "prisma": "^7.8.0",
+    "prisma": "^7.10.0",
     "tailwindcss": "^4.3.3",
-    "tsx": "^4.22.3"
+    "tsx": "^4.23.15"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
