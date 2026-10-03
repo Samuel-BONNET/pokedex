@@ -1,10 +1,12 @@
 import { readdirSync } from 'node:fs'
-import { join } from 'node:path'
-
-const TYPES_DIR = join(process.cwd(), 'public', 'img', 'types')
+import { typesDir, typeIcon, img } from '../utils/lang'
 
 export default defineEventHandler(() =>
-    readdirSync(TYPES_DIR)
-        .filter(f => f.endsWith('.png'))
+    readdirSync(typesDir())
+        .filter(f => f.endsWith(img.types.ext))
         .sort()
+        .map(f => {
+            const name = f.slice(0, -img.types.ext.length)
+            return { name, icon: typeIcon(name) }
+        })
 )

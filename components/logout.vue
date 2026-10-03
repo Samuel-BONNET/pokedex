@@ -1,6 +1,6 @@
 <template>
   <button @click="logout">
-    Logout
+    {{ text.auth.logout }}
   </button>
 </template>
 
@@ -12,6 +12,7 @@
 import {useAuth} from "~/composables/useAuth";
 
 const { logout: authLogout } = useAuth()
+const { text } = useLang()
 
 async function logout() {
   await authLogout()

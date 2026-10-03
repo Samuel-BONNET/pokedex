@@ -1,3 +1,5 @@
+import lang from '~/data/lang.json'
+
 export function buildPokemonSpriteUrl(
     pokeNumber: number,
     generation: string,
@@ -6,7 +8,7 @@ export function buildPokemonSpriteUrl(
 ) {
     const shinyPath = shiny ? 'shiny/' : ''
 
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/${generation}/${game}/${shinyPath}/${pokeNumber}.png`
+    return `${lang.img.remote.pokeApiSprites}/${generation}/${game}/${shinyPath}/${pokeNumber}.png`
 }
 
 const SPRITE_ALIASES: Record<string, string[]> = {

@@ -1,0 +1,297 @@
+{
+  "meta": {
+    "appName": "PokeMind",
+    "defaultTheme": "rouge",
+    "themeStorageKey": "pokedex:theme"
+  },
+  "themes": {
+    "bleu": {
+      "classes": {
+        "mainBackground": "bg-blue-200",
+        "secondaryBackground": "bg-blue-500",
+        "color": "text-blue-500",
+        "border": "border-blue-500",
+        "hue": "hue-rotate-[0deg]",
+        "themeClassesLogoImageSize": "size-80",
+        "themeClassesRightImageSize": "size-75",
+        "positionLogoImage": "-left-2 sm:-left-10 -top-24",
+        "positionLeftImage": "-left-2 sm:-left-27 -top-10",
+        "positionRightImage": "left-20 sm:left-120 top-10"
+      },
+      "backgroundImage": false
+    },
+    "rouge": {
+      "classes": {
+        "mainBackground": "bg-red-300",
+        "secondaryBackground": "bg-red-500",
+        "color": "text-red-500",
+        "border": "border-red-500",
+        "hue": "hue-rotate-[140deg]",
+        "themeClassesLogoImageSize": "size-50",
+        "themeClassesRightImageSize": "size-85",
+        "positionLogoImage": "left-12 sm:left-8 -top-11",
+        "positionLeftImage": "left-20 sm:-left-27 -top-35",
+        "positionRightImage": "left-15 sm:left-125 top-0"
+      },
+      "backgroundImage": false
+    },
+    "vert": {
+      "classes": {
+        "mainBackground": "bg-green-500",
+        "secondaryBackground": "bg-green-600",
+        "color": "text-green-500",
+        "border": "border-green-500",
+        "hue": "hue-rotate-[290deg]",
+        "themeClassesLogoImageSize": "size-150",
+        "themeClassesRightImageSize": "size-80",
+        "positionLogoImage": "-left-2 sm:-left-8 -top-24",
+        "positionLeftImage": "-left-2 sm:-left-8 -top-24",
+        "positionRightImage": "left-20 sm:-left-27 -top-35"
+      },
+      "backgroundImage": false
+    }
+  },
+  "img": {
+    "logo": "/logo.png",
+    "favicon": "/favicon.ico",
+    "background": "/background.png",
+    "loading": "/loading.gif",
+    "pokeIcon": "/poke_icon.png",
+    "sparkles": "/img/diverse/sparkles.png",
+    "badges": {
+      "backup": "/badge1.png",
+      "welcome": "/badge2.png",
+      "pokedex": "/badge3.png",
+      "customize": "/badge4.png"
+    },
+    "avatar": {
+      "guest": "/img/diverse/pokemon/qulbutoke.png"
+    },
+    "types": {
+      "dir": "/img/types",
+      "ext": ".png"
+    },
+    "games": {
+      "defaultCover": "/img/games/defaultJaquette.png",
+      "covers": {
+        "locale": "fr",
+        "dir": "/img/games/fr"
+      }
+    },
+    "diverse": {
+      "bleu": {
+        "hero": "/img/diverse/pokemon/lugia.png",
+        "mascotRight": "/img/diverse/pokemon/mew.png",
+        "mascotLeft": "/img/diverse/pokemon/kaiminus.png"
+      },
+      "rouge": {
+        "hero": "/img/diverse/pokemon/salameche.png",
+        "mascotRight": "/img/diverse/pokemon/groudon.png",
+        "mascotLeft": "/img/diverse/pokemon/genesect.png"
+      },
+      "vert": {
+        "hero": null,
+        "mascotRight": null,
+        "mascotLeft": null
+      }
+    },
+    "remote": {
+      "pokeApi": "https://pokeapi.co",
+      "pokeApiSprites": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions",
+      "loadingPage": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+      "loginWallpaper": "https://wallpapercave.com/wp/wp2860892.jpg",
+      "loginPanel": {
+        "login": "https://images.alphacoders.com/508/thumb-1920-508993.jpg",
+        "register": "https://i.pinimg.com/1200x/b2/e2/f4/b2e2f42866502add8e97da97d600de04.jpg"
+      }
+    }
+  },
+  "text": {
+    "common": {
+      "save": "Sauvegarder",
+      "close": "Fermer",
+      "error": "Erreur",
+      "cancel": "Annuler"
+    },
+    "nav": {
+      "home": "Accueil",
+      "pokedex": "Pokedex",
+      "games": "Jeux",
+      "preferences": "Préférences",
+      "profil": "Profil"
+    },
+    "auth": {
+      "login": "Login",
+      "register": "Register",
+      "logout": "Logout",
+      "profil": "Profil"
+    },
+    "home": {
+      "cards": {
+        "welcome": {
+          "lead": "Bienvenue sur PokeMind",
+          "body": "Votre outil de gestion de collection pokemon et bien plus !"
+        },
+        "backup": {
+          "lead": "Archivez vos",
+          "highlight": "Sauvegardes",
+          "body": "Pour chaque jeux ayez un aperçu des sauvegardes"
+        },
+        "pokedex": {
+          "lead": "Complétez le",
+          "highlight": "Pokedex",
+          "trail": "!",
+          "body": "Enregistrez vos pokemon, vos shiny avec leurs informations de capture..."
+        },
+        "customize": {
+          "highlight": "Personnalisez",
+          "trail": "votre expérience",
+          "body": "Choisissez vos sprites de pokemons et jeux préférés et bien plus !"
+        }
+      }
+    },
+    "login": {
+      "hub": "Hub",
+      "connexion": "Connexion",
+      "inscription": "Inscription",
+      "email": "Email",
+      "password": "Password",
+      "passwordFr": "Mot de passe",
+      "pseudo": "Pseudo",
+      "passwordConfirmation": "Confirmation",
+      "secretToken": "Secret Token",
+      "guest": "Continuer en tant qu'invité",
+      "forgotPassword": "Mot de passe oublié",
+      "createAccount": "Créer un compte",
+      "alreadyMember": "Déjà membre ? Connexion",
+      "loginFailed": "Login Failed",
+      "registerFailed": "Register Failed"
+    },
+    "pokedex": {
+      "title": "Pokedex",
+      "search": {
+        "fr": "Rechercher par nom français",
+        "en": "Rechercher par nom anglais",
+        "number": "Numéro pokedex"
+      },
+      "types": "Types",
+      "all": "Toutes",
+      "page": "page",
+      "perPage": "nb Poke par page",
+      "showToolbar": "Voir la toolbar",
+      "hideToolbar": "Masquer la toolbar"
+    },
+    "pokedexDetail": {
+      "owned": "Pokeball",
+      "shiny": "Shiny",
+      "prev": "Prev",
+      "next": "Next"
+    },
+    "stats": {
+      "hp": "Hp",
+      "attack": "Attack",
+      "defense": "Def",
+      "specialAttack": "Attack spe",
+      "specialDefense": "Def spe",
+      "speed": "Speed"
+    },
+    "toolbar": {
+      "unitSelection": "Activer la sélection unitaire",
+      "rangeSelection": "Activer la sélection d'ensemble",
+      "cancelSelection": "Annuler la sélection",
+      "markNotOwned": "Marquer comme non possédé",
+      "markOwned": "Marquer comme possédé",
+      "markShiny": "Marquer comme shiny"
+    },
+    "games": {
+      "title": "Games",
+      "intro": "Gérez vos sauvegardes ici",
+      "choose": "Choississez un jeu",
+      "generation": "Génération",
+      "changeCover": "Changer la jaquette",
+      "pickFile": "Choisir un fichier .sav",
+      "download": "Télécharger",
+      "delete": "Supprimer",
+      "saveSent": "Sauvegarde envoyée",
+      "saveDeleted": "Sauvegarde Supprimée",
+      "names": {
+        "black-2-white-2": "Black 2 / White 2",
+        "black-white": "Black / White",
+        "blue-japan": "Bleu (Japon)",
+        "brilliant-diamond-shining-pearl": "Brillante Diamant / Éclat Perl",
+        "champions": "Champions",
+        "colosseum": "Colosseum",
+        "crystal": "Cristal",
+        "diamond-pearl": "Diamant / Perle",
+        "emerald": "Émeraude",
+        "firered-leafgreen": "Rouge Feu / Vert Feuille",
+        "gold-silver": "Or / Argent",
+        "heartgold-soulsilver": "HeartGold / SoulSilver",
+        "legends-arceus": "Legends: Arceus",
+        "legends-za": "Legends: Z-A",
+        "lets-go-pikachu-lets-go-eevee": "Let's Go Pikachu / Let's Go Évoli",
+        "mega-dimension": "Dimension Méga",
+        "omega-ruby-alpha-sapphire": "Omega Rubis / Alpha Saphir",
+        "platinum": "Platine",
+        "red-blue": "Rouge / Bleu",
+        "red-green-japan": "Rouge / Vert (Japon)",
+        "ruby-sapphire": "Rubis / Saphir",
+        "scarlet-violet": "Écran / Violette",
+        "sun-moon": "Soleil / Lune",
+        "sword-shield": "Épée / Bouclier",
+        "the-crown-tundra": "La Couronne Glaciale",
+        "the-indigo-disk": "Le Disque Indigo",
+        "the-isle-of-armor": "L'Île d'Armure",
+        "the-teal-mask": "Le Masque Cyan",
+        "ultra-sun-ultra-moon": "Ultra-Soleil / Ultra-Lune",
+        "xd": "XD",
+        "x-y": "X / Y",
+        "yellow": "Jaune"
+      }
+    },
+    "option": {
+      "theme": "Thème"
+    },
+    "preferences": {
+      "title": "Préférences",
+      "intro": "Choisissez votre ordre de sprites de jeux préférés",
+      "orderSaved": "Ordre enregistré",
+      "tiers": ["Favori", "J'aime beaucoup", "J'apprécie", "Neutre", "Peu utilisé"]
+    },
+    "welcome": {
+      "title": "Welcome !",
+      "tagline": "Fan site Pokémon dédié au suivi d'un Living Dex Shiny.",
+      "objective": "Objectif du site",
+      "objectiveBody": "La première fonctionnalité implémentée est le Pokédex.",
+      "eachPokemon": "Chaque Pokémon peut être marqué comme :",
+      "owned": "Possédé",
+      "ownedShiny": "Possédé en shiny",
+      "livingDex": "Living Dex Shiny",
+      "livingDexBody1": "Ce projet a été développé pour suivre l'avancement d'un Living Dex Shiny.",
+      "livingDexBody2": "L'objectif final est d'obtenir chaque Pokémon existant sous sa forme shiny."
+    },
+    "updates": {
+      "patchNote": "Patch Note",
+      "version": "Version"
+    },
+    "footer": {
+      "tagline": "Suivi d'un Living Dex Shiny",
+      "credits": "Crédits",
+      "dataSource": "Données PokeAPI",
+      "builtBy": "Built by Twist",
+      "nonOfficial": "Site de fans non officiel",
+      "trademark": "Pokémon et ses logos sont des marques de Nintendo, Creatures Inc. et GAME FREAK Inc.",
+      "disclaimer": "Ce site n'est pas approuvé par Nintendo, Creatures Inc. ni GAME FREAK Inc.",
+      "copyright": "© {year} PokeMind"
+    },
+    "alt": {
+      "logo": "PokeMind",
+      "login": "Login",
+      "register": "Register",
+      "guest": "Visiteur invité",
+      "hero": "Pokémon de fond",
+      "mascotRight": "Mascotte à droite",
+      "mascotLeft": "Mascotte à gauche"
+    }
+  }
+}
