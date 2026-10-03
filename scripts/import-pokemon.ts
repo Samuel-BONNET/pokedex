@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import { prisma } from '../server/utils/prisma'
 import { buildPokemonSpriteUrl } from '../server/utils/sprite'
+import lang from '../data/lang.json'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -39,13 +40,14 @@ function getFrenchName(species: any): string {
     return species.names?.find((n: any) => n.language.name === 'fr')?.name ?? species.name
 }
 
-const JQ_DIR =  join(process.cwd(), 'public', 'img', 'games', 'fr')
+const COVERS_DIR = lang.img.games.covers.dir
+const JQ_DIR = join(process.cwd(), 'public', COVERS_DIR.replace(/^\/+/, ''))
 
 function loadJaquette(nomEn: string): string {
 
     for(const file of [`${nomEn}1.png`, `${nomEn}.png`]){
         if (existsSync(join(JQ_DIR, file))) {
-            return `/img/games/fr/${file}`
+            return `${COVERS_DIR}/${file}`
         }
     }
     return ''
