@@ -1,7 +1,10 @@
 <script setup lang="ts">
+const { img, themeClassesMainBackground, themeBackgroundImage } = useLang()
 </script>
 <template>
-  <div class="fixed inset-0 -z-10 bg-[url('/background.png')] bg-repeat-y bg-[length:100%_auto]" />
+  <div :class="themeClassesMainBackground"
+       :style="themeBackgroundImage ? { backgroundImage: `url('${img.background}')` } : undefined"
+       class="fixed inset-0 -z-10 bg-repeat-y bg-[length:100%_auto]" />
 
   <Header class="relative z-10" />
 

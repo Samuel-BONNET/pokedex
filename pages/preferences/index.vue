@@ -1,29 +1,29 @@
 <template>
   <section class="flex flex-col text-center mb-12 px-4 sm:px-8 min-h-screen gap-4">
     <h1 class="text-4xl font-bold mb-6">
-      Préférences
+      {{ text.preferences.title }}
     </h1>
 
     <p class="text-lg">
-      Choisissez votre ordre de sprites de jeux préférés
+      {{ text.preferences.intro }}
     </p>
 
     <div class="flex flex-col bg-blue-300">
-      <ul v-for="(tierName, t) in TIER_NAMES" :key="tierName" class="flex gap-2 p-2" :class="TIER_NAMES.indexOf(tierName) % 2 === 0 ? 'bg-black/90' : 'bg-black/80'" @dragover.prevent="onTierDragOver(t)" @drop="onTierDrop(t)">
+      <ul v-for="(tierName, t) in tiers" :key="tierName" class="flex gap-2 p-2" :class="tiers.indexOf(tierName) % 2 === 0 ? 'bg-black/90' : 'bg-black/80'" @dragover.prevent="onTierDragOver(t)" @drop="onTierDrop(t)">
         <div class="flex flex-row gap-2">
           <span class="flex flex-row justify-center bg-black/80 items-center text-white text-xl font-bold w-32 min-h-28">
               {{ tierName }}
           </span>
           <li v-for="(g, i) in tierGames[t]" :key="g.id" draggable="true" @dragstart="onDragStart(t, i)" @dragover.prevent.stop="onDragOver(t, i)" @drop="onDrop(t, i)" @dragend="onDragEnd">
             <div v-if="overTier === t && overIndex === i && dragTier !== null" class="h-28 w-14 border-2 border-dashed rounded" />
-            <img v-else :src="g.currentSprite ?? '/img/games/defaultJaquette.png'" class="h-28 w-auto object-contain" :class="{ 'opacity-30': dragTier === t && dragIndex === i }" />
+            <img v-else :src="g.currentSprite ?? img.games.defaultCover" class="h-28 w-auto object-contain" :class="{ 'opacity-30': dragTier === t && dragIndex === i }" />
           </li>
         </div>
       </ul>
     </div>
 
     <div class="flex flex-col justify-between items-center">
-      <button @click="save" :disabled="!user" class="px-4 py-2 text-sm border border-slate-300 rounded transition-colors hover:bg-slate-200 hover:border-green-600 hover:text-green-800 action:bg-green-300 action:text-white">Sauvegarder</button>
+      <button @click="save" :disabled="!user" class="px-4 py-2 text-sm border border-slate-300 rounded transition-colors hover:bg-slate-200 hover:border-green-600 hover:text-green-800 action:bg-green-300 action:text-white">{{ text.common.save }}</button>
       <p v-if="message">{{ message }}</p>
     </div>
 
@@ -37,6 +37,7 @@
 <script setup lang="ts">
 
 const { user } = useAuth()
+const { img, text } = useLang()
 
 type GameRow = {
   id: number
@@ -55,13 +56,13 @@ const rank = new Map((prefs.value?.gameOrder ?? []).map((id, i) => [id, i]))
 
 orderedGames.value.sort((a, b) => ((rank.get(a.id) ?? games.value!.length) - (rank.get(b.id) ?? games.value!.length)) || a.id - b.id)
 
-const TIER_NAMES = ['Favori', "J'aime beaucoup", "J'apprécie", 'Neutre', 'Peu utilisé']
+const tiers = text.preferences.tiers
 
 const defaultSizes = computed(() => {
   const n = orderedGames.value.length
-  const base = Math.floor(n / TIER_NAMES.length)
-  const rest = n % TIER_NAMES.length
-  return TIER_NAMES.map((_, i) => base + (i < rest ? 1 : 0))
+  const base = Math.floor(n / tiers.length)
+  const rest = n % tiers.length
+  return tiers.map((_, i) => base + (i < rest ? 1 : 0))
 })
 
 const tierSizes = ref<number[]>(defaultSizes.value)
@@ -69,7 +70,7 @@ const tierSizes = ref<number[]>(defaultSizes.value)
 const tierGames = computed(() => {
   const result: GameRow[][] = []
   let offset = 0
-  for (let t = 0; t < TIER_NAMES.length; t++) {
+  for (let t = 0; t < tiers.length; t++) {
     const size = tierSizes.value[t] ?? 0
     const end = Math.min(offset + size, orderedGames.value.length)
     result.push(orderedGames.value.slice(offset, end))
@@ -169,7 +170,7 @@ async function save() {
     method: 'POST',
     body: { order: orderedGames.value.map(g => g.id ), idUser: user.value.id }
   })
-  message.value = 'Ordre enregistré'
+  message.value = text.preferences.orderSaved
 }
 
 </script>

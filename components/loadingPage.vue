@@ -1,10 +1,12 @@
 <template>
   <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <img class="w-24 h-24" src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" />
+    <img class="w-24 h-24" :src="img.remote.loadingPage" />
   </div>
 </template>
 
 <script setup lang="ts">
+const { img } = useLang()
+
 const props = withDefaults(defineProps<{
   loading: boolean
   delay?: number
