@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from "node:fs"
-import { join } from "node:path"
+import { coversDir, coverPath } from "../../utils/lang"
 
-const JQ_DIR = join(process.cwd(), 'public', 'img', 'games', 'fr')
+const JQ_DIR = coversDir()
 
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     const allFiles = readdirSync(JQ_DIR)
     const availableJaquettes = allFiles.filter(f => f.startsWith(game.nameEn) && f.endsWith('.png')).map(f => ({
         name: f.replace('.png', ''),
-        sprite: `/img/games/fr/${f}`
+        sprite: coverPath(f)
         }))
 
     return {

@@ -1,31 +1,31 @@
 <template>
   <section class="flex flex-col text-center mb-12 px-4 sm:px-8  min-h-screen">
     <h1 class="text-4xl font-bold mb-6">
-      Pokedex
+      {{ text.pokedex.title }}
     </h1>
 
     <div class="flex flex-wrap gap-2 justify-center mb-3">
-      <input placeholder="Rechercher par nom français" v-model="frenchSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
-      <input placeholder="Rechercher par nom anglais" v-model="englishSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
-      <input placeholder="Numéro pokedex" v-model="pokeNumberSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <input :placeholder="text.pokedex.search.fr" v-model="frenchSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <input :placeholder="text.pokedex.search.en" v-model="englishSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
+      <input :placeholder="text.pokedex.search.number" v-model="pokeNumberSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
       <details class="dropdown-checkbox">
-        <summary>Types</summary>
+        <summary>{{ text.pokedex.types }}</summary>
           <div class="absolute bg-white z-10 option-list flex flex-col max-h-100 px-2 overflow-y-auto">
-            <label v-for="f in typeFiles">
-              <input name="couleur[]" v-model="selectedTypes" :value="f.replace('.png', '')" type="checkbox" class="peer sr-only" />
-              <img :src="`/img/types/${f}`" class="max-h-15 peer-checked:opacity-50 peer-checked:ring-3 peer-checked:ring-blue-500 peer-checked:rounded" />
+            <label v-for="type in types" :key="type.name">
+              <input name="couleur[]" v-model="selectedTypes" :value="type.name" type="checkbox" class="peer sr-only" />
+              <img :src="type.icon" class="max-h-15 peer-checked:opacity-50 peer-checked:ring-3 peer-checked:ring-blue-500 peer-checked:rounded" />
             </label>
           </div>
       </details>
       <select v-model="generationSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
-        <option :value="0" selected>Toutes</option>
+        <option :value="0" selected>{{ text.pokedex.all }}</option>
         <option v-for="gen in genBound.length - 1" :key="gen" :value="gen">{{ gen }}</option>
       </select>
     </div>
 
     <div class="flex flex-wrap gap-2 justify-center mb-3">
       <label class="flex items-center gap-1 text-sm text-slate-600">
-        page
+        {{ text.pokedex.page }}
         <select v-model="cardNumber" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
           <option :value="50">50</option>
           <option :value="200">200</option>
@@ -35,7 +35,7 @@
       </label>
 
       <label class="flex items-center gap-1 text-sm text-slate-600">
-        nb Poke par page
+        {{ text.pokedex.perPage }}
         <select v-model="cardsPerRow" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
           <option :value="5">5</option>
           <option :value="7">7</option>
@@ -43,27 +43,27 @@
         </select>
       </label>
 
-      <button class="bg-white text-slate-800 border-slate-300" @click="toolbarEnable = !toolbarEnable">{{ toolbarEnable ? 'Masquer la toolbar' : 'Voir la toolbar'}}</button>
+      <button class="bg-white text-slate-800 border-slate-300" @click="toolbarEnable = !toolbarEnable">{{ toolbarEnable ? text.pokedex.hideToolbar : text.pokedex.showToolbar }}</button>
 
     </div>
 
     <div v-for="position in (cardNumber > 50 ? 2 : 1)" :key="position">
       <div class="flex flex-wrap gap-2 justify-center mb-6">
-        <button v-if="totalPages > 2" @click="currentPage = 1" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+        <button v-if="totalPages > 2" @click="currentPage = 1" class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-white transition-colors" :class="themeClassesSecondaryBackground">
           <<
         </button>
-        <button v-if="totalPages > 1" @click="currentPage > 1 && currentPage--" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+        <button v-if="totalPages > 1" @click="currentPage > 1 && currentPage--" class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-white transition-colors" :class="themeClassesSecondaryBackground">
           <
         </button>
         <button v-for="n in visiblePages" :key="n" @click="currentPage = n"
-          class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200 hover:text-green-800"
-          :class="currentPage === n ? 'bg-green-600 text-white border-green-800 hover:border-green-600' : 'bg-white'">
+          class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-black transition-colors"
+          :class="[themeClassesSecondaryBackground, currentPage === n ? 'text-white border-white hover:border-white' : 'bg-white']">
           {{ n }}
         </button>
-        <button v-if="totalPages > 1" @click="currentPage < totalPages && currentPage++" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+        <button v-if="totalPages > 1" @click="currentPage < totalPages && currentPage++" class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-white transition-colors" :class="themeClassesSecondaryBackground">
           >
         </button>
-        <button v-if="totalPages > 2" @click="currentPage = totalPages" class="px-2 py-1 text-sm border border-slate-300 rounded hover:bg-slate-200">
+        <button v-if="totalPages > 2" @click="currentPage = totalPages" class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-white transition-colors" :class="themeClassesSecondaryBackground">
           >>
         </button>
       </div>
@@ -95,6 +95,7 @@
 </style>
 
 <script setup lang="ts">
+const { text } = useLang()
 
 const frenchSearchQuery = ref('')
 const englishSearchQuery = ref('')
@@ -105,8 +106,8 @@ const getGeneration = (n: number) => genBound.findIndex(bound => n <= bound)
 const toolbarEnable = ref(true)
 const selectedTypes = ref<string[]>([])
 
-const { data: typeFiles } = useFetch<string[]>('/api/types')
-
+const { data: types } = useFetch<{ name: string, icon: string }[]>('/api/types')
+const { themeClassesSecondaryBackground } = useLang()
 const filteredPokemons = computed(() => {
   const fr = frenchSearchQuery.value.trim().toLowerCase()
   const en = englishSearchQuery.value.trim().toLowerCase()

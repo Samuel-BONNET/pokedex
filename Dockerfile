@@ -8,12 +8,14 @@ ENV CI=true
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
 
 RUN pnpm prisma generate
 
+RUN pnpm prisma generate
+RUN pnpm nuxt prepare
 RUN pnpm build
 
 COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh
