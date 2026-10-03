@@ -15,7 +15,7 @@
         <div class="bg-slate-400 rounded-xl p-8 m-2 [clip-path:polygon(0_0,100%_0,100%_100%,9%_100%,0_88%)] drop-shadow-lg  shadow-lg shadow">
           <div class="flex flex-col justify-center bg-white p-4 px-12 drop-shadow-lg  shadow-lg">
             <span class=" absolute flex justify-end text-yellow-400 top-0 right-0">
-              <img src="/img/diverse/sparkles.png" class="object-contain relative w-10 p-1" :class="pokemon?.isShiny ? 'opacity-100' : 'opacity-0'" />
+              <img :src="img.sparkles" class="object-contain relative w-10 p-1" :class="pokemon?.isShiny ? 'opacity-100' : 'opacity-0'" />
             </span>
 
             <img v-if="!isOpen" :src="pokemon?.isShiny && pokemon?.currentSprite ? shinyUrl(pokemon?.currentSprite) ?? undefined : pokemon?.currentSprite ?? undefined" :alt="pokemon?.nameFr" :class="!pokemon?.isShiny && !pokemon?.isOwned ? 'grayscale' : ''" class="w-48 h-48 object-contain mt-5" draggable="false" />
@@ -40,13 +40,13 @@
         <div class="flex flex-row justify-center items-center gap-2 my-6">
           <div class="flex flex-row justify-between gap-6">
             <button @click="changeOwned()" :disabled="!pokemon" class="w-15 h-7.5 flex items-center justify-center text-[6.5px] text-center border transition-colors bg-white text-black border-blue-500 hover:bg-blue-500 disabled:cursor-not-allowed">
-              Pokeball
+              {{ text.pokedexDetail.owned }}
             </button>
 
 
 
             <button @click="changeShiny" :disabled="!pokemon" class="w-15 h-7.5 p-1 fit flex items-center justify-center text-[6.5px] text-center border transition-colors bg-white text-black border-yellow-500 hover:bg-yellow-500 disabled:cursor-not-allowed">
-              Shiny
+              {{ text.pokedexDetail.shiny }}
             </button>
           </div>
         </div>
@@ -76,10 +76,10 @@
 
           <div class="flex flex-row justify-center items-center gap-4">
             <div>
-              <img :src="`/img/types/${pokemon?.types[0]}.png`" class="max-h-[5vh]" />
+              <img :src="typeIcon(pokemon.types[0]!)" class="max-h-[5vh]" />
             </div>
             <div v-if="pokemon?.types.length > 1">
-              <img :src="`/img/types/${pokemon?.types[1]}.png`" class="max-h-[5vh]" />
+              <img :src="typeIcon(pokemon.types[1]!)" class="max-h-[5vh]" />
             </div>
           </div>
         </div>
@@ -94,24 +94,24 @@
         </div>
 
         <div v-if="pokemon" class="flex flex-col gap-2 bg-green-500 p-2">
-          <div><span >></span><span>Hp: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "hp")].value }}</span></div>
-          <div><span >></span><span>Attack: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "attack")].value }}</span></div>
-          <div><span >></span><span>Def: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "defense")].value }}</span></div>
-          <div><span >></span><span>Attack spe: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "special-attack")].value }}</span></div>
-          <div><span >></span><span>Def spe: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "special-defense")].value }}</span></div>
-          <div><span >></span><span>Speed: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "speed")].value }}</span></div>
+          <div><span >></span><span>{{ text.stats.hp }}: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "hp")].value }}</span></div>
+          <div><span >></span><span>{{ text.stats.attack }}: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "attack")].value }}</span></div>
+          <div><span >></span><span>{{ text.stats.defense }}: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "defense")].value }}</span></div>
+          <div><span >></span><span>{{ text.stats.specialAttack }}: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "special-attack")].value }}</span></div>
+          <div><span >></span><span>{{ text.stats.specialDefense }}: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "special-defense")].value }}</span></div>
+          <div><span >></span><span>{{ text.stats.speed }}: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "speed")].value }}</span></div>
         </div>
 
         <div v-if="pokemon" class="flex flex-row items-center justify-between gap-6 mb-6 text-white">
             <NuxtLink :disable="pokemon!.id > 1" :to="`/pokedex/${pokemon!.id-1}`">
               <div class="bg-slate-800 p-4 px-12 rounded-lg">
-                Prev
+                {{ text.pokedexDetail.prev }}
               </div>
             </NuxtLink>
 
             <NuxtLink v-if="pokemon && pokemon?.id < MAX_ID_POKE" :to="`/pokedex/${pokemon?.id+1}`">
               <div class="bg-slate-800 p-4 px-12 rounded-lg">
-                Next
+                {{ text.pokedexDetail.next }}
               </div>
             </NuxtLink>
         </div>
@@ -128,6 +128,8 @@
 import type { AvailableGames } from "~/components/spriteChoose.vue";
 import { Circle, Weight, RulerDimensionLine  } from 'lucide-vue-next'
 import {shinyUrl} from "#server/utils/sprite";
+
+const { img, text, typeIcon } = useLang()
 import type { EvolutionStage } from "~/server/utils/evolution";
 
 const route = useRoute()

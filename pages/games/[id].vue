@@ -2,16 +2,16 @@
   <section class="max-w-5xl mx-auto px-4 py-10">
     <header class="text-center mb-10">
       <h1 class="text-3xl font-bold text-slate-800">
-        {{ game?.nameEn }}
+        {{ game ? gameName(game.nameEn) : '' }}
       </h1>
       <p v-if="game" class="text-slate-500 mt-2">
-        Génération {{ game.generation }}
+        {{ text.games.generation }} {{ game.generation }}
       </p>
     </header>
 
     <div class="flex flex-col md:flex-row items-center justify-center gap-8">
       <div class="flex flex-col items-center gap-4">
-        <img v-if="game" :src="game?.currentSprite ?? '/img/games/defaultJaquette.png'" :alt="game.nameEn"
+        <img v-if="game" :src="game?.currentSprite ?? img.games.defaultCover" :alt="gameName(game.nameEn)"
              class="h-110 object-contain select-none" draggable="false" />
       </div>
 
@@ -27,19 +27,19 @@
 
           <button @click="isOpen = !isOpen" :disabled="!user"
                   class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 transition-colors hover:bg-slate-50 hover:border-green-600 hover:text-green-700 disabled:opacity-40 disabled:cursor-not-allowed">
-            {{ isOpen ? 'Fermer' : 'Changer la jaquette' }}
+            {{ isOpen ? text.common.close : text.games.changeCover }}
           </button>
           </div>
 
           <label class="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm border border-slate-300 rounded-lg text-slate-600 cursor-pointer transition-colors hover:bg-slate-50">
             <FileText class="w-4 h-4 shrink-0" />
-            <span class="truncate">{{ file ? file.name : 'Choisir un fichier .sav' }}</span>
+            <span class="truncate">{{ file ? file.name : text.games.pickFile }}</span>
             <input type="file" accept=".sav" class="hidden" @change="onFileChange" :disabled="!user" />
           </label>
 
           <a v-if="url !== null" :href="url" download
              class="text-sm text-green-700 hover:underline inline-flex items-center justify-center gap-1">
-            <Download class="w-4 h-4" /> Télécharger
+            <Download class="w-4 h-4" /> {{ text.games.download }}
           </a>
         </div>
 
@@ -47,11 +47,11 @@
           <div class="flex w-full gap-3">
             <button @click="upload" :disabled="!user"
                     class="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg bg-green-600 text-white transition-colors hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed">
-              Sauvegarder
+              {{ text.common.save }}
             </button>
             <button @click="remove" :disabled="!user"
                     class="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-slate-300 text-slate-700 transition-colors hover:border-red-400 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed">
-              Supprimer
+              {{ text.games.delete }}
             </button>
           </div>
 
@@ -68,6 +68,7 @@
 import { Download, FileText } from 'lucide-vue-next'
 
 const { user } = useAuth()
+const { img, text, gameName } = useLang()
 const route = useRoute()
 const gameId =  String(route.params.id)
 const url = ref<string | null>(null)
@@ -98,9 +99,9 @@ async function upload() {
     if (!res.ok) throw new Error()
 
     file.value = null
-    result.value = "Sauvegarde envoyée"
+    result.value = text.games.saveSent
   } catch (e: any) {
-    result.value = e?.data?.statusMessage ?? 'Erreur'
+    result.value = e?.data?.statusMessage ?? text.common.error
   }
 }
 
@@ -114,7 +115,7 @@ async function download() {
 
 async function remove() {
   await fetch(`/api/games/${gameId}/save`, { method: 'DELETE' })
-  result.value = "Sauvegarde Supprimée"
+  result.value = text.games.saveDeleted
 }
 
 download()

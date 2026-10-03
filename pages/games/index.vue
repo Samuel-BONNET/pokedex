@@ -2,12 +2,12 @@
 
   <section class="text-center mb-12">
     <h1 class="text-4xl font-bold mb-4">
-      Games
+      {{ text.games.title }}
     </h1>
 
     <p class="text-lg">
-      Gérez vos sauvegardes ici<br>
-      Choississez un jeu
+      {{ text.games.intro }}<br>
+      {{ text.games.choose }}
     </p>
   </section>
 
@@ -28,7 +28,7 @@
     <button @click="scrollNext" class="z-10 absolute top-1/2 -translate-y-1/2 right-2 rounded-lg bg-transparent border border-transparent hover:border-green-500 hover:text-green-500 px-5 py-4 shadow"><ChevronRight class="hover:text-black" /></button>
 
     <p v-if="selectedGame" class="text-center text-2xl mt-8">
-      {{ selectedGame.nameEn }}
+      {{ gameName(selectedGame.nameEn) }}
     </p>
   </div>
 </template>
@@ -38,6 +38,7 @@ import useEmblaCarousel from 'embla-carousel-vue'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const { user } = useAuth()
+const { text, gameName } = useLang()
 const { data: games } = await useFetch('/api/games', {
   query: { userId: user.value?.id }
 })

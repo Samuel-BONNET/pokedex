@@ -25,7 +25,7 @@
     <div class="flex gap-3">
       <button v-if="spriteList.length && pokemon" @click="save" :disabled="!isConnected"
               class="px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white transition-colors hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed">
-        Sauvegarder
+        {{ text.common.save }}
       </button>
     </div>
   </div>
@@ -60,6 +60,7 @@ const spriteTarget = ref<string | null>(null)
 const gameTarget = ref<string | null>(null)
 
 const { isConnected, user } = useAuth()
+const { text } = useLang()
 
 const [emblaRef, emblaApi] = useEmblaCarousel({
   loop: true,
