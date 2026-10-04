@@ -1,33 +1,31 @@
 import { useState, computed } from '#imports'
 
 export const useAuth = () => {
-    const user = useState<{ id: number } | null>('auth:user', () => null)
-    const guest = useState<{ id: number } | null>('auth:guest', () => null)
+    type AuthUser = { id: number; role: string }
+    const user = useState<AuthUser | null>('auth:user', () => null)
     const loading = useState<boolean>('auth:loading', () => true)
 
     async function fetchUser() {
         loading.value = true
         try {
-            const data = await $fetch<{ userId: number }>('/api/user/me')
-            user.value = data.userId ? { id: data.userId } : null
-        } catch {
-            user.value = null
-        } finally {
-            loading.value = false
-        }
+            const { user: data } = await $fetch<{ user: AuthUser | null }>('/api/user/me')
+            user.value = data
+        } catch { user.value = null } finally { loading.value = false }
     }
 
-    function setGuest() {
-        guest.value = { id: 1 }
-        navigateTo('/')
+    async function setGuest() {
+        const res = await $fetch<{ user: AuthUser }>('/api/auth/guest', { method: 'POST' })
+        user.value = res.user
+        await navigateTo('/')
     }
+
 
     async function login(email: string, password: string) {
         const res = await $fetch<{ user: { id: number; email: string; role: string } }>('/api/auth/login', {
             method: 'POST',
             body: { email, password },
         })
-        user.value = { id: res.user.id }
+        user.value = { id: res.user.id, role: res.user.role }
         return res
     }
 
@@ -38,6 +36,7 @@ export const useAuth = () => {
     }
 
     const isConnected = computed(() => user.value !== null)
+    const isGuest = computed(() => user.value?.role === 'GUEST')
 
-    return { user, loading, isConnected, fetchUser, login, logout, guest, setGuest }
+    return { user, loading, isConnected, isGuest, fetchUser, login, logout, setGuest }
 }

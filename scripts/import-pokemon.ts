@@ -207,9 +207,17 @@ async function importPokemon(start: number, end: number) {
             orderBy: { id: 'asc' },
         })
 
+        const systemOrder = gameWithJaquette.map(g => g.id)
+        const RANKED_TIER_COUNT = lang.text.preferences.tiers.length - 1
+        const base = Math.floor(systemOrder.length / RANKED_TIER_COUNT)
+        const rest = systemOrder.length % RANKED_TIER_COUNT
+        const gameTierSizes = lang.text.preferences.tiers.map((_, i) =>
+            i < RANKED_TIER_COUNT ? base + (i < rest ? 1 : 0) : 0,
+        )
+
         await prisma.user.update({
             where: { id: 0 },
-            data: { preferences: { gameOrder: gameWithJaquette.map(g => g.id) } }
+            data: { preferences: { gameOrder: systemOrder, gameTierSizes } }
         })
 
         if (id % BATCH_SIZE === 0 && id < end) {

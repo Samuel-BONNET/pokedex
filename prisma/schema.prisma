@@ -34,13 +34,14 @@ model GameSave {
     id          Int         @id @default(autoincrement())
     idGame      Int
     idUser      Int
+    version     String      @default("default") @db.VarChar(30)
     file        Bytes       @db.ByteA
     fileName    String
     size        Int
     updatedAt   DateTime    @updatedAt
     game        Game        @relation(fields: [idGame], references: [id])
     user        User        @relation(fields: [idUser], references: [id])
-    @@unique([idGame, idUser])
+    @@unique([idGame, idUser, version])
 }
 
 model Pokemon {
