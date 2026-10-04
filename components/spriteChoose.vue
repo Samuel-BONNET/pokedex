@@ -1,10 +1,6 @@
 <template>
   <div class="flex flex-col items-center gap-2">
     <div v-if="spriteList.length" class="flex items-center gap-2">
-      <button @click="scrollPrev" class="rounded-full border border-slate-300 bg-white p-1 hover:bg-slate-200 disabled:opacity-40">
-        <ChevronLeft />
-      </button>
-
       <div ref="emblaRef" class="overflow-hidden w-36">
         <div class="flex">
           <div v-for="item in spriteList" :key="item.game" class="shrink-0 w-full flex justify-center">
@@ -12,18 +8,14 @@
           </div>
         </div>
       </div>
-
-      <button @click="scrollNext" class="rounded-full border border-slate-300 bg-white p-1 hover:bg-slate-200 disabled:opacity-40">
-        <ChevronRight />
-      </button>
     </div>
 
-    <p v-if="spriteList.length" class="text-xs text-slate-500">
-      {{ currentItem?.name }} ({{ selectedIndex + 1 }} / {{ spriteList.length }})
+    <p v-if="spriteList.length" class="text-xs text-slate-500 text-center">
+      {{ currentItem?.name }}<br> ({{ selectedIndex + 1 }} / {{ spriteList.length }})
     </p>
 
     <div class="flex gap-3">
-      <button v-if="spriteList.length && pokemon" @click="save" :disabled="!isConnected"
+      <button v-if="false && spriteList.length && pokemon" @click="save" :disabled="!isConnected"
               class="px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white transition-colors hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed">
         {{ text.common.save }}
       </button>
@@ -109,13 +101,23 @@ watch(currentItem, (item) => {
   }
 }, { immediate: true })
 
-function scrollPrev() {
+const scrollPrev = () => {
   emblaApi.value?.scrollPrev()
 }
 
-function scrollNext() {
+const scrollNext = () => {
   emblaApi.value?.scrollNext()
 }
+
+const saveCurrent = () => {
+  save()
+}
+
+defineExpose({
+  scrollPrev,
+  scrollNext,
+  saveCurrent
+})
 
 const currentIdUser = computed(() => isConnected.value && user.value ? user.value.id : 1)
 

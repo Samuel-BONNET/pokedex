@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-    const idUser = Number(getQuery(event).userId ?? 0)
+    const idUser = Number(event.context.user?.userId ?? 0)
 
     return await prisma.statut.findMany({
         where: {
