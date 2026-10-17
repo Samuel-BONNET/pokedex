@@ -37,12 +37,13 @@
             <p v-if="message" class="text-red-500">{{ message }}</p>
           </label>
 
-          <a v-if="url !== null"
-             :href="url"
-             download
-             class="text-xs font-bold text-green-700 bg-emerald-100 border border-emerald-500 px-3 py-1 hover:bg-emerald-200 inline-flex items-center justify-center gap-1.5 transition-colors w-full">
-            <Download class="w-4 h-4" /> {{ text.games.download }}
-          </a>
+          <div v-if="url !== null">
+            <a :href="url"
+               download
+               class="text-xs font-bold text-green-700 bg-emerald-100 border border-emerald-500 px-3 py-1 hover:bg-emerald-200 inline-flex items-center justify-center gap-1.5 transition-colors w-full">
+              <Download class="w-4 h-4" /> {{ text.games.download }}
+            </a>
+          </div>
         </div>
 
         <div class="flex flex-col items-center gap-3 w-full border-t-2 border-dashed border-neutral-500 pt-4">
@@ -67,12 +68,18 @@
         </div>
       </div>
     </div>
+
+    <div class="flex items-center justify-center gap-2 mt-3 w-full px-3 py-2 text-xs font-bold bg-white border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-neutral-800 cursor-pointer transition-all hover:bg-neutral-100 active:translate-y-0.5">
+      <p v-if="output" class="text-red-500">{{ output }}</p>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { Download, FileText } from 'lucide-vue-next'
 import { versionLabel } from '~/utils/gameVersions'
+import { createEngine } from '@pkhex-everywhere/engine'
+import { ref, watch } from 'vue'
 
 const { user } = useAuth()
 const { img, text, gameName } = useLang()
@@ -83,6 +90,7 @@ const url = ref<string | null>(null)
 const result = ref<string | null>(null)
 const file = ref<File | null>(null)
 const message = ref('')
+const output = ref('')
 
 const { data: game } = await useFetch<{
   id: number
@@ -223,4 +231,23 @@ const verifierFichier = (e: Event) => {
   }
 }
 
+
+const { data: fileData, error } = await useFetch<ArrayBuffer>(`/api/games/${gameId}/save`, {
+  method : 'GET', query : { version: activeVersionId}, responseType: 'arrayBuffer' })
+
+const engine = createEngine()
+
+watch(fileData, async (newBuffer) => {
+  if (newBuffer) {
+    try {
+      const byteArray = new Uint8Array(newBuffer)
+      await engine.game.load(byteArray)
+      const party = await engine.box.get()
+      output.value = JSON.stringify(party, null, 2)
+    } catch (error) {
+      console.error("Erreur PKHeX", error)
+      message.value = "Erreur lors de la lecture du fichier de sauvegarde."
+    }
+  }
+}, { immediate: true })
 </script>

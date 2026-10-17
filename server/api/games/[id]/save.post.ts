@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         })
     } catch (e) {
         return await prisma.gameSave.upsert({
-            where: { idGame_idUser: { idGame, idUser: userId } as any },
+            where: { idGame_idUser_version: { idGame, idUser: userId } as any },
             update: { file: fileData, fileName, size: filePart.data.length },
             create: { idGame, idUser: userId, version, file: fileData, fileName, size: filePart.data.length },
         })
