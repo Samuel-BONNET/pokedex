@@ -10,7 +10,7 @@ const { img, themeClassesMainBackground, themeBackgroundImage } = useLang()
     <Header />
 
     <div class="grid grow grid-cols-3">
-      <main class="col-span-3 ml-0 lg:ml-20">
+      <main class="col-span-3">
         <slot />
       </main>
     </div>
