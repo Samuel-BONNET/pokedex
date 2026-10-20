@@ -1,19 +1,26 @@
 <template>
-  <div ref="root" class="relative flex flex-col items-center w-fit self-start">
+  <div ref="root" class="relative flex flex-col items-center w-fit self-start font-mono">
     <button type="button"
-            class="flex items-center gap-2 p-2 cursor-pointer"
-            :class="[themeClassesMainBackground, open ? 'ring-2 ring-offset-1 ring-gray-400' : '']"
+            class="flex items-center justify-center p-2 bg-neutral-300 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-200 transition-all cursor-pointer"
+            :class="open ? 'bg-neutral-400 translate-y-0.5 shadow-none' : ''"
             :aria-expanded="open"
             aria-haspopup="true"
             @click="open = !open">
-      <Menu class="h-6 w-6 text-gray-800" />
+      <Menu class="h-6 w-6 text-neutral-900" />
     </button>
 
     <Transition name="menu">
-      <div v-if="open" class="absolute items-center gap-1.5 px-2 top-full mt-2 z-20 w-fit max-h-100 overflow-y-auto border border-black/10 py-1 bg-slate-600 text-gray-800 shadow-xl flex flex-col">
-        <NuxtLink v-if="!isConnected" to="/login">{{ text.auth.login }}</NuxtLink>
-        <NuxtLink v-if="!isProfil && isConnected" to="/profil">{{ text.auth.profil }}</NuxtLink>
-        <Logout v-if="isConnected" />
+      <div v-if="open" class="absolute right-0 top-full mt-2 z-30 w-48 bg-neutral-300 border-4 border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-2 flex flex-col gap-1.5 text-xs font-bold text-neutral-900">
+        <NuxtLink v-if="!isConnected || isGuest" to="/login" class="px-3 py-2 bg-white border-2 border-neutral-700 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-100 text-center">
+          {{ text.auth.login }}
+        </NuxtLink>
+        <NuxtLink v-if="isConnected && !isGuest" to="/profil" class="px-3 py-2 bg-white border-2 border-neutral-700 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-100 text-center">
+          {{ text.auth.profil }}
+        </NuxtLink>
+        <NuxtLink to="/settings" class="px-3 py-2 bg-white border-2 border-neutral-700 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-100 text-center">
+          {{ text.auth.settings}}
+        </NuxtLink>
+        <Logout v-if="isConnected && !isGuest" class="w-full text-center px-3 py-2 bg-white border-2 border-neutral-700 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-100" />
       </div>
     </Transition>
   </div>
@@ -23,14 +30,11 @@
 </style>
 
 <script setup lang="ts">
-import { Check, ChevronDown, Menu } from 'lucide-vue-next'
-import lang from '~/data/lang.json'
+import { Menu } from 'lucide-vue-next'
 import {useAuth} from "~/composables/useAuth.ts";
 
-const { text, themeClassesMainBackground } = useLang()
-const { isConnected } = useAuth()
-const route = useRoute()
-const isProfil = computed(() => route.path === "/profil")
+const { text } = useLang()
+const { isConnected, isGuest } = useAuth()
 const root = ref<HTMLElement | null>(null)
 const open = ref(false)
 

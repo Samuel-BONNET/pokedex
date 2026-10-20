@@ -1,87 +1,127 @@
 <template>
   <section class="flex flex-col text-center mb-12 px-4 sm:px-8  min-h-screen">
-    <h1 class="text-4xl font-bold mb-6">
-      {{ text.pokedex.title }}
-    </h1>
-
-    <div class="flex flex-wrap gap-2 justify-center mb-3">
-      <input :placeholder="text.pokedex.search.fr" v-model="frenchSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
-      <input :placeholder="text.pokedex.search.en" v-model="englishSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
-      <input :placeholder="text.pokedex.search.number" v-model="pokeNumberSearchQuery" class="border bg-white border-slate-300 rounded px-2 py-1 text-sm" />
-      <details class="dropdown-checkbox">
-        <summary>{{ text.pokedex.types }}</summary>
-          <div class="absolute bg-white z-10 option-list flex flex-col max-h-100 px-2 overflow-y-auto">
-            <label v-for="type in types" :key="type.name">
-              <input name="couleur[]" v-model="selectedTypes" :value="type.name" type="checkbox" class="peer sr-only" />
-              <img :src="type.icon" class="max-h-15 peer-checked:opacity-50 peer-checked:ring-3 peer-checked:ring-blue-500 peer-checked:rounded" />
-            </label>
-          </div>
-      </details>
-      <select v-model="generationSearchQuery" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
-        <option :value="0" selected>{{ text.pokedex.all }}</option>
-        <option v-for="gen in genBound.length - 1" :key="gen" :value="gen">{{ gen }}</option>
-      </select>
-    </div>
-
-    <div class="flex flex-wrap gap-2 justify-center mb-3">
-      <label class="flex items-center gap-1 text-sm text-slate-600">
-        {{ text.pokedex.page }}
-        <select v-model="cardNumber" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
-          <option :value="50">50</option>
-          <option :value="200">200</option>
-          <option :value="500">500</option>
-          <option :value="1025">1025</option>
-        </select>
-      </label>
-
-      <label class="flex items-center gap-1 text-sm text-slate-600">
-        {{ text.pokedex.perPage }}
-        <select v-model="cardsPerRow" class="border border-slate-300 rounded px-2 py-1 text-sm bg-white">
-          <option :value="5">5</option>
-          <option :value="7">7</option>
-          <option :value="9">9</option>
-        </select>
-      </label>
-
-      <button class="bg-white text-slate-800 border-slate-300" @click="toolbarEnable = !toolbarEnable">{{ toolbarEnable ? text.pokedex.hideToolbar : text.pokedex.showToolbar }}</button>
-
-    </div>
-
     <div v-for="position in (cardNumber > 50 ? 2 : 1)" :key="position">
-      <div class="flex flex-wrap gap-2 justify-center mb-6">
-        <button v-if="totalPages > 2" @click="currentPage = 1" class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-white transition-colors" :class="themeClassesSecondaryBackground">
-          <<
-        </button>
-        <button v-if="totalPages > 1" @click="currentPage > 1 && currentPage--" class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-white transition-colors" :class="themeClassesSecondaryBackground">
-          <
-        </button>
-        <button v-for="n in visiblePages" :key="n" @click="currentPage = n"
-          class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-black transition-colors"
-          :class="[themeClassesSecondaryBackground, currentPage === n ? 'text-white border-white hover:border-white' : 'bg-white']">
-          {{ n }}
-        </button>
-        <button v-if="totalPages > 1" @click="currentPage < totalPages && currentPage++" class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-white transition-colors" :class="themeClassesSecondaryBackground">
-          >
-        </button>
-        <button v-if="totalPages > 2" @click="currentPage = totalPages" class="px-2 py-1 text-sm border border-slate-300 rounded hover:brightness-90 hover:text-white transition-colors" :class="themeClassesSecondaryBackground">
-          >>
-        </button>
-      </div>
+      <div class="flex flex-row gap-4 justify-center mb-6" v-if="position === 1">
+        <div class="flex flex-col justify-center items-center">
+          <div class="flex justify-center items-center my-4 w-fit">
+            <div class="bg-neutral-300 border-4 border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-col justify-center items-center gap-4 w-full text-neutral-900 font-mono">
+              <div class="flex flex-col gap-2 justify-center">
+                <h1 class="text-4xl font-bold mb-6">
+                  {{ text.pokedex.title }}
+                </h1>
+                <div class="flex flex-row gap-2">
+                  <input :placeholder="text.pokedex.search.fr" v-model="frenchSearchQuery" class="bg-white border-2 border-neutral-700 px-2 py-1 text-xs outline-none focus:bg-amber-50" />
+                  <input :placeholder="text.pokedex.search.en" v-model="englishSearchQuery" class="bg-white border-2 border-neutral-700 px-2 py-1 text-xs outline-none focus:bg-amber-50" />
+                  <input :placeholder="text.pokedex.search.number" v-model="pokeNumberSearchQuery" class="bg-white border-2 border-neutral-700 px-2 py-1 text-xs outline-none focus:bg-amber-50" />
+                </div>
 
-      <div class="flex flex-row gap-2 justify-center mb-6" v-if="position === 1">
-        <div class="flex justify-between">
-          <PokedexToolBar v-if="toolbarEnable" :selection-mode="selectionMode" :selected-pokemons="selectedPokemons" :rangeSelectionMode="rangeSelectionMode" @update:selection-mode="selectionMode = $event" @update:rangeSelectionMode="rangeSelectionMode = $event" @saved="refresh" />
-        </div>
+                <div class="flex flex-row gap-8 justify-center items-center">
+                  <div class="flex flex-col items-center text-md">
+                    <details class="dropdown-checkbox relative w-full">
+                      <summary class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">
+                        {{ text.pokedex.types }}
+                      </summary>
+                      <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20 grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto w-64">
+                        <label v-for="type in types" :key="type.name" class="cursor-pointer flex justify-center items-center">
+                          <input name="couleur[]" v-model="selectedTypes" :value="type.name" type="checkbox" class="peer sr-only" />
+                          <img :src="type.icon" class="h-10 object-contain border-transparent border-2 peer-checked:border-neutral-900 p-0.5" />
+                        </label>
+                      </div>
+                    </details>
+                  </div>
 
-        <div class="w-full mx-auto" :style="{ maxWidth: gridMaxWidth }">
-          <div class="flex flex-wrap justify-center gap-3">
-            <div v-for="p in displayPokemons" :key="p.pokeNumber" class="shrink-0">
-              <div v-if="selectionMode || rangeSelectionMode" class="cursor-pointer" @click="toggleSelection(p.pokeNumber)" @contextmenu.prevent @click.right.prevent="deselectPokemon(p.pokeNumber)">
-                <PokemonCard :pokemon="p" :selected="selectedPokemons.includes(p.pokeNumber)" :range-start-end="p.pokeNumber === rangeStart || p.pokeNumber === rangeEnd" />
+                  <div class="flex flex-col text-md items-center">
+                    <details class="dropdown-checkbox relative">
+                      <summary class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">
+                        {{ generationSearchQuery === 0 ? text.pokedex.generation : 'Gen ' + generationSearchQuery }}
+                      </summary>
+                      <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20 grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto w-64">
+
+                        <label class="col-span-4 cursor-pointer flex items-center gap-1 border-b border-neutral-400 pb-1 mb-1">
+                          <input type="radio" :value="0" v-model="generationSearchQuery" />
+                          {{ text.pokedex.all }}
+                        </label>
+
+                        <label v-for="gen in genBound.length - 1" :key="gen" class="cursor-pointer flex items-center gap-1">
+                          <input type="radio" :value="gen" v-model="generationSearchQuery" />
+                          Gen {{ gen }}
+                        </label>
+                      </div>
+                    </details>
+                  </div>
+                </div>
               </div>
-              <NuxtLink v-else class="block" :to="`/pokedex/${p.pokeNumber}`">
-                <PokemonCard :pokemon="p" />
-              </NuxtLink>
+
+              <div class="flex flex-wrap items-center justify-center gap-3 pt-2 border-t-2 border-dashed border-neutral-500 text-xs">
+                <label class="flex flex-col items-center gap-1">
+                  <span class="font-bold">{{ text.pokedex.page }}</span>
+                  <select v-model="cardNumber" class="bg-white border-2 border-neutral-700 px-1 py-0.5 text-xs">
+                    <option :value="50">50</option>
+                    <option :value="200">200</option>
+                    <option :value="500">500</option>
+                    <option :value="1025">1025</option>
+                  </select>
+                </label>
+
+                <label class="flex flex-col items-center gap-1">
+                  <span class="font-bold">{{ text.pokedex.perPage }}</span>
+                  <select v-model="cardsPerRow" class="bg-white border-2 border-neutral-700 px-1 py-0.5 text-xs">
+                    <option :value="5">5x5</option>
+                    <option :value="7">7x7</option>
+                    <option :value="9">9x9</option>
+                  </select>
+                </label>
+              </div>
+
+              <button class="bg-neutral-800 text-white border-2 border-neutral-900 px-3 py-1 text-xs active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" @click="toolbarEnable = !toolbarEnable">
+                {{ toolbarEnable ? text.pokedex.hideToolbar : text.pokedex.showToolbar }}
+              </button>
+
+              <div class="flex flex-wrap items-center justify-center gap-1 pt-2 border-t-2 border-dashed border-neutral-500">
+                <button v-if="totalPages > 2" @click="currentPage = 1" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  &lt;&lt;
+                </button>
+                <button v-if="totalPages > 1" @click="currentPage > 1 && currentPage--" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  &lt;
+                </button>
+
+                <button v-for="n in visiblePages" :key="n" @click="currentPage = n"
+                        class="px-2.5 py-1 text-xs border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] font-bold"
+                        :class="currentPage === n ? 'bg-neutral-800 text-white' : 'bg-white text-neutral-900'">
+                  {{ n }}
+                </button>
+
+                <button v-if="totalPages > 1" @click="currentPage < totalPages && currentPage++" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  &gt;
+                </button>
+                <button v-if="totalPages > 2" @click="currentPage = totalPages" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  &gt;&gt;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-row">
+            <div class="flex justify-between">
+              <PokedexToolBar v-if="toolbarEnable" :selection-mode="selectionMode" :selected-pokemons="selectedPokemons" :rangeSelectionMode="rangeSelectionMode" @update:selection-mode="selectionMode = $event" @update:rangeSelectionMode="rangeSelectionMode = $event" @saved="refresh" />
+            </div>
+
+            <div class="w-full mx-auto bg-neutral-200 border-4 border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 font-mono" :style="{ maxWidth: gridMaxWidth }">
+              <div class="flex flex-wrap justify-center gap-3">
+                <div v-for="p in displayPokemons" :key="p.pokeNumber" class="shrink-0">
+                  <div v-if="selectionMode || rangeSelectionMode"
+                       class="cursor-pointer transition-transform active:translate-y-0.5"
+                       @click="toggleSelection(p.pokeNumber)"
+                       @contextmenu.prevent
+                       @click.right.prevent="deselectPokemon(p.pokeNumber)">
+                    <PokemonCard :pokemon="p" :selected="selectedPokemons.includes(p.pokeNumber)" :range-start-end="p.pokeNumber === rangeStart || p.pokeNumber === rangeEnd" />
+                  </div>
+
+                  <NuxtLink v-else class="block transition-transform active:translate-y-0.5" :to="`/pokedex/${p.pokeNumber}`">
+                    <PokemonCard :pokemon="p" />
+                  </NuxtLink>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -138,10 +178,12 @@ const { data: pokemons, refresh } = await useFetch('/api/pokemon', {
 const { cardsPerRow, cardNumber, currentPage } = usePokedexPrefs()
 
 const CARD_WIDTH = 144
-const GRID_GAP = 16
+const GRID_GAP = 12
+const CONTAINER_PADDING = 32
+const CONTAINER_BORDER = 8
 const gridMaxWidth = computed(() => {
   const n = cardsPerRow.value
-  return `${n * CARD_WIDTH + (n - 1) * GRID_GAP}px`
+  return `${n * CARD_WIDTH + (n-1) * GRID_GAP + CONTAINER_PADDING + CONTAINER_BORDER}px`
 })
 
 const displayPokemons = computed(() => {

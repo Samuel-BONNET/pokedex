@@ -1,32 +1,58 @@
 <template>
-  <div class="w-20 shrink-0">
-    <div ref="toolbarEl" class="w-20 flex flex-col gap-10 py-8 px-5 bg-transparent rounded-xl overflow-y-auto">
-      <div class="flex flex-col gap-4 justify-center mb-3 items-center">
-        <button :title="text.toolbar.unitSelection" @click="$emit('update:selectionMode', !selectionMode)" :class="selectionMode ? 'bg-slate-800 text-green-500 border-slate-800 hover:border-green-500' : 'bg-white text-slate-800 border-slate-300 hover:text-green-500 hover:border-green-500'"
-                class="w-12.5 h-12.5 rounded-lg flex items-center justify-center text-xs text-center leading-tight px-3 py-1 text border hover:bg-transparent hover:text-black transition-colors">
-          <MousePointer2 class="hover:grayscale-0 hover:fill-green-500 hover:text-green-600" />
+  <div class="w-24 shrink-0">
+    <!-- Boîtier de la barre d'outils style console rétro -->
+    <div ref="toolbarEl" class="w-fit flex flex-col gap-4 py-4 px-3 bg-neutral-300 border-4 border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-y-auto">
+      <div class="flex flex-col gap-3 justify-center items-center">
+
+        <!-- Mode sélection simple -->
+        <button :title="text.toolbar.unitSelection"
+                @click="$emit('update:selectionMode', !selectionMode)"
+                :class="selectionMode ? 'bg-neutral-800 text-green-400 border-neutral-900 shadow-none translate-y-0.5' : 'bg-white text-neutral-800 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-100'"
+                class="w-12 h-12 border-2 flex items-center justify-center transition-all active:translate-y-0.5">
+          <MousePointer2 class="w-5 h-5" />
         </button>
 
-        <button :title="text.toolbar.rangeSelection" @click="$emit('update:rangeSelectionMode', !rangeSelectionMode)" :class="rangeSelectionMode ? 'bg-slate-800 text-green-500  border-slate-800 hover:border-green-500' : 'bg-white text-slate-800 border-slate-300 hover:text-green-500 hover:border-green-500'"
-                class="w-12.5 h-12.5 rounded-lg flex items-center justify-center text-xs text-center leading-tight borderpx-3 py-1 border hover:bg-transparent hover:text-black transition-colors">
-          <CopyPlus class="hover:grayscale-0 hover:text-green-600" />
+        <!-- Mode sélection par plage -->
+        <button :title="text.toolbar.rangeSelection"
+                @click="$emit('update:rangeSelectionMode', !rangeSelectionMode)"
+                :class="rangeSelectionMode ? 'bg-neutral-800 text-green-400 border-neutral-900 shadow-none translate-y-0.5' : 'bg-white text-neutral-800 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-100'"
+                class="w-12 h-12 border-2 flex items-center justify-center transition-all active:translate-y-0.5">
+          <CopyPlus class="w-5 h-5" />
         </button>
 
-        <button :title="text.toolbar.cancelSelection" :disabled="!selectionMode && !rangeSelectionMode" @click="$emit('update:selectionMode', false); $emit('update:rangeSelectionMode', false)"
-                class="disabled:opacity-50 disabled:cursor-not-allowed w-12.5 h-12.5 rounded-lg flex items-center justify-center text-xs text-center leading-tight border transition-colors bg-white text-slate-800 border-slate-400 hover:not-disabled:border-red-500 px-3 py-1 text grayscale hover:not-disabled:grayscale-0">
-          <Eraser class="min-w-5.5 min-h-5.5 text-red-600" />
+        <!-- Annuler la sélection -->
+        <button :title="text.toolbar.cancelSelection"
+                :disabled="!selectionMode && !rangeSelectionMode"
+                @click="$emit('update:selectionMode', false); $emit('update:rangeSelectionMode', false)"
+                class="w-12 h-12 border-2 flex items-center justify-center transition-all bg-white text-neutral-800 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-100 active:translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:translate-y-0">
+          <Eraser class="w-5 h-5 text-red-600" />
         </button>
 
-        <button :title="text.toolbar.markNotOwned" :disabled="selectedPokemons.length === 0" @click="empty" class="disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale w-12.5 h-12.5 rounded-lg flex items-center justify-center text-xs text-center leading-tight border transition-colors bg-white active:not-disabled:bg-black  text-slate-800 active:text-white border-slate-400 hover:not-disabled:border-black ">
-          <Minus />
+        <!-- Séparateur visuel -->
+        <div class="w-full border-t-2 border-dashed border-neutral-400 my-1"></div>
+
+        <!-- Marquer non possédé (Moins) -->
+        <button :title="text.toolbar.markNotOwned"
+                :disabled="selectedPokemons.length === 0"
+                @click="empty"
+                class="w-12 h-12 border-2 flex items-center justify-center transition-all bg-white text-neutral-800 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-100 active:bg-neutral-900 active:text-white active:translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:translate-y-0">
+          <Minus class="w-5 h-5" />
         </button>
 
-        <button :title="text.toolbar.markOwned" :disabled="selectedPokemons.length === 0" @click="normal" class="disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale w-12.5 h-12.5 rounded-lg flex items-center justify-center text-xs text-center leading-tight border transition-colors bg-white active:not-disabled:bg-blue-500  text-blue-500 active:text-white border-slate-400 hover:not-disabled:border-blue-500">
-          <Plus />
+        <!-- Marquer possédé (Plus) -->
+        <button :title="text.toolbar.markOwned"
+                :disabled="selectedPokemons.length === 0"
+                @click="normal"
+                class="w-12 h-12 border-2 flex items-center justify-center transition-all bg-white text-blue-600 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-100 active:bg-blue-600 active:text-white active:translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:translate-y-0">
+          <Plus class="w-5 h-5" />
         </button>
 
-        <button :title="text.toolbar.markShiny" :disabled="selectedPokemons.length === 0" @click="shiny" class="disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale w-12.5 h-12.5 rounded-lg flex items-center justify-center text-xs text-center leading-tight border transition-colors bg-white active:not-disabled:bg-orange-500 text-slate-800 border-slate-400 hover:not-disabled:border-orange-500 hover:border-slate-400 brightness-100 ">
-          <img :src="img.sparkles" class="p-2 ml-1" />
+        <!-- Marquer Shiny -->
+        <button :title="text.toolbar.markShiny"
+                :disabled="selectedPokemons.length === 0"
+                @click="shiny"
+                class="w-12 h-12 border-2 flex items-center justify-center transition-all bg-white text-neutral-800 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-100 active:bg-amber-500 active:text-white active:translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:translate-y-0">
+          <img :src="img.sparkles" class="w-6 h-6 object-contain" />
         </button>
       </div>
     </div>
