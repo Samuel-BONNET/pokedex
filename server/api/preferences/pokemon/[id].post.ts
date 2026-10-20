@@ -1,8 +1,8 @@
 export default defineEventHandler(async (event) => {
     const idPokemon = Number(getRouterParam(event, 'id'))
     const body = await readBody(event)
-    const idUser = body.idUser ?? 1
-    if (idUser === 0) return
+    const idUser = event.context.user?.userId
+    if (!idUser) return
 
     const result = await prisma.pokemonPreferences.upsert({
         where: { idPokemon_idUser: { idPokemon, idUser } },
