@@ -32,6 +32,13 @@ async function fetchGenerationApi(id: number) {
     })
 }
 
+async function fetchPokemonAbilitiesAPI(id: number){
+    return await fetch(`https://pokeapi.co/api/v2/ability/${id}`).then(res => {
+        if (!res.ok) throw new Error(`Failed to fetch ability ${id}: ${res.status}`)
+        return res.json()
+    })
+}
+
 function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -207,15 +214,239 @@ async function importPokemon(start: number, end: number) {
             orderBy: { id: 'asc' },
         })
 
+        const systemOrder = gameWithJaquette.map(g => g.id)
+        const RANKED_TIER_COUNT = lang.text.preferences.tiers.length - 1
+        const base = Math.floor(systemOrder.length / RANKED_TIER_COUNT)
+        const rest = systemOrder.length % RANKED_TIER_COUNT
+        const gameTierSizes = lang.text.preferences.tiers.map((_, i) =>
+            i < RANKED_TIER_COUNT ? base + (i < rest ? 1 : 0) : 0,
+        )
+
         await prisma.user.update({
             where: { id: 0 },
-            data: { preferences: { gameOrder: gameWithJaquette.map(g => g.id) } }
+            data: { preferences: { gameOrder: systemOrder, gameTierSizes } }
         })
 
         if (id % BATCH_SIZE === 0 && id < end) {
             console.log(`  Batch complete, waiting ${DELAY_BETWEEN_BATCHES}ms...`)
             await delay(DELAY_BETWEEN_BATCHES)
         }
+    }
+}
+
+async function importAbilities(){
+    const indexAbility = await fetch(`https://pokeapi.co/api/v2/ability?limit=1`).then(res => {
+        if (!res.ok) throw new Error(`Failed to fetch global ability : ${res.status}`)
+        return res.json()
+    })
+
+    const nbAbilities = indexAbility.count
+
+    for (let i = 1; i <= nbAbilities; i++) {
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/ability/${i}`);
+            if (!res.ok) continue;
+            const currentAbility = await res.json();
+
+            const nameFrObj = currentAbility.names.find((n: { language: { name: string } }) => n.language.name === 'fr');
+            const nameFr = nameFrObj ? nameFrObj.name : currentAbility.name;
+
+            const effectFrObj = currentAbility.effect_entries.find((e: { language: { name: string } }) => e.language.name === 'fr');
+            const description = effectFrObj ? effectFrObj.effect : "Pas de description disponible.";
+
+            const nameEn = currentAbility.name;
+
+            await prisma.ability.upsert({
+                where: {
+                    id: currentAbility.id
+                },
+                update: {
+                    nameFr,
+                    nameEn,
+                    description
+                },
+                create: {
+                    id: currentAbility.id,
+                    nameFr,
+                    nameEn,
+                    description
+                }
+            });
+            console.log(`Talents importés avec succès : ${nameEn}`);
+        } catch (error) {
+            // @ts-ignore
+            console.error(`Erreur sur le talent ${i}:`, error.message);
+        }
+    }
+}
+
+async function importMoves(){
+    const indexAbility = await fetch(`https://pokeapi.co/api/v2/move?limit=1`).then(res => {
+        if (!res.ok) throw new Error(`Failed to fetch global move : ${res.status}`)
+        return res.json()
+    })
+
+    const nbMoves = indexAbility.count
+
+    for (let i = 1; i <= nbMoves; i++) {
+        try {
+            const res = await fetch(`https://pokeapi.co/api/v2/move/${i}`);
+            if (!res.ok) continue;
+            const currentMove = await res.json();
+
+            const nameFrObj = currentMove.names.find((n: { language: { name: string} }) => n.language.name === 'fr');
+            const nameFr = nameFrObj ? nameFrObj.name : currentMove.name;
+            const nameEn = currentMove.name;
+            const accuracy = currentMove.accuracy
+            const effectChance = currentMove.effectChance
+            const pp = currentMove.pp
+            const priority = currentMove.priority
+            const power = currentMove.power
+            const contestCombo = currentMove.contestCombo
+            const damageClass = currentMove.damageClass.name
+            const minHits = currentMove.meta.minHits
+            const maxHits = currentMove.meta.maxHits
+            const minTurns = currentMove.meta.minTurns
+            const maxTurns = currentMove.meta.maxTurns
+            const drain = currentMove.drain
+            const healing = currentMove.meta.healing
+            const critRate = currentMove.meta.critRate
+            const ailmentChance = currentMove.meta.ailmentChance
+            const flinchChance = currentMove.meta.flinchChance
+            const statChance = currentMove.meta.statChance
+            const targetChance = currentMove.targetChance
+            const effectEntries = currentMove.effect_entries
+            const shortEntries = currentMove.shortEntries
+            const description = currentMove.flavor_text_entries.findFirst((n: { language: { name: string} }) => n.language.name === 'fr');
+
+
+            await prisma.move.upsert({
+                where: {
+                    id: currentMove.id
+                },
+                update: {
+                    nameFr,
+                    nameEn,
+                    accuracy,
+                    effectChance,
+                    pp,
+                    priority,
+                    power,
+                    contestCombo,
+                    damageClass,
+                    minHits,
+                    maxHits,
+                    minTurns,
+                    maxTurns,
+                    drain,
+                    healing,
+                    critRate,
+                    ailmentChance,
+                    flinchChance,
+                    statChance,
+                    targetChance,
+                    effectEntries,
+                    shortEntries,
+                    description
+                },
+                create: {
+                    id: currentMove.id,
+                    nameFr,
+                    nameEn,
+                    accuracy,
+                    effectChance,
+                    pp,
+                    priority,
+                    power,
+                    contestCombo,
+                    damageClass,
+                    minHits,
+                    maxHits,
+                    minTurns,
+                    maxTurns,
+                    drain,
+                    healing,
+                    critRate,
+                    ailmentChance,
+                    flinchChance,
+                    statChance,
+                    targetChance,
+                    effectEntries,
+                    shortEntries,
+                    description
+                }
+            });
+
+            for (const pokemon of currentMove.learned_by_pokemon) {
+                const idPokemon = pokemon.url.split('/').at(-1)
+
+                await prisma.pokemonMove.upsert({
+                    where: {
+                        idPokemon_moveId: {
+                            idPokemon,
+                            moveId: currentMove.id
+                        }
+                    },
+                    update: {
+                        idPokemon,
+                        moveId: currentMove.id
+                    },
+                    create: {
+                        idPokemon,
+                        moveId: currentMove.id
+                    }
+                })
+            }
+
+            console.log(`Capacités importées avec succès : ${nameEn}`);
+        } catch (error) {
+            // @ts-ignore
+            console.error(`Erreur sur la capacité ${i}:`, error.message);
+        }
+    }
+}
+
+async function importTypes(){
+    const indexTypes = await fetch(`https://pokeapi.co/api/v2/type?limit=1`).then(res => {
+        if (!res.ok) throw new Error(`Failed to fetch global type : ${res.status}`)
+        return res.json()
+    })
+
+
+    const res = await fetch(`https://pokeapi.co/api/v2/type`);
+
+    const allType = await res.json()
+
+    for (const type of allType.result) {
+        const index: number = allType.result.indexOf(type);
+        try {
+            await prisma.type.upsert({
+                where: {
+                    id: index
+                },
+                update: {
+                    id: index,
+                    nameEn: type
+                },
+                create: {
+                    id: index,
+                    name: type
+                }
+            })
+
+            console.log(`Types importés avec succès : ${name}`);
+        } catch (error) {
+            // @ts-ignore
+            console.error(`Erreur sur la capacité ${i}:`, error.message);
+        }
+    }
+
+    for (let i = 1; i <= indexTypes; i++) {
+        if (!res.ok) continue;
+        const currentType = await res.json();
+        const nameEn = currentType.name
+
+
     }
 }
 
@@ -233,6 +464,12 @@ async function main() {
         case "games":
             await importGames()
             break;
+        case "Ability":
+            await importAbilities()
+            break;
+        case "Move":
+            await importMoves()
+            break;
         case "all":
             await importGames()
             if(GENERATION_CIBLE === undefined) {
@@ -241,6 +478,8 @@ async function main() {
             else {
                 await importPokemon(GENERATION_CIBLE, GENERATION_CIBLE+1)
             }
+            await importAbilities()
+            await importMoves()
             break;
     }
     console.log('\nImport completed successfully!')
