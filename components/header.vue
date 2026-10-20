@@ -1,6 +1,6 @@
 <template>
   <div v-if="route.path === '/'">
-    <div class="relative flex flex-col items-center justify-center">
+    <div class="relative flex flex-col items-center justify-center" :class="meta.defaultTheme === 'vert' ? 'mt-23' : ''">
       <poke-logo />
     </div>
     <div class="flex flex-row flex-wrap items-center justify-center gap-x-4">
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 const route = useRoute()
-const { img, text } = useLang()
+const { img, text, meta } = useLang()
 
 </script>
 

@@ -36,6 +36,7 @@ export const useLang = () => {
     const themeClassesPositionLeftImage = computed(() => lang.themes[theme.value].classes.positionLeftImage)
     const themeClassesPositionRightImage = computed(() => lang.themes[theme.value].classes.positionRightImage)
     const themeClassesLogoImageSize = computed(() => lang.themes[theme.value].classes.themeClassesLogoImageSize)
+    const themeClassesLogoImageZIndex = computed(() => lang.themes[theme.value].classes.zIndexLogoImage)
     const themeClassesRightImageSize = computed(() => lang.themes[theme.value].classes.themeClassesRightImageSize)
     const themeBackgroundImage = computed(() => lang.themes[theme.value].backgroundImage)
 
@@ -72,6 +73,7 @@ export const useLang = () => {
         themeClassesBorder,
         themeClassesHue,
         themeClassesLogoImageSize,
+        themeClassesLogoImageZIndex,
         themeClassesRightImageSize,
         themeBackgroundImage,
         typeIcon,
