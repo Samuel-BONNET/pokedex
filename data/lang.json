@@ -112,6 +112,8 @@
   "text": {
     "common": {
       "save": "Sauvegarder",
+      "reset": "Reset",
+      "default": "Defaut",
       "close": "Fermer",
       "error": "Erreur",
       "cancel": "Annuler"
@@ -127,7 +129,8 @@
       "login": "Login",
       "register": "Register",
       "logout": "Logout",
-      "profil": "Profil"
+      "profil": "Profil",
+      "settings": "Settings"
     },
     "home": {
       "cards": {
@@ -173,14 +176,15 @@
     "pokedex": {
       "title": "Pokedex",
       "search": {
-        "fr": "Rechercher par nom français",
-        "en": "Rechercher par nom anglais",
+        "fr": "Nom français",
+        "en": "Nom anglais",
         "number": "Numéro pokedex"
       },
       "types": "Types",
+      "generation": "Générations",
       "all": "Toutes",
-      "page": "page",
-      "perPage": "nb Poke par page",
+      "page": "Page",
+      "perPage": "Size",
       "showToolbar": "Voir la toolbar",
       "hideToolbar": "Masquer la toolbar"
     },
@@ -211,7 +215,7 @@
       "intro": "Gérez vos sauvegardes ici",
       "choose": "Choississez un jeu",
       "generation": "Génération",
-      "changeCover": "Changer la jaquette",
+      "changeVersion": "Changer de version",
       "pickFile": "Choisir un fichier .sav",
       "download": "Télécharger",
       "delete": "Supprimer",
@@ -259,7 +263,8 @@
       "title": "Préférences",
       "intro": "Choisissez votre ordre de sprites de jeux préférés",
       "orderSaved": "Ordre enregistré",
-      "tiers": ["Favori", "J'aime beaucoup", "J'apprécie", "Neutre", "Peu utilisé"]
+      "orderReset": "Ordre réinitialisé",
+      "tiers": ["Favori", "J'aime beaucoup", "J'apprécie", "Neutre", "Peu utilisé", "Non classé"]
     },
     "welcome": {
       "title": "Welcome !",
