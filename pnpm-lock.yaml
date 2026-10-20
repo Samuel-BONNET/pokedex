@@ -38,6 +38,9 @@ importers:
       pg:
         specifier: ^8.23.0
         version: 8.23.1
+      reicon-vue:
+        specifier: ^1.1.104
+        version: 1.1.104(vue@3.5.44)
       vue:
         specifier: ^3.5.43
         version: 3.5.44
@@ -3140,6 +3143,11 @@ packages:
   redis-parser@3.0.0:
     resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
     engines: {node: '>=4'}
+
+  reicon-vue@1.1.104:
+    resolution: {integrity: sha512-MKtVCb20Uhg9QSavucuoXd0RrvWQ2K3n6F5n0N3GxeXx3tAKMXkqf/+KfDExZIedSzU2ZMME1kxe2d18JGvDRA==}
+    peerDependencies:
+      vue: ^3.0.0
 
   remeda@2.33.4:
     resolution: {integrity: sha512-ygHswjlc/opg2VrtiYvUOPLjxjtdKvjGz1/plDhkG66hjNjFr1xmfrs2ClNFo/E6TyUFiwYNh53bKV26oBoMGQ==}
@@ -7345,6 +7353,10 @@ snapshots:
   redis-parser@3.0.0:
     dependencies:
       redis-errors: 1.2.0
+
+  reicon-vue@1.1.104(vue@3.5.44):
+    dependencies:
+      vue: 3.5.44
 
   remeda@2.33.4: {}
 
