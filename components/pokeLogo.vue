@@ -5,7 +5,7 @@
 
     <img v-if="diverse.mascotRight" :src="diverse.mascotRight" :alt="text.alt.mascotRight" class="absolute -right-6 sm:-right-50 -bottom-25 sm:-bottom-30 z-10 drop-shadow-md pointer-events-none rotate-5 object-contain" :class="[themeClassesRightImageSize, themeClassesPositionRightImage]" />
 
-    <img v-if="diverse.mascotLeft" :src="diverse.mascotLeft" :alt="text.alt.mascotLeft" class="absolute aspect-square object-contain z-0 drop-shadow-md pointer-events-none" :class="[themeClassesLogoImageSize, themeClassesPositionLogoImage]" />
+    <img v-if="diverse.mascotLeft" :src="diverse.mascotLeft" :alt="text.alt.mascotLeft" class="absolute aspect-square object-contain drop-shadow-md pointer-events-none" :class="[themeClassesLogoImageSize, themeClassesPositionLogoImage, themeClassesLogoImageZIndex]" />
 
   </div>
 
@@ -16,5 +16,5 @@
 </style>
 
 <script setup lang="ts">
-const { img, text, diverse, themeClassesLogoImageSize, themeClassesRightImageSize, themeClassesPositionRightImage, themeClassesPositionLogoImage } = useLang()
+const { img, text, diverse, themeClassesLogoImageSize, themeClassesRightImageSize, themeClassesPositionRightImage, themeClassesPositionLogoImage, themeClassesLogoImageZIndex } = useLang()
 </script>

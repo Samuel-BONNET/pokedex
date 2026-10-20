@@ -1,7 +1,7 @@
 {
   "meta": {
     "appName": "PokeMind",
-    "defaultTheme": "rouge",
+    "defaultTheme": "vert",
     "themeStorageKey": "pokedex:theme"
   },
   "themes": {
@@ -14,6 +14,7 @@
         "hue": "hue-rotate-[0deg]",
         "themeClassesLogoImageSize": "size-80",
         "themeClassesRightImageSize": "size-75",
+        "zIndexLogoImage": "z-0",
         "positionLogoImage": "-left-2 sm:-left-10 -top-24",
         "positionLeftImage": "-left-2 sm:-left-27 -top-10",
         "positionRightImage": "left-20 sm:left-120 top-10"
@@ -29,6 +30,7 @@
         "hue": "hue-rotate-[140deg]",
         "themeClassesLogoImageSize": "size-50",
         "themeClassesRightImageSize": "size-85",
+        "zIndexLogoImage": "z-0",
         "positionLogoImage": "left-12 sm:left-8 -top-11",
         "positionLeftImage": "left-20 sm:-left-27 -top-35",
         "positionRightImage": "left-15 sm:left-125 top-0"
@@ -37,16 +39,17 @@
     },
     "vert": {
       "classes": {
-        "mainBackground": "bg-green-500",
-        "secondaryBackground": "bg-green-600",
+        "mainBackground": "bg-green-300",
+        "secondaryBackground": "bg-green-500",
         "color": "text-green-500",
         "border": "border-green-500",
         "hue": "hue-rotate-[290deg]",
-        "themeClassesLogoImageSize": "size-150",
-        "themeClassesRightImageSize": "size-80",
-        "positionLogoImage": "-left-2 sm:-left-8 -top-24",
-        "positionLeftImage": "-left-2 sm:-left-8 -top-24",
-        "positionRightImage": "left-20 sm:-left-27 -top-35"
+        "themeClassesLogoImageSize": "scale-[1.07]",
+        "themeClassesRightImageSize": "size-70",
+        "zIndexLogoImage": "z-20",
+        "positionLogoImage": "-left-2 sm:left-7.5 -top-69.5",
+        "positionLeftImage": "-left-2 sm:-left-20 -top-45",
+        "positionRightImage": "left-20 sm:left-155 top-10"
       },
       "backgroundImage": false
     }
@@ -90,9 +93,9 @@
         "mascotLeft": "/img/diverse/pokemon/genesect.png"
       },
       "vert": {
-        "hero": null,
-        "mascotRight": null,
-        "mascotLeft": null
+        "hero": "/img/diverse/pokemon/shaymin.png",
+        "mascotRight": "/img/diverse/pokemon/tortipousse.png",
+        "mascotLeft": "/img/diverse/pokemon/rayquaza.png"
       }
     },
     "remote": {
