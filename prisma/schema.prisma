@@ -34,13 +34,14 @@ model GameSave {
     id          Int         @id @default(autoincrement())
     idGame      Int
     idUser      Int
+    version     String      @default("default") @db.VarChar(30)
     file        Bytes       @db.ByteA
     fileName    String
     size        Int
     updatedAt   DateTime    @updatedAt
     game        Game        @relation(fields: [idGame], references: [id])
     user        User        @relation(fields: [idUser], references: [id])
-    @@unique([idGame, idUser])
+    @@unique([idGame, idUser, version])
 }
 
 model Pokemon {
@@ -48,22 +49,24 @@ model Pokemon {
     nameFr          String  @db.VarChar(50)
     nameEn          String  @db.VarChar(50)
     pokeNumber      Int     @unique
-    types           Json?
+    types           PokemonType[]
     height          Int?
     weight          Int?
     stats           Json?
     availableGames  Json
-    statuts         Statut[]
-    evolutionsFrom  Evolution[] @relation("EvolutionFrom")
-    evolutionsTo    Evolution[] @relation("EvolutionTo")
+
+    abilities      Ability[]       @relation("Ability")
+    moves          PokemonMove[]
+    statuts        Statut[]
+    evolutionsFrom Evolution[]      @relation("EvolutionFrom")
+    evolutionsTo   Evolution[]      @relation("EvolutionTo")
     pokemonPreferences PokemonPreferences[]
 }
 
 model Evolution {
     id              Int            @id @default(autoincrement())
-
-    fromPokemonId       Int
-    toPokemonId   Int
+    fromPokemonId   Int
+    toPokemonId     Int
 
     pokemon         Pokemon        @relation("EvolutionFrom", fields: [fromPokemonId], references: [id])
     nextPokemon     Pokemon        @relation("EvolutionTo", fields: [toPokemonId], references: [id])
@@ -74,6 +77,7 @@ model Evolution {
 model Statut {
     idPokemon           Int
     idUser              Int
+    capturedGame        Int[]       @default([])
 
     user                User        @relation(fields: [idUser], references: [id])
     pokemon             Pokemon     @relation(fields: [idPokemon], references: [id])
@@ -99,12 +103,91 @@ model PokemonPreferences {
 model GamePreferences {
     idGame              Int
     idUser              Int
+    currentSprite       String
 
     game              Game       @relation(fields: [idGame], references: [id])
     user              User       @relation(fields: [idUser], references: [id])
 
-
-    currentSprite       String
-
     @@id([idGame, idUser])
+}
+
+model Ability {
+  id            Int              @id @default(autoincrement())
+  nameFr        String           @db.VarChar(50)
+  nameEn        String           @db.VarChar(50)
+  description   String
+
+  pokemons      PokemonAbility[]
+}
+
+model PokemonAbility {
+    pokemonId   Int
+    abilityId   Int
+    isHidden    Boolean @default(false)
+
+    pokemon     Pokemon @relation(fields: [pokemonId], references: [id], onDelete: Cascade)
+    ability     Ability @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+    @@id([pokemonId, abilityId])
+}
+
+model Move {
+    id              Int            @id @default(autoincrement())
+    nameFr          String         @db.VarChar(50)
+    nameEn          String         @db.VarChar(50)
+    type            String
+    category        String
+    power           Int?
+    accuracy        Int?
+    pp              Int
+    effectChance    Int?
+    priority        Int
+    minHits         Int?
+    maxHits         Int?
+    minTurns        Int?
+    maxTurns        Int?
+    drain           Int
+    healing         Int
+    critRate        Int
+    ailmentChance   Int
+    flinchChance    Int
+    statChance      Int
+    target          String
+    description     String
+    damageClass     String
+    effectEntries   String
+    shortEntries    String
+
+
+
+
+    pokemons    PokemonMove[]
+}
+
+model PokemonMove {
+  pokemonId         Int
+  moveId            Int
+  learnMethod       String?
+  level             Int?
+
+  pokemon           Pokemon        @relation(fields: [pokemonId], references: [id], onDelete: Cascade)
+  move              Move           @relation(fields: [moveId], references: [id], onDelete: Cascade)
+
+  @@id([pokemonId, moveId])
+}
+
+model Type {
+    id              Int            @id @default(autoincrement())
+    nameEn          String         @db.VarChar(30)
+    strength        JSON?
+    weaknesses      JSON?
+}
+
+model PokemonType {
+    pokemonId       Int
+    typeId          Int
+
+    pokemon         Pokemon     @relation(fields: [pokemonId], references: [id])
+    type            Type        @relation(fields: [typeId], references: [id])
+
+    @@id([pokemonId, typeId])
 }
