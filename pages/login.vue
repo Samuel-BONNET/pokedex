@@ -85,8 +85,8 @@ const regError = ref<string | null>(null);
 
 const { login: authLogin, setGuest } = useAuth();
 
-function guestLogin() {
-  setGuest()
+async function guestLogin() {
+  await setGuest()
 }
 
 async function login() {
