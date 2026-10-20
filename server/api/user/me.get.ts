@@ -1,7 +1,5 @@
 export default defineEventHandler((event) => {
     const user = event.context.user
 
-    return {
-        userId: user?.userId ?? 0
-    }
+    return user ? { user: { id: user.userId, role: user.role } } : { user: null }
 })

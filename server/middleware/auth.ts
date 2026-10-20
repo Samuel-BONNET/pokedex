@@ -1,26 +1,23 @@
-import { defineEventHandler, getRequestURL, createError, getCookie } from 'h3'
+import { defineEventHandler, getRequestURL, getCookie, deleteCookie, createError } from 'h3'
 import { verifyToken } from '../utils/jwt'
+
+const PUBLIC_PREFIXES = ['/api/auth', '/api/pokemon', '/api/types', '/api/changelog', '/api/test']
 
 export default defineEventHandler((event) => {
     const pathname = getRequestURL(event).pathname
-
-    if (!pathname.startsWith('/api/user') && !pathname.startsWith('/api/statut')) return
+    if (!pathname.startsWith('/api')) return
 
     const token = getCookie(event, 'auth_token')
-
-    if (!token) {
-        if (pathname.startsWith('/api/user') || pathname.startsWith('/api/game')) {
-            throw createError({ statusCode: 401, statusMessage: 'No token' })
+    if (token) {
+        try {
+            event.context.user = verifyToken(token)
+        } catch {
+            deleteCookie(event, 'auth_token', { path: '/' })
         }
-        return
     }
 
-    try {
-        const decoded = verifyToken(token)
-        event.context.user = decoded
-    } catch {
-        if (pathname.startsWith('/api/user')) {
-            throw createError({ statusCode: 401, statusMessage: 'Invalid token' })
-        }
+    const isPublic = PUBLIC_PREFIXES.some(p => pathname.startsWith(p))
+    if (!isPublic && !event.context.user) {
+        throw createError({ statusCode: 401, statusMessage: 'Authentication required' })
     }
 })
