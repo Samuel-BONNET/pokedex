@@ -2,7 +2,7 @@ import {getFullEvolutionChain} from "#server/utils/evolution";
 
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
-    const idUser = Number(getQuery(event).userId ?? 1)
+    const idUser = Number(event.context.user?.userId ?? 0)
 
     const orderedNames = await getOrderedGameNames(idUser)
 

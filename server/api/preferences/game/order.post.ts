@@ -10,11 +10,15 @@ function isValidTierSizes(value: unknown): value is number[] {
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
-    const idUser = body.idUser ?? 0
+    const idUser = event.context.user?.userId
     const order: number[] = Array.isArray(body.order) ? body.order.map(Number): []
     const tierSizes: number[] = Array.isArray(body.tierSizes) ? body.tierSizes.map(Number) : []
 
-    if ( idUser === 0 || !order.length ) return
+    if (!idUser) {
+        throw createError({ statusCode: 400, statusMessage: 'Utilisateur invalide' })
+    }
+
+    if (!order.length && !isValidTierSizes(tierSizes)) return
 
     const validGames = await prisma.game.findMany({
         where: { id: { in: order } },

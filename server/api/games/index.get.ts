@@ -4,7 +4,7 @@ import { coversDir, coverPath } from "../../utils/lang"
 const JQ_DIR = coversDir()
 
 export default defineEventHandler(async (event) => {
-    const idUser = Number(getQuery(event).userId ?? 0)
+    const idUser = Number(event.context.user?.userId ?? 0)
 
     const games = await prisma.game.findMany({
         orderBy: { id: 'asc' },
