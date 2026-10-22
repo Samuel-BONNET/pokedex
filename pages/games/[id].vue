@@ -12,7 +12,7 @@
     </header>
     <div class="flex flex-col md:flex-row items-center justify-center gap-8">
       <div class="flex flex-col items-center bg-neutral-300 border-4 border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 shrink-0">
-        <div class="bg-neutral-100 border-2 border-neutral-400 p-2 flex items-center justify-center min-w-70 min-h-87.5">
+        <div class="bg-neutral-100 border-2 border-neutral-400 p-4 flex items-center justify-center min-w-70 min-h-87.5">
           <img v-if="game"
                :src="displaySprite"
                :alt="gameName(game.nameEn)"
@@ -67,12 +67,40 @@
         </div>
       </div>
     </div>
+
+    <div v-if="fileData" class="flex flex-col items-center mt-3 text-xs font-bold bg-white border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-neutral-800 transition-all hover:bg-neutral-100">
+      <span class="mt-3 text-xl">File Viewer</span>
+
+      <div class="flex flex-col w-full px-3 py-2 items-center justify-center gap-4">
+        <div class="flex flex-row flex-wrap items-center justify-center gap-2 w-full">
+          <div v-for="poke in team" :key="poke.id" class="flex flex-row bg-slate-500">
+            <img :src="'https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/regular/' + getName(poke.id) + '.png'" class="object-contain min-h-20 min-w-20" />
+          </div>
+        </div>
+
+        <div class="flex flex-row flex-wrap items-center justify-center gap-2 w-full">
+          <div v-for="poke in boxes" :key="poke.id" class="flex flex-row bg-slate-200">
+            <img :src="'https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/regular/' + getName(poke.id) + '.png'" class="object-contain min-h-20 min-w-20" />
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { Download, FileText } from 'lucide-vue-next'
 import { versionLabel } from '~/utils/gameVersions'
+import { createEngine } from '@pkhex-everywhere/engine'
+import { ref, watch } from 'vue'
+import { getName } from '~/utils/pokeName.ts'
+
+interface Pokemon {
+  id: string;
+  speciesId: number;
+  nickname: string;
+  level: number;
+}
 
 const { user } = useAuth()
 const { img, text, gameName } = useLang()
@@ -83,6 +111,9 @@ const url = ref<string | null>(null)
 const result = ref<string | null>(null)
 const file = ref<File | null>(null)
 const message = ref('')
+const team = ref<Pokemon[]>([])
+const boxes = ref<Pokemon[]>([])
+
 
 const { data: game } = await useFetch<{
   id: number
@@ -223,4 +254,26 @@ const verifierFichier = (e: Event) => {
   }
 }
 
+const { data: fileData } = await useFetch<ArrayBuffer>(`/api/games/${gameId}/save`, {
+  method : 'GET', query : { version: activeVersionId}, responseType: 'arrayBuffer' })
+
+const engine = createEngine()
+
+watch(fileData, async (newBuffer) => {
+  if (newBuffer) {
+    try {
+      const byteArray = new Uint8Array(newBuffer)
+      await engine.game.load(byteArray)
+      team.value = await engine.party.get() as Pokemon[]
+      boxes.value = await engine.box.get() as Pokemon[]
+    } catch (error) {
+      console.error("Erreur PKHeX", error)
+      message.value = "Erreur lors de la lecture du fichier de sauvegarde."
+    }
+  }
+}, { immediate: true })
 </script>
+
+<style scoped>
+
+</style>
