@@ -123,7 +123,8 @@
       "pokedex": "Pokedex",
       "games": "Jeux",
       "preferences": "Préférences",
-      "profil": "Profil"
+      "profil": "Profil",
+      "error": "Error"
     },
     "auth": {
       "login": "Login",
