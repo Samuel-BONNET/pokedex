@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         const save = await prisma.gameSave.findUnique({
-            where: { idGame_idUser: { idGame, idUser: userId } as any },
+            where: { idGame_idUser_version: { idGame, idUser: userId, version } as any },
         })
         if (save) {
             setHeader(event, 'Content-Type', 'application/octet-stream')

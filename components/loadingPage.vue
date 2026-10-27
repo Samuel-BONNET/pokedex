@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <img class="w-24 h-24" :src="img.remote.loadingPage" />
+    <img class="w-24 h-24" src="/loading.gif" />
   </div>
 </template>
 

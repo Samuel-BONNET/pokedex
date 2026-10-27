@@ -16,10 +16,14 @@ export default defineEventHandler(async (event) => {
                 where: { idUser: { in: [idUser, 0] } },
                 select: { idUser: true, currentSprite: true }
             },
+            types: {
+                include: { type: { select: { nameEn: true } } },
+            }
         },
     })
     return pokemon.map(p => ({
         ...p,
+        types: p.types.map(t => t.type.nameEn),
         isOwned: p.statuts.find(s => s.idUser === idUser)?.isOwned ?? false,
         isShiny: p.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
         currentSprite: p.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(p.availableGames, orderedName) ?? findSpriteByOrder(p.availableGames, orderedNameSys) ?? null,

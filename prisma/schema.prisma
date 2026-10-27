@@ -137,26 +137,26 @@ model Move {
   nameEn        String @db.VarChar(50)
   type          String
   category      String
+  contestCombos  String
   power         Int?
   accuracy      Int?
-  pp            Int
+  pp            Int?
   effectChance  Int?
-  priority      Int
+  priority      Int?
   minHits       Int?
   maxHits       Int?
   minTurns      Int?
   maxTurns      Int?
-  drain         Int
-  healing       Int
-  critRate      Int
-  ailmentChance Int
-  flinchChance  Int
-  statChance    Int
+  drain         Int?
+  healing       Int?
+  critRate      Int?
+  ailmentChance Int?
+  flinchChance  Int?
+  statChance    Int?
   target        String
   description   String
   damageClass   String
   effectEntries String
-  shortEntries  String
 
   pokemons PokemonMove[]
 }
@@ -175,7 +175,7 @@ model PokemonMove {
 
 model Type {
   id         Int    @id @default(autoincrement())
-  nameEn     String @db.VarChar(30)
+  nameEn     String @db.VarChar(30) @unique
   strength   Json?
   weaknesses Json?
 

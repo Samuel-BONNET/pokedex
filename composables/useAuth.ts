@@ -8,7 +8,8 @@ export const useAuth = () => {
     async function fetchUser() {
         loading.value = true
         try {
-            const { user: data } = await $fetch<{ user: AuthUser | null }>('/api/user/me')
+            const requestFetch = useRequestFetch()
+            const { user: data } = await requestFetch<{ user: AuthUser | null }>('/api/user/me')
             user.value = data
         } catch { user.value = null } finally { loading.value = false }
     }
