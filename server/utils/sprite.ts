@@ -1,4 +1,4 @@
-import lang from '~/data/lang.json'
+import lang from '../../data/lang.json'
 
 export function buildPokemonSpriteUrl(
     pokeNumber: number,

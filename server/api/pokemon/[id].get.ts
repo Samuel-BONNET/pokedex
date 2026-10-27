@@ -17,6 +17,12 @@ export default defineEventHandler(async (event) => {
                 where: { idUser: { in: [idUser, 0] } },
                 select: { idUser: true, currentSprite: true }
             },
+            types: {
+                include: { type: { select: { nameEn: true } } },
+            },
+            abilities: {
+                include: { ability: { select: { id: true, nameEn: true, nameFr: true, description: true } } },
+            }
         },
     })
 
@@ -29,5 +35,13 @@ export default defineEventHandler(async (event) => {
         currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
         evolutionChain: await getFullEvolutionChain(id, idUser),
         statuts: undefined,
+        types: pokemon.types.map(t => t.type.nameEn),
+        abilities: pokemon.abilities.map(entry => ({
+            id: entry.ability.id,
+            nameFr: entry.ability.nameFr,
+            nameEn: entry.ability.nameEn,
+            description: entry.ability.description,
+            isHidden: entry.isHidden,
+        })).sort((a, b) => Number(a.isHidden) - Number(b.isHidden))
     }
 })
