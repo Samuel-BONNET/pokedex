@@ -23,8 +23,13 @@
             <form @submit.prevent="login" class="auth-card">
               <h2 class="text-2xl text-center mb-4 font-bold text-green-600">{{ text.login.connexion.toUpperCase() }}</h2>
               <input v-model="email" :placeholder="text.login.email" type="email" name="email" autocomplete="email" class="field-input" />
-              <input v-model="password" :placeholder="text.login.password" type="password" name="password" autocomplete="current-password" class="field-input" />
-
+              <div class="flex flex-row items-center w-full relative">
+                <input v-model="password" :placeholder="text.login.password" :type="seePassword ? 'text' : 'password'" name="password" autocomplete="current-password" class="field-input w-full pr-10" />
+                <button @click="seePassword = !seePassword" class="absolute right-2 p-1">
+                  <Eye3 v-if="seePassword" :size="24" class="text-slate-800" />
+                  <EyeSlash v-else :size="24" class="text-slate-800" />
+                </button>
+              </div>
                 <div>
                   <a class="flex flex-row justify-center cursor-pointer" @click.prevent="guestLogin" >
                     <p class="mx-2 text-sm text-slate-500 hover:text-blue-600 transition-colors flex items-center">{{ text.login.guest }}</p>
@@ -64,6 +69,7 @@
 </template>
 
 <script setup lang="ts">
+import { Eye3, EyeSlash } from 'reicon-vue';
 definePageMeta({ layout: false })
 
 const { img, text } = useLang()
@@ -71,7 +77,7 @@ const { img, text } = useLang()
 const route = useRoute()
 
 const mode = ref<'login' | 'register'>(route.query.mode === 'register' ? 'register' : 'login')
-
+const seePassword = ref(false)
 const email = ref('');
 const password = ref('');
 const error = ref<string | null>(null);

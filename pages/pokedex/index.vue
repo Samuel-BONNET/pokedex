@@ -122,6 +122,27 @@
                   </NuxtLink>
                 </div>
               </div>
+              <div class="flex flex-wrap items-center justify-center gap-1 pt-4">
+                <button v-if="totalPages > 2" @click="currentPage = 1" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  &lt;&lt;
+                </button>
+                <button v-if="totalPages > 1" @click="currentPage > 1 && currentPage--" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  &lt;
+                </button>
+
+                <button v-for="n in visiblePages" :key="n" @click="currentPage = n"
+                        class="px-2.5 py-1 text-xs border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] font-bold"
+                        :class="currentPage === n ? 'bg-neutral-800 text-white' : 'bg-white text-neutral-900'">
+                  {{ n }}
+                </button>
+
+                <button v-if="totalPages > 1" @click="currentPage < totalPages && currentPage++" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  &gt;
+                </button>
+                <button v-if="totalPages > 2" @click="currentPage = totalPages" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                  &gt;&gt;
+                </button>
+              </div>
             </div>
           </div>
         </div>

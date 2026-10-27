@@ -3,9 +3,7 @@ const { img, text, diverse, themeClassesColor, themeClassesBorder, themeClassesP
 </script>
 <template>
   <div class="relative max-w-6xl mx-auto p-6">
-
     <section class="flex flex-col lg:flex-row gap-4 lg:gap-2 mb-8">
-
       <div v-if="diverse.hero" class="hidden lg:flex w-80 shrink-0 justify-center absolute -top-30 -left-30 pointer-events-none z-0" :class="themeClassesPositionLeftImage">
         <img :src="diverse.hero" class="pointer-events-none object-contain w-full h-auto" :alt="text.alt.hero" />
       </div>

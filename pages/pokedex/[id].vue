@@ -251,6 +251,7 @@ const save = () => {
   if (spriteRef.value) {
     spriteRef.value.saveCurrent()
   }
+  isOpen.value = false
 }
 
 async function changeOwned() {
