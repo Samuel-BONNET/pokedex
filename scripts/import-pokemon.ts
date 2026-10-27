@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { prisma } from '../server/utils/prisma'
 import { buildPokemonSpriteUrl } from '../server/utils/sprite'
 import lang from '../data/lang.json'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const MOD: string = process.argv[2]!
@@ -81,10 +81,10 @@ async function importGames() {
                 },
                 update: { currentSprite: loadJaquette(g.name) },
                 create: {
-                    idGame: game.id,
-                    idUser: 0,
+                    game: { connect: { id: game.id } },
+                    user: { connect: { id: 0 } },
                     currentSprite: loadJaquette(g.name),
-                }
+                },
             })
         }
         await delay(300)
@@ -98,12 +98,21 @@ async function importPokemon(start: number, end: number) {
         prisma.user.findUnique({ where: { id: 0 } }),
     ])
 
+    const dbTypes = await prisma.type.findMany({ select: { id: true, nameEn: true } })
+    const typeIdByName = new Map(dbTypes.map(t => [t.nameEn, t.id]))
+    const dbAbilities = await prisma.ability.findMany({ select: { id: true } })
+    const abilityIds = new Set(dbAbilities.map(a => a.id))
+
     if (games.length === 0) {
-        console.error('  Aucun jeu en base. Exécute d\'abord: pnpm import:games')
+        console.error('Aucun jeu en base. Exécute d\'abord: pnpm import:games')
         process.exit(1)
     }
     if (!sysUser) {
-        console.error('  Utilisateur System (id=0) introuvable. Exécute d\'abord: pnpm prisma:seed')
+        console.error('Utilisateur System (id=0) introuvable. Exécute d\'abord: pnpm prisma:seed')
+        process.exit(1)
+    }
+    if (dbAbilities.length === 0) {
+        console.error("Aucun talent en base. Exécute d'abord: pnpm import:ability")
         process.exit(1)
     }
 
@@ -132,40 +141,47 @@ async function importPokemon(start: number, end: number) {
             sprite: buildPokemonSpriteUrl(id, item.generation, item.game),
         }))
 
-        const types = (pokemon.types ?? []).map((type: any) => type.type.name)
+        const typeIds = (pokemon.types ?? []).map((type: any) => typeIdByName.get(type.type.name)).filter((typeId: any): typeId is number => typeId !== undefined)
 
         const stats = (pokemon.stats ?? []).map((stat: any) => ({ name: stat.stat.name, value: stat.base_stat }))
 
         let pokemonId: number
         if(MOD != "statut"){
-            const dbPokemon = await prisma.pokemon.upsert({
-                where: {
-                    pokeNumber: id
-                },
-                update: {
-                    id: id,
-                    pokeNumber: id,
-                    nameEn: pokemon.name,
-                    nameFr: frenchName,
-                    height: pokemon.height,
-                    weight: pokemon.weight,
-                    stats: stats,
-                    types: types,
-                    availableGames: enrichedGamesList,
-                },
-                create: {
-                    id: id,
-                    pokeNumber: id,
-                    nameEn: pokemon.name,
-                    nameFr: frenchName,
-                    height: pokemon.height,
-                    weight: pokemon.weight,
-                    stats: stats,
-                    types: types,
-                    availableGames: enrichedGamesList,
-                },
+            const pokemonData = {
+                pokeNumber: id,
+                nameEn: pokemon.name,
+                nameFr: frenchName,
+                height: pokemon.height,
+                weight: pokemon.weight,
+                stats,
+                availableGames: enrichedGamesList,
+            }
+
+            const updated = await prisma.pokemon.updateMany({
+                where: { pokeNumber: id },
+                data: pokemonData,
+            })
+
+            if (updated.count === 0) {
+                await prisma.pokemon.createMany({
+                    data: [{ id, ...pokemonData }],
+                })
+            }
+
+            const dbPokemon = await prisma.pokemon.findUniqueOrThrow({
+                where: { pokeNumber: id },
+                select: { id: true },
             })
             pokemonId = dbPokemon.id
+
+            await prisma.pokemonType.deleteMany({ where: { pokemonId } })
+
+            if (typeIds.length > 0) {
+                await prisma.pokemonType.createMany({
+                    data: typeIds.map((typeId: number) => ({ pokemonId, typeId })),
+                    skipDuplicates: true,
+                })
+            }
         } else {
             const dbPokemon = await prisma.pokemon.findUniqueOrThrow({
                 where: {
@@ -180,17 +196,15 @@ async function importPokemon(start: number, end: number) {
                 idPokemon_idUser: {
                     idPokemon: pokemonId,
                     idUser: 0,
-                }
+                },
             },
             update: {
-                idPokemon: pokemonId,
-                idUser: 0,
                 isOwned: false,
                 isShiny: false,
             },
             create: {
-                idPokemon: pokemonId,
-                idUser: 0,
+                pokemon: { connect: { id: pokemonId } },
+                user: { connect: { id: 0 } },
                 isOwned: false,
                 isShiny: false,
             },
@@ -204,7 +218,10 @@ async function importPokemon(start: number, end: number) {
                 await prisma.evolution.upsert({
                     where: { fromPokemonId_toPokemonId: { fromPokemonId: fromId, toPokemonId: pokemonId } },
                     update: {},
-                    create: { fromPokemonId: fromId, toPokemonId: pokemonId },
+                    create: {
+                        pokemon: { connect: { id: fromId } },
+                        nextPokemon: { connect: { id: pokemonId } },
+                    },
                 })
             }
         }
@@ -231,20 +248,32 @@ async function importPokemon(start: number, end: number) {
             console.log(`  Batch complete, waiting ${DELAY_BETWEEN_BATCHES}ms...`)
             await delay(DELAY_BETWEEN_BATCHES)
         }
+
+        const abilityLinks = (pokemon.abilities ?? []).map((entry: any) => ({ abilityId: Number(entry.ability?.url?.split('/').filter(Boolean).at(-1)), isHidden: Boolean(entry.is_hidden)}))
+            .filter((entry: any) => Number.isInteger(entry.abilityId) && abilityIds.has(entry.abilityId))
+
+        await prisma.pokemonAbility.deleteMany({ where: { pokemonId } })
+
+        if (abilityLinks.length > 0) {
+            await prisma.pokemonAbility.createMany({
+                data: abilityLinks.map((entry: any) => ({ pokemonId, ...entry })),
+                skipDuplicates: true,
+            })
+        }
     }
 }
 
 async function importAbilities(){
-    const indexAbility = await fetch(`https://pokeapi.co/api/v2/ability?limit=1`).then(res => {
+    const abilityList = await fetch(`https://pokeapi.co/api/v2/ability?limit=1000`).then(res => {
         if (!res.ok) throw new Error(`Failed to fetch global ability : ${res.status}`)
         return res.json()
     })
 
-    const nbAbilities = indexAbility.count
+    const total: number = abilityList.count
 
-    for (let i = 1; i <= nbAbilities; i++) {
+    for (const [index, entry] of abilityList.results.entries()) {
         try {
-            const res = await fetch(`https://pokeapi.co/api/v2/ability/${i}`);
+            const res = await fetch(entry.url);
             if (!res.ok) continue;
             const currentAbility = await res.json();
 
@@ -256,198 +285,179 @@ async function importAbilities(){
 
             const nameEn = currentAbility.name;
 
-            await prisma.ability.upsert({
-                where: {
-                    id: currentAbility.id
-                },
-                update: {
-                    nameFr,
-                    nameEn,
-                    description
-                },
-                create: {
-                    id: currentAbility.id,
-                    nameFr,
-                    nameEn,
-                    description
-                }
-            });
-            console.log(`Talents importés avec succès : ${nameEn}`);
+            const abilityData = { nameFr, nameEn, description }
+
+            const updated = await prisma.ability.updateMany({
+                where: { id: currentAbility.id },
+                data: abilityData,
+            })
+
+            if (updated.count === 0) {
+                await prisma.ability.createMany({
+                    data: [{ id: currentAbility.id, ...abilityData }],
+                })
+            }
+            console.log(`Importing Ability #${index + 1}/${total}`);
         } catch (error) {
             // @ts-ignore
-            console.error(`Erreur sur le talent ${i}:`, error.message);
+            console.error(`Error: Ability ${entry.name}:`, error.message);
         }
     }
 }
 
 async function importMoves(){
-    const indexAbility = await fetch(`https://pokeapi.co/api/v2/move?limit=1`).then(res => {
+    const moveList = await fetch(`https://pokeapi.co/api/v2/move?limit=2000`).then(res => {
         if (!res.ok) throw new Error(`Failed to fetch global move : ${res.status}`)
         return res.json()
     })
 
-    const nbMoves = indexAbility.count
+    const existingPokemonIds = new Set(
+        (await prisma.pokemon.findMany({ select: { id: true } })).map(p => p.id)
+    )
 
-    for (let i = 1; i <= nbMoves; i++) {
+    const total: number = moveList.count
+
+    for (const [index, entry] of moveList.results.entries()) {
         try {
-            const res = await fetch(`https://pokeapi.co/api/v2/move/${i}`);
+            const res = await fetch(entry.url);
             if (!res.ok) continue;
             const currentMove = await res.json();
+            const meta = currentMove.meta;
 
             const nameFrObj = currentMove.names.find((n: { language: { name: string} }) => n.language.name === 'fr');
             const nameFr = nameFrObj ? nameFrObj.name : currentMove.name;
-            const nameEn = currentMove.name;
+            const nameEn = currentMove.name
+            const type = currentMove.type.name
+            const category = currentMove.meta?.category?.name ?? 'unknown'
             const accuracy = currentMove.accuracy
-            const effectChance = currentMove.effectChance
+            const effectChance = currentMove.effect_chance
             const pp = currentMove.pp
             const priority = currentMove.priority
             const power = currentMove.power
-            const contestCombo = currentMove.contestCombo
-            const damageClass = currentMove.damageClass.name
-            const minHits = currentMove.meta.minHits
-            const maxHits = currentMove.meta.maxHits
-            const minTurns = currentMove.meta.minTurns
-            const maxTurns = currentMove.meta.maxTurns
-            const drain = currentMove.drain
-            const healing = currentMove.meta.healing
-            const critRate = currentMove.meta.critRate
-            const ailmentChance = currentMove.meta.ailmentChance
-            const flinchChance = currentMove.meta.flinchChance
-            const statChance = currentMove.meta.statChance
-            const targetChance = currentMove.targetChance
-            const effectEntries = currentMove.effect_entries
-            const shortEntries = currentMove.shortEntries
-            const description = currentMove.flavor_text_entries.findFirst((n: { language: { name: string} }) => n.language.name === 'fr');
+            const contestCombos = JSON.stringify(currentMove.contest_combos ?? {})
+            const damageClass = currentMove.damage_class.name
+            const minHits = meta?.min_hits
+            const maxHits = meta?.max_hits
+            const minTurns = meta?.min_turns
+            const maxTurns = meta?.max_turns
+            const drain = meta?.drain
+            const healing = meta?.healing
+            const critRate = meta?.critRate
+            const ailmentChance = meta?.ailment_chance
+            const flinchChance = meta?.flinch_chance
+            const statChance = meta?.stat_chance
+            const target = currentMove.target.name
+            const effectEntries = JSON.stringify(currentMove.effect_entries ?? [])
+            const flavor_text = currentMove.flavor_text_entries.find((n: any) => n.language.name === 'fr')?.flavor_text ?? currentMove.flavor_text_entries.find((n: any) => n.language.name === 'en')?.flavor_text ??
+                currentMove.effect_entries.find((e: any) => e.language.name === 'en')?.short_effect ?? ''
+            const description = flavor_text.replace(/[\n\f\r]+/g, ' ')
 
+            const moveData = {
+                nameFr,
+                nameEn,
+                type,
+                category,
+                accuracy,
+                effectChance,
+                pp,
+                priority,
+                power,
+                contestCombos,
+                damageClass,
+                minHits,
+                maxHits,
+                minTurns,
+                maxTurns,
+                drain,
+                healing,
+                critRate,
+                ailmentChance,
+                flinchChance,
+                statChance,
+                target,
+                effectEntries,
+                description,
+            }
 
-            await prisma.move.upsert({
-                where: {
-                    id: currentMove.id
-                },
-                update: {
-                    nameFr,
-                    nameEn,
-                    accuracy,
-                    effectChance,
-                    pp,
-                    priority,
-                    power,
-                    contestCombo,
-                    damageClass,
-                    minHits,
-                    maxHits,
-                    minTurns,
-                    maxTurns,
-                    drain,
-                    healing,
-                    critRate,
-                    ailmentChance,
-                    flinchChance,
-                    statChance,
-                    targetChance,
-                    effectEntries,
-                    shortEntries,
-                    description
-                },
-                create: {
-                    id: currentMove.id,
-                    nameFr,
-                    nameEn,
-                    accuracy,
-                    effectChance,
-                    pp,
-                    priority,
-                    power,
-                    contestCombo,
-                    damageClass,
-                    minHits,
-                    maxHits,
-                    minTurns,
-                    maxTurns,
-                    drain,
-                    healing,
-                    critRate,
-                    ailmentChance,
-                    flinchChance,
-                    statChance,
-                    targetChance,
-                    effectEntries,
-                    shortEntries,
-                    description
-                }
-            });
+            const updated = await prisma.move.updateMany({
+                where: { id: currentMove.id },
+                data: moveData,
+            })
 
-            for (const pokemon of currentMove.learned_by_pokemon) {
-                const idPokemon = pokemon.url.split('/').at(-1)
-
-                await prisma.pokemonMove.upsert({
-                    where: {
-                        idPokemon_moveId: {
-                            idPokemon,
-                            moveId: currentMove.id
-                        }
-                    },
-                    update: {
-                        idPokemon,
-                        moveId: currentMove.id
-                    },
-                    create: {
-                        idPokemon,
-                        moveId: currentMove.id
-                    }
+            if (updated.count === 0) {
+                await prisma.move.createMany({
+                    data: [{ id: currentMove.id, ...moveData }],
                 })
             }
 
-            console.log(`Capacités importées avec succès : ${nameEn}`);
+            const learnedBy = currentMove.learned_by_pokemon
+                .map((pokemon: { url: string }) => Number(pokemon.url.split('/').filter(Boolean).at(-1)))
+                .filter((pokemonId: number) => Number.isInteger(pokemonId) && existingPokemonIds.has(pokemonId))
+
+            if (learnedBy.length > 0) {
+                await prisma.pokemonMove.createMany({
+                    data: learnedBy.map((pokemonId: number) => ({
+                        pokemonId,
+                        moveId: currentMove.id,
+                    })),
+                    skipDuplicates: true,
+                })
+            }
+
+            console.log(`Importing Move #${index + 1}/${total}`);
         } catch (error) {
             // @ts-ignore
-            console.error(`Erreur sur la capacité ${i}:`, error.message);
+            console.error(`Erreur sur la capacité ${entry.name}:`, error.message);
         }
     }
 }
 
 async function importTypes(){
-    const indexTypes = await fetch(`https://pokeapi.co/api/v2/type?limit=1`).then(res => {
+    await fetch(`https://pokeapi.co/api/v2/type?limit=25`).then(async res => {
         if (!res.ok) throw new Error(`Failed to fetch global type : ${res.status}`)
-        return res.json()
-    })
+        const allTypes = await res.json()
 
+        const csv = readFileSync(join(process.cwd(), 'scripts/pokemon_type_chart.csv'), 'utf8')
+        const [headerLine, ...rows] = csv.trim().split(/\r?\n/)
+        const typeNames = headerLine!.split(',').slice(1).map(t => t.trim().toLowerCase())
+        const chart = new Map<string, Map<string, number>>()
 
-    const res = await fetch(`https://pokeapi.co/api/v2/type`);
-
-    const allType = await res.json()
-
-    for (const type of allType.result) {
-        const index: number = allType.result.indexOf(type);
-        try {
-            await prisma.type.upsert({
-                where: {
-                    id: index
-                },
-                update: {
-                    id: index,
-                    nameEn: type
-                },
-                create: {
-                    id: index,
-                    name: type
-                }
-            })
-
-            console.log(`Types importés avec succès : ${name}`);
-        } catch (error) {
-            // @ts-ignore
-            console.error(`Erreur sur la capacité ${i}:`, error.message);
+        for (const row of rows) {
+            const [attacker, ...values] = row.split(',')
+            chart.set(attacker!.trim().toLowerCase(), new Map(typeNames.map((defender, index) => [defender, Number(values[index])])),
+            )
         }
-    }
 
-    for (let i = 1; i <= indexTypes; i++) {
-        if (!res.ok) continue;
-        const currentType = await res.json();
-        const nameEn = currentType.name
+        const total: number = allTypes.count
 
+        for (const [index, type] of allTypes.results.entries()) {
+            const id = Number(type.url.split('/').filter(Boolean).at(-1))
+            if (!Number.isInteger(id) || id > 18) continue
 
-    }
+            const name = type.name.toLowerCase()
+            const strength = typeNames.filter(defender => (chart.get(name)?.get(defender) ?? 0) > 1)
+            const weaknesses = typeNames.filter(attacker => (chart.get(attacker)?.get(name) ?? 0) > 1)
+
+            try{
+                const typeData = { nameEn: name, strength, weaknesses }
+
+                const updated = await prisma.type.updateMany({
+                    where: { id },
+                    data: typeData,
+                })
+
+                if (updated.count === 0) {
+                    await prisma.type.createMany({
+                        data: [{ id, ...typeData }],
+                    })
+                }
+                console.log(`Importing Types #${index + 1}/${total}`)
+            } catch (error) {
+                // @ts-ignore
+                console.error(`Error Type ${name} : `, error.message)
+            }
+        }
+    })
 }
 
 async function main() {
@@ -464,21 +474,25 @@ async function main() {
         case "games":
             await importGames()
             break;
-        case "Ability":
+        case "ability":
             await importAbilities()
             break;
-        case "Move":
+        case "move":
             await importMoves()
+            break;
+        case "type":
+            await importTypes()
             break;
         case "all":
             await importGames()
+            await importTypes()
+            await importAbilities()
             if(GENERATION_CIBLE === undefined) {
                 await importPokemon(1,9)
             }
             else {
                 await importPokemon(GENERATION_CIBLE, GENERATION_CIBLE+1)
             }
-            await importAbilities()
             await importMoves()
             break;
     }
