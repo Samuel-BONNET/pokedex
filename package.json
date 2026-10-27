@@ -15,9 +15,13 @@
     "import:pokemon": "tsx scripts/import-pokemon.ts pokemon",
     "import:games": "tsx scripts/import-pokemon.ts games",
     "import:statut": "tsx scripts/import-pokemon.ts statut",
+    "import:move": "tsx scripts/import-pokemon.ts move",
+    "import:ability": "tsx scripts/import-pokemon.ts ability",
+    "import:type": "tsx scripts/import-pokemon.ts type",
     "import:all": "tsx scripts/import-pokemon.ts all"
   },
   "dependencies": {
+    "@pkhex-everywhere/engine": "^0.26.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "bcrypt": "^6.0.0",
