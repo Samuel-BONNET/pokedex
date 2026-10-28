@@ -1,28 +1,123 @@
+export const VERSION_TO_GROUP: Record<string, string> = {
+  'red': 'red-blue',
+  'blue': 'red-blue',
+  'green-japan': 'red-green-japan',
+  'red-japan': 'red-green-japan',
+  'blue-japan': 'blue-japan',
+  'yellow': 'yellow',
+  'gold': 'gold-silver',
+  'silver': 'gold-silver',
+  'crystal': 'crystal',
+  'ruby': 'ruby-sapphire',
+  'sapphire': 'ruby-sapphire',
+  'emerald': 'emerald',
+  'firered': 'firered-leafgreen',
+  'leafgreen': 'firered-leafgreen',
+  'colosseum': 'colosseum',
+  'xd': 'xd',
+  'diamond': 'diamond-pearl',
+  'pearl': 'diamond-pearl',
+  'platinum': 'platinum',
+  'heartgold': 'heartgold-soulsilver',
+  'soulsilver': 'heartgold-soulsilver',
+  'black': 'black-white',
+  'white': 'black-white',
+  'black-2': 'black-2-white-2',
+  'white-2': 'black-2-white-2',
+  'x': 'x-y',
+  'y': 'x-y',
+  'omega-ruby': 'omega-ruby-alpha-sapphire',
+  'alpha-sapphire': 'omega-ruby-alpha-sapphire',
+  'sun': 'sun-moon',
+  'moon': 'sun-moon',
+  'ultra-sun': 'ultra-sun-ultra-moon',
+  'ultra-moon': 'ultra-sun-ultra-moon',
+  'lets-go-pikachu': 'lets-go-pikachu-lets-go-eevee',
+  'lets-go-eevee': 'lets-go-pikachu-lets-go-eevee',
+  'sword': 'sword-shield',
+  'shield': 'sword-shield',
+  'the-isle-of-armor-sword': 'the-isle-of-armor',
+  'the-crown-tundra-sword': 'the-crown-tundra',
+  'brilliant-diamond': 'brilliant-diamond-shining-pearl',
+  'shining-pearl': 'brilliant-diamond-shining-pearl',
+  'legends-arceus': 'legends-arceus',
+  'scarlet': 'scarlet-violet',
+  'violet': 'scarlet-violet',
+  'the-teal-mask-scarlet': 'the-teal-mask',
+  'the-indigo-disk-scarlet': 'the-indigo-disk',
+  'legends-za': 'legends-za',
+  'mega-dimension': 'mega-dimension',
+  'champions': 'champions',
+  'icons': 'icons',
+}
+
+export const VERSION_TO_COVER_VARIANT: Record<string, string> = {
+  'red': 'red-blue1',
+  'blue': 'red-blue2',
+  'yellow': 'yellow',
+  'gold': 'gold-silver1',
+  'silver': 'gold-silver2',
+  'crystal': 'crystal',
+  'ruby': 'ruby-sapphire1',
+  'sapphire': 'ruby-sapphire2',
+  'emerald': 'emerald',
+  'firered': 'firered-leafgreen1',
+  'leafgreen': 'firered-leafgreen2',
+  'diamond': 'diamond-pearl1',
+  'pearl': 'diamond-pearl2',
+  'platinum': 'platinum',
+  'heartgold': 'heartgold-soulsilver1',
+  'soulsilver': 'heartgold-soulsilver2',
+  'black': 'black-white1',
+  'white': 'black-white2',
+  'black-2': 'black-2-white-21',
+  'white-2': 'black-2-white-22',
+  'x': 'x-y1',
+  'y': 'x-y2',
+  'omega-ruby': 'omega-ruby-alpha-sapphire1',
+  'alpha-sapphire': 'omega-ruby-alpha-sapphire2',
+  'sun': 'sun-moon1',
+  'moon': 'sun-moon2',
+  'ultra-sun': 'ultra-sun-ultra-moon1',
+  'ultra-moon': 'ultra-sun-ultra-moon2',
+  'lets-go-pikachu': 'lets-go-pikachu-lets-go-eevee1',
+  'lets-go-eevee': 'lets-go-pikachu-lets-go-eevee2',
+  'sword': 'sword-shield1',
+  'shield': 'sword-shield2',
+  'brilliant-diamond': 'brilliant-diamond-shining-pearl1',
+  'shining-pearl': 'brilliant-diamond-shining-pearl2',
+  'legends-arceus': 'legends-arceus',
+  'scarlet': 'scarlet-violet1',
+  'violet': 'scarlet-violet2',
+  'legends-za': 'legends-za',
+}
+
+const COVER_VARIANT_TO_GROUP = new Map<string, string>(
+  Object.entries(VERSION_TO_COVER_VARIANT)
+    .map(([version, file]) => [file, VERSION_TO_GROUP[version]] as const)
+    .filter((entry): entry is readonly [string, string] => Boolean(entry[1])),
+)
+
+export function coverVariantForVersion(version: string): string | null {
+  return VERSION_TO_COVER_VARIANT[version] ?? null
+}
+
 export function getBaseFromVariant(name: string): string {
   if (!name) return name
-  const m = name.match(/^(.*?)(1|2|21|22)$/)
-  if (m) {
-    return m[1]
-  }
-  return name
+  return COVER_VARIANT_TO_GROUP.get(name) ?? name
 }
 
 export function isTwinPair(variants: string[]): boolean {
   if (variants.length !== 2) return false
   const [a, b] = variants
-  const ba = getBaseFromVariant(a)
-  const bb = getBaseFromVariant(b)
+  const ba = getBaseFromVariant(a!)
+  const bb = getBaseFromVariant(b!)
   return ba === bb && ba !== a && ba !== b
 }
 
 export function getTwinGroupKey(versionId: string): string {
   if (!versionId) return 'default'
-  const base = getBaseFromVariant(versionId)
-  if (base === versionId) {
-    // check if it's a base that represents pair? usually not
-    return base
-  }
-  return base
+  return getBaseFromVariant(versionId)
 }
 
 export function versionLabel(name: string): string {

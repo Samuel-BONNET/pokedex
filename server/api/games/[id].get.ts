@@ -1,5 +1,6 @@
-import { existsSync, readdirSync } from "node:fs"
+import { readdirSync } from "node:fs"
 import { coversDir, coverPath } from "../../utils/lang"
+import { getBaseFromVariant } from "../../../utils/gameVersions"
 
 const JQ_DIR = coversDir()
 
@@ -20,9 +21,11 @@ export default defineEventHandler(async (event) => {
     if (!game) return null
 
     const allFiles = readdirSync(JQ_DIR)
-    const availableJaquettes = allFiles.filter(f => f.startsWith(game.nameEn) && f.endsWith('.png')).map(f => ({
-        name: f.replace('.png', ''),
-        sprite: coverPath(f)
+    const availableJaquettes = allFiles
+        .filter(f => f.endsWith('.png') && getBaseFromVariant(f.replace(/\.png$/, '')) === game.nameEn)
+        .map(f => ({
+            name: f.replace(/\.png$/, ''),
+            sprite: coverPath(f),
         }))
 
     return {

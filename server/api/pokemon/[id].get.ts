@@ -1,4 +1,5 @@
 import {getFullEvolutionChain} from "#server/utils/evolution";
+import {resolveGameAppearances} from "#server/utils/gameCovers";
 
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
         include: {
             statuts: {
                 where: { idUser: { in: [idUser, 0] } },
-                select: { idUser: true, isOwned: true, isShiny: true },
+                select: { idUser: true, isOwned: true, isShiny: true, capturedGame: true },
             },
             pokemonPreferences: {
                 where: { idUser: { in: [idUser, 0] } },
@@ -22,7 +23,10 @@ export default defineEventHandler(async (event) => {
             },
             abilities: {
                 include: { ability: { select: { id: true, nameEn: true, nameFr: true, description: true } } },
-            }
+            },
+            moves: {
+                include: { move: true },
+            },
         },
     })
 
@@ -34,8 +38,11 @@ export default defineEventHandler(async (event) => {
         isShiny: pokemon.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
         currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
         evolutionChain: await getFullEvolutionChain(id, idUser),
+        gameAppearances: resolveGameAppearances(pokemon.gameVersions),
         statuts: undefined,
         types: pokemon.types.map(t => t.type.nameEn),
+        moves: pokemon.moves,
+        capturedGame: pokemon.statuts.find(s => s.idUser === idUser)?.capturedGame,
         abilities: pokemon.abilities.map(entry => ({
             id: entry.ability.id,
             nameFr: entry.ability.nameFr,

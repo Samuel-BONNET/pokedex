@@ -80,9 +80,9 @@
       <span class="bg-red-800 h-auto w-8"></span>
       <div class="flex flex-col justify-end">
         <div class="[clip-path:polygon(0%_0%,80%_0%,100%_100%,0%_100%)] bg-red-600 w-50 h-8"></div>
-        <div class="flex flex-col p-6 rounded-r-lg h-fit pt-29 bg-red-600">
+        <div class="flex flex-col p-6 rounded-r-lg h-fit pt-19 bg-red-600">
           <div class="flex flex-col justify-between gap-11.5 bg-red-600">
-            <div ref="screen" class="relative w-full h-30 min-h-0 flex flex-col overflow-hidden">
+            <div ref="screen" class="relative w-full h-40 min-h-0 flex flex-col overflow-hidden">
               <div v-if="display === 0 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
                 Description pokedex
               </div>
@@ -128,12 +128,20 @@
                 </div>
               </div>
 
-              <div v-if="display === 5 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
-                Liste capacités par niveau
+              <div v-if="display === 5 && pokemon" class="flex flex-col bg-white max-w-full h-full overflow-y-auto">
+                <div v-for="move in listMove" :key="move.moveId" class="flex flex-row justify-between items-center w-full px-6 py-1">
+                  <span>{{ move.move.nameFr }}</span>
+                  <img :src="typeIcon(move.move.type)" :alt="move.move.type" class="object-contain max-h-5" />
+                </div>
+                <p v-if="!listMove.length" class="text-xs text-slate-500 m-auto">Aucune capacité</p>
               </div>
 
-              <div v-if="display === 6 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
-                Talent & capacité spé
+              <div v-if="display === 6 && pokemon" class="flex flex-col bg-white max-w-full h-full overflow-y-auto">
+                <div v-for="ability in listAbility" :key="ability.id" class="flex flex-row justify-between items-center w-full px-6 py-1">
+                  <span>{{ ability.nameFr }}</span>
+                  <span v-if="ability.isHidden" class="text-[9px] text-slate-500">Talent caché</span>
+                </div>
+                <p v-if="!listAbility.length" class="text-xs text-slate-500 m-auto">Aucun talent</p>
               </div>
 
               <div v-if="display === 7 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
@@ -141,11 +149,12 @@
               </div>
 
               <div v-if="display === 8 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
-                Methode et taux de capture
+                Capture Rate : {{ pokemon.capture_rate ?? '—' }}
               </div>
 
-              <div v-if="display === 9 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
-                Jeux de capture
+              <div v-if="display === 9 && pokemon" class="grid grid-cols-4 grid-rows-2 place-content-start place-items-center gap-0 bg-white w-full h-full overflow-y-auto py-0">
+                <img v-for="game in gameDisplay ?? []" :key="game.version" :src="game.cover" :alt="game.label" :title="game.label" class="object-contain max-w-16 max-h-16" :class="!pokemon.capturedGame && 'grayscale'" />
+                <p v-if="!(gameDisplay?.length)" class="text-xs text-slate-500 m-auto">Aucun jeu disponible</p>
               </div>
             </div>
 
@@ -159,10 +168,12 @@
               </div>
             </div>
 
+            <p> ICIII : {{gameDisplay}}</p>
+
             <div class="flex flex-row justify-between m-2">
               <div class="flex flex-row">
-                <button class="bg-white rounded-xs border border-black/60 w-10 h-10 hover:bg-slate-700 active:bg-slate-500"  />
-                <button class="bg-white rounded-xs border border-black/60 w-10 h-10 hover:bg-slate-700 active:bg-slate-500"  />
+                <button @click="prevPage" :disabled="!canPrev" class="bg-white rounded-xs border border-black/60 w-10 h-10 hover:bg-slate-700 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"  />
+                <button @click="nextPage" :disabled="!canNext" class="bg-white rounded-xs border border-black/60 w-10 h-10 hover:bg-slate-700 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"  />
               </div>
               <button class="btn bg-yellow-500 rounded-full w-8 h-8" />
             </div>
@@ -213,17 +224,90 @@ const { data: pokemon, refresh } = await useFetch<{
   currentSprite: string
   isOwned: boolean
   isShiny: boolean
+  capturedGame: any[]
   height: number
   weight: number
+  capture_rate: number | null
+  moves: any[]
+  abilities: any[]
   types: any[]
   stats: any[]
   availableGames: AvailableGames[],
+  gameAppearances: { version: string; label: string; cover: string }[],
   evolutionChain: EvolutionStage[]
 }>(`/api/pokemon/${id}`, {
   query: { userId: user.value?.id },
 })
 const freeDisplay = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 const display = ref(1)
+const PAGE_SIZE = 5
+
+const movePage = ref(0)
+const movePageCount = computed(() => Math.max(1, Math.ceil((pokemon.value?.moves.length ?? 0) / PAGE_SIZE)))
+const listMove = computed(() => {
+  const start = movePage.value * PAGE_SIZE
+  return (pokemon.value?.moves ?? []).slice(start, start + PAGE_SIZE)
+})
+
+const abilityPage = ref(0)
+const abilityPageCount = computed(() => Math.max(1, Math.ceil((pokemon.value?.abilities.length ?? 0) / PAGE_SIZE)))
+const listAbility = computed(() => {
+  const start = abilityPage.value * PAGE_SIZE
+  return (pokemon.value?.abilities ?? []).slice(start, start + PAGE_SIZE)
+})
+
+const gameIndex = ref(0)
+const gameDisplay = computed(() => {
+  const start = gameIndex.value * 8
+  return (pokemon.value?.gameAppearances ?? []).slice(start, start + 8)
+})
+
+const canPrevPageAbility = computed(() =>
+  (display.value === 5 && movePage.value > 0) || (display.value === 6 && abilityPage.value > 0),
+)
+
+const canNextPageAbility = computed(() =>
+  (display.value === 5 && movePage.value < movePageCount.value - 1) || (display.value === 6 && abilityPage.value < abilityPageCount.value - 1),
+)
+
+const canPrevGames = computed(() =>
+  gameIndex.value > 0
+)
+
+const canNextGames = computed(() =>
+    gameDisplay.value.length === 8
+)
+
+const canPrev = computed(() => canPrevGames.value || canPrevPageAbility.value)
+const canNext = computed(() => canNextGames.value || canNextPageAbility.value)
+
+const prevPage = () => {
+  switch(display.value) {
+    case 5:
+      movePage.value--
+      break;
+    case 6:
+      abilityPage.value--
+      break;
+    case 9:
+      gameIndex.value--
+      break;
+  }
+}
+
+const nextPage = () => {
+  switch(display.value) {
+    case 5:
+      movePage.value++
+      break;
+    case 6:
+      abilityPage.value++
+      break;
+    case 9:
+      gameIndex.value++
+      break;
+  }
+}
 
 function changeDisplay(value: number) {
   display.value = value

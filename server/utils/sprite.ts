@@ -13,7 +13,7 @@ export function buildPokemonSpriteUrl(
 
 const SPRITE_ALIASES: Record<string, string[]> = {
     "gold-silver": ["gold", "silver"],
-    "omega-ruby-alpha-sapphire": ["omegaruby", "alphasapphire"],
+    "omega-ruby-alpha-sapphire": ["omegaruby", "alphasapphire", "omegaruby-alphasapphire"],
     "black-2-white-2": ["black-white"],
     "sun-moon": ["ultra-sun-ultra-moon"],
 }

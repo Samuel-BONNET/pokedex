@@ -47,6 +47,43 @@ function getFrenchName(species: any): string {
     return species.names?.find((n: any) => n.language.name === 'fr')?.name ?? species.name
 }
 
+function getGameVersions(pokemon: any): string[] {
+    return [...new Set(
+        (pokemon.game_indices ?? [])
+            .map((entry: any) => entry.version?.name)
+            .filter((name: unknown): name is string => typeof name === 'string' && name.length > 0),
+    )]
+}
+
+const SPRITE_GAME_ALIASES: Record<string, string> = {
+    'omegaruby-alphasapphire': 'omega-ruby-alpha-sapphire',
+}
+
+function buildAvailableGames(pokemon: any) {
+    const versions: Record<string, Record<string, any>> = pokemon.sprites?.versions ?? {}
+    const games: { generationName: string; game: string; sprite: string }[] = []
+    const seen = new Set<string>()
+
+    for (const generation in versions) {
+        for (const game in versions[generation]) {
+            if (game === 'icons') continue
+            if (!versions[generation][game]?.front_default) continue
+
+            const canonicalGame = SPRITE_GAME_ALIASES[game] ?? game
+            if (seen.has(canonicalGame)) continue
+            seen.add(canonicalGame)
+
+            games.push({
+                generationName: generation,
+                game: canonicalGame,
+                sprite: buildPokemonSpriteUrl(pokemon.id, generation, game),
+            })
+        }
+    }
+
+    return games
+}
+
 const COVERS_DIR = lang.img.games.covers.dir
 const JQ_DIR = join(process.cwd(), 'public', COVERS_DIR.replace(/^\/+/, ''))
 
@@ -124,26 +161,14 @@ async function importPokemon(start: number, end: number) {
             fetchPokemonSpeciesApi(id),
         ])
 
-        const versions: Record<string, Record<string, any>> = pokemon.sprites?.versions ?? {}
         const frenchName = getFrenchName(species)
-
-        const gamesList: { generation: string; game: string }[] = []
-        for (const generation in versions) {
-            for (const game in versions[generation]) {
-                if (!versions[generation][game]?.front_default) continue
-                gamesList.push({ generation, game })
-            }
-        }
-
-        const enrichedGamesList = gamesList.map((item) => ({
-            generationName: item.generation,
-            game: item.game,
-            sprite: buildPokemonSpriteUrl(id, item.generation, item.game),
-        }))
+        const enrichedGamesList = buildAvailableGames(pokemon)
 
         const typeIds = (pokemon.types ?? []).map((type: any) => typeIdByName.get(type.type.name)).filter((typeId: any): typeId is number => typeId !== undefined)
 
         const stats = (pokemon.stats ?? []).map((stat: any) => ({ name: stat.stat.name, value: stat.base_stat }))
+
+        const typeTable = ''
 
         let pokemonId: number
         if(MOD != "statut"){
@@ -153,7 +178,10 @@ async function importPokemon(start: number, end: number) {
                 nameFr: frenchName,
                 height: pokemon.height,
                 weight: pokemon.weight,
+                capture_rate: species.capture_rate,
+                gameVersions: getGameVersions(pokemon),
                 stats,
+                typeTable,
                 availableGames: enrichedGamesList,
             }
 
@@ -259,6 +287,33 @@ async function importPokemon(start: number, end: number) {
                 data: abilityLinks.map((entry: any) => ({ pokemonId, ...entry })),
                 skipDuplicates: true,
             })
+        }
+    }
+}
+
+async function importAppearances() {
+    const maxId = POKEMON_GEN[POKEMON_GEN.length - 1]!
+
+    for (let id = 1; id <= maxId; id++) {
+        console.log(`Importing Appearances #${id}/${maxId}`)
+
+        const [pokemon, species] = await Promise.all([
+            fetchPokemonApi(id),
+            fetchPokemonSpeciesApi(id),
+        ])
+
+        await prisma.pokemon.updateMany({
+            where: { pokeNumber: id },
+            data: {
+                gameVersions: getGameVersions(pokemon),
+                capture_rate: species.capture_rate,
+                availableGames: buildAvailableGames(pokemon),
+            },
+        })
+
+        if (id % BATCH_SIZE === 0 && id < maxId) {
+            console.log(`  Batch complete, waiting ${DELAY_BETWEEN_BATCHES}ms...`)
+            await delay(DELAY_BETWEEN_BATCHES)
         }
     }
 }
@@ -437,9 +492,10 @@ async function importTypes(){
             const name = type.name.toLowerCase()
             const strength = typeNames.filter(defender => (chart.get(name)?.get(defender) ?? 0) > 1)
             const weaknesses = typeNames.filter(attacker => (chart.get(attacker)?.get(name) ?? 0) > 1)
+            const immunities = typeNames.filter(attacker => (chart.get(attacker)?.get(name) ?? 0) == 0)
 
             try{
-                const typeData = { nameEn: name, strength, weaknesses }
+                const typeData = { nameEn: name, strength, weaknesses, immunities }
 
                 const updated = await prisma.type.updateMany({
                     where: { id },
@@ -474,6 +530,9 @@ async function main() {
         case "games":
             await importGames()
             break;
+        case "appearances":
+            await importAppearances()
+            break;
         case "ability":
             await importAbilities()
             break;
@@ -488,7 +547,7 @@ async function main() {
             await importTypes()
             await importAbilities()
             if(GENERATION_CIBLE === undefined) {
-                await importPokemon(1,9)
+                await importPokemon(1,10)
             }
             else {
                 await importPokemon(GENERATION_CIBLE, GENERATION_CIBLE+1)

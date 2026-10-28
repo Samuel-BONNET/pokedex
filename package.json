@@ -14,6 +14,7 @@
     "prisma:studio": "prisma studio",
     "import:pokemon": "tsx scripts/import-pokemon.ts pokemon",
     "import:games": "tsx scripts/import-pokemon.ts games",
+    "import:appearances": "tsx scripts/import-pokemon.ts appearances",
     "import:statut": "tsx scripts/import-pokemon.ts statut",
     "import:move": "tsx scripts/import-pokemon.ts move",
     "import:ability": "tsx scripts/import-pokemon.ts ability",

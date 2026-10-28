@@ -1,5 +1,6 @@
 import { readdirSync } from "node:fs"
 import { coversDir, coverPath } from "../../utils/lang"
+import { getBaseFromVariant } from "../../../utils/gameVersions"
 
 const JQ_DIR = coversDir()
 
@@ -22,9 +23,11 @@ export default defineEventHandler(async (event) => {
         ...g,
         currentSprite: g.gamePreferences.find(s => s.idUser === idUser)?.currentSprite ?? g.gamePreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
         gamePreferences: undefined,
-        availableJaquettes: allFiles.filter(f => f.startsWith(g.nameEn) && f.endsWith('.png')).map(f => ({
-            name: f.replace('.png', ''),
-            sprite: coverPath(f),
-        })),
+        availableJaquettes: allFiles
+            .filter(f => f.endsWith('.png') && getBaseFromVariant(f.replace(/\.png$/, '')) === g.nameEn)
+            .map(f => ({
+                name: f.replace(/\.png$/, ''),
+                sprite: coverPath(f),
+            })),
     }))
 })
