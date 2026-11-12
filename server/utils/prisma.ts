@@ -1,15 +1,29 @@
-import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
+import dotenv from 'dotenv'
+import { resolve } from 'path'
 
-const globalForPrisma = globalThis as unknown as {
-    prisma?: PrismaClient
+dotenv.config({ path: resolve(process.cwd(), '.env') })
+
+import { PrismaClient } from '@prisma/client'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+
+const connectionString = process.env.DATABASE_URL
+
+if (!connectionString) {
+  throw new Error('La variable d\'environnement DATABASE_URL est manquante ou non définie.')
 }
 
-const adapter = new PrismaPg(process.env.DATABASE_URL!)
+const adapter = new PrismaMariaDb(connectionString)
 
-export const prisma =
-    globalForPrisma.prisma ?? new PrismaClient({ adapter })
+const prismaClientSingleton = () => {
+  return new PrismaClient({ adapter })
+}
+
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>
+} & typeof global
+
+export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
 
 if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.prisma = prisma
+  globalThis.prismaGlobal = prisma
 }

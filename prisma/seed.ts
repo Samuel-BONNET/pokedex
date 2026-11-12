@@ -1,28 +1,22 @@
 import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import * as bcrypt from 'bcrypt'
 
-const adapter = new PrismaPg(process.env.DATABASE_URL!)
+const dbUrl = new URL(process.env.DATABASE_URL!)
+
+const adapter = new PrismaMariaDb({
+    host: dbUrl.hostname,
+    port: parseInt(dbUrl.port || '3306'),
+    user: dbUrl.username,
+    password: decodeURIComponent(dbUrl.password),
+    database: dbUrl.pathname.replace('/', ''),
+    connectionLimit: 5,
+})
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
     const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD!, 10)
-
-    await prisma.user.upsert({
-        where: {
-            id: 0
-        },
-        update: {},
-        create: {
-            id: 0,
-            email: "system@local.fr",
-            password: "",
-            role: "SYS",
-            pseudo: "System",
-            preferences: {},
-        }
-    })
 
     await prisma.user.upsert({
         where: {
@@ -31,10 +25,10 @@ async function main() {
         update: {},
         create: {
             id: 1,
-            email: "",
+            email: "system@local.fr",
             password: "",
-            role: "GUEST",
-            pseudo: "Guest",
+            role: "SYS",
+            pseudo: "System",
             preferences: {},
         }
     })
@@ -46,6 +40,21 @@ async function main() {
         update: {},
         create: {
             id: 2,
+            email: "",
+            password: "",
+            role: "GUEST",
+            pseudo: "Guest",
+            preferences: {},
+        }
+    })
+
+    await prisma.user.upsert({
+        where: {
+            id: 3
+        },
+        update: {},
+        create: {
+            id: 3,
             email: process.env.ADMIN_EMAIL!,
             password: hashedPassword,
             role: 'ADMIN',

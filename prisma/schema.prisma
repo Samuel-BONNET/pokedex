@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
 }
 
 model User {
@@ -13,7 +13,7 @@ model User {
   password           String
   role               String               @db.VarChar(50)
   isActive           Boolean              @default(true)
-  preferences        Json                 @db.JsonB
+  preferences        Json                 
   createdAt          DateTime             @default(now())
   statuts            Statut[]
   gameSaves          GameSave[]
@@ -34,7 +34,7 @@ model GameSave {
   idGame    Int
   idUser    Int
   version   String   @default("default") @db.VarChar(30)
-  file      Bytes    @db.ByteA
+  file      Bytes    @db.LongBlob
   fileName  String
   size      Int
   updatedAt DateTime @updatedAt
@@ -77,7 +77,7 @@ model Evolution {
 model Statut {
   idPokemon    Int
   idUser       Int
-  capturedGame Int[] @default([])
+  capturedGame Json @default("[]")
 
   user    User    @relation(fields: [idUser], references: [id])
   pokemon Pokemon @relation(fields: [idPokemon], references: [id])
@@ -115,7 +115,7 @@ model Ability {
   id          Int    @id @default(autoincrement())
   nameFr      String @db.VarChar(50)
   nameEn      String @db.VarChar(50)
-  description String
+  description String @db.Text
 
   pokemons PokemonAbility[]
 }
@@ -137,7 +137,7 @@ model Move {
   nameEn        String @db.VarChar(50)
   type          String
   category      String
-  contestCombos  String
+  contestCombos  String @db.Text
   power         Int?
   accuracy      Int?
   pp            Int?
@@ -154,9 +154,9 @@ model Move {
   flinchChance  Int?
   statChance    Int?
   target        String
-  description   String
+  description   String @db.Text
   damageClass   String
-  effectEntries String
+  effectEntries String @db.Text
 
   pokemons PokemonMove[]
 }
