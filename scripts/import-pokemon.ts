@@ -4,6 +4,7 @@ import { buildPokemonSpriteUrl } from '../server/utils/sprite'
 import lang from '../data/lang.json'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import {SYSTEM_USER_ID} from "../server/utils/constants";
 
 const MOD: string = process.argv[2]!
 const GENERATION_CIBLE: number | undefined = process.argv[3] ? Number(process.argv[3]) : undefined
@@ -77,12 +78,12 @@ async function importGames() {
             })
             await prisma.gamePreferences.upsert({
                 where: {
-                    idGame_idUser: { idGame: game.id, idUser: 0 }
+                    idGame_idUser: { idGame: game.id, idUser: SYSTEM_USER_ID },
                 },
                 update: { currentSprite: loadJaquette(g.name) },
                 create: {
                     game: { connect: { id: game.id } },
-                    user: { connect: { id: 0 } },
+                    user: { connect: { id: SYSTEM_USER_ID } },
                     currentSprite: loadJaquette(g.name),
                 },
             })
@@ -95,7 +96,7 @@ async function importGames() {
 async function importPokemon(start: number, end: number) {
     const [games, sysUser] = await Promise.all([
         prisma.game.findMany(),
-        prisma.user.findUnique({ where: { id: 0 } }),
+        prisma.user.findUnique({ where: { id: SYSTEM_USER_ID } }),
     ])
 
     const dbTypes = await prisma.type.findMany({ select: { id: true, nameEn: true } })
@@ -195,7 +196,7 @@ async function importPokemon(start: number, end: number) {
             where: {
                 idPokemon_idUser: {
                     idPokemon: pokemonId,
-                    idUser: 0,
+                    idUser: SYSTEM_USER_ID,
                 },
             },
             update: {
@@ -204,7 +205,7 @@ async function importPokemon(start: number, end: number) {
             },
             create: {
                 pokemon: { connect: { id: pokemonId } },
-                user: { connect: { id: 0 } },
+                user: { connect: { id: SYSTEM_USER_ID } },
                 isOwned: false,
                 isShiny: false,
             },
@@ -227,7 +228,7 @@ async function importPokemon(start: number, end: number) {
         }
 
         const gameWithJaquette = await prisma.game.findMany({
-            where: { gamePreferences: { some: { idUser: 0, currentSprite: { not: '' } } } },
+            where: { gamePreferences: { some: { idUser: SYSTEM_USER_ID, currentSprite: { not: '' } } } },
             orderBy: { id: 'asc' },
         })
 
@@ -240,7 +241,7 @@ async function importPokemon(start: number, end: number) {
         )
 
         await prisma.user.update({
-            where: { id: 0 },
+            where: { id: SYSTEM_USER_ID },
             data: { preferences: { gameOrder: systemOrder, gameTierSizes } }
         })
 

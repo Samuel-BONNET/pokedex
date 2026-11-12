@@ -1,5 +1,7 @@
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
+
 export default defineEventHandler(async (event) => {
-    const idUser = Number(getQuery(event).userId ?? 0)
+    const idUser = Number(getQuery(event).userId ?? SYSTEM_USER_ID)
 
     const user = await prisma.user.findUnique({
         where: { id: idUser },

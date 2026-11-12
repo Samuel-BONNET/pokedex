@@ -1,8 +1,9 @@
 import {getFullEvolutionChain} from "#server/utils/evolution";
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
 
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
-    const idUser = Number(event.context.user?.userId ?? 0)
+    const idUser = Number(event.context.user?.userId ?? SYSTEM_USER_ID)
 
     const orderedNames = await getOrderedGameNames(idUser)
 
@@ -10,11 +11,11 @@ export default defineEventHandler(async (event) => {
         where: { pokeNumber: id },
         include: {
             statuts: {
-                where: { idUser: { in: [idUser, 0] } },
+                where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
                 select: { idUser: true, isOwned: true, isShiny: true },
             },
             pokemonPreferences: {
-                where: { idUser: { in: [idUser, 0] } },
+                where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
                 select: { idUser: true, currentSprite: true }
             },
             types: {
@@ -32,7 +33,7 @@ export default defineEventHandler(async (event) => {
         ...pokemon,
         isOwned: pokemon.statuts.find(s => s.idUser === idUser)?.isOwned ?? false,
         isShiny: pokemon.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
-        currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
+        currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === SYSTEM_USER_ID)?.currentSprite ?? null,
         evolutionChain: await getFullEvolutionChain(id, idUser),
         statuts: undefined,
         types: pokemon.types.map(t => t.type.nameEn),

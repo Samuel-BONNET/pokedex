@@ -1,9 +1,10 @@
 import { signToken } from '../../utils/jwt'
 import { prisma } from '../../utils/prisma'
 import { setCookie } from 'h3'
+import {GUEST_USER_ID} from "#server/utils/constants.ts";
 
 export default defineEventHandler(async (event) => {
-    const guest = await prisma.user.findUnique({ where: { id: 1 } })
+    const guest = await prisma.user.findUnique({ where: { id: GUEST_USER_ID } })
     if (!guest || guest.role !== 'GUEST') {
         throw createError({ statusCode: 500, statusMessage: 'Guest account missing' })
     }

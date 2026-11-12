@@ -1,16 +1,17 @@
 import { readdirSync } from "node:fs"
 import { coversDir, coverPath } from "../../utils/lang"
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
 
 const JQ_DIR = coversDir()
 
 export default defineEventHandler(async (event) => {
-    const idUser = Number(event.context.user?.userId ?? 0)
+    const idUser = Number(event.context.user?.userId ?? SYSTEM_USER_ID)
 
     const games = await prisma.game.findMany({
         orderBy: { id: 'asc' },
         include: {
             gamePreferences: {
-                where: { idUser: { in: [idUser, 0] } },
+                where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
                 select: { idUser: true, currentSprite: true }
             },
         },
@@ -20,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
     return games.map(g => ({
         ...g,
-        currentSprite: g.gamePreferences.find(s => s.idUser === idUser)?.currentSprite ?? g.gamePreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
+        currentSprite: g.gamePreferences.find(s => s.idUser === idUser)?.currentSprite ?? g.gamePreferences.find(s => s.idUser === SYSTEM_USER_ID)?.currentSprite ?? null,
         gamePreferences: undefined,
         availableJaquettes: allFiles.filter(f => f.startsWith(g.nameEn) && f.endsWith('.png')).map(f => ({
             name: f.replace('.png', ''),
