@@ -2,7 +2,10 @@ import { getTwinGroupKey } from '~/utils/gameVersions'
 
 export default defineEventHandler(async (event) => {
     const idGame = Number(getRouterParam(event, 'id'))
-    const userId = event.context.user?.userId ?? 0
+    const userId = event.context.user?.userId
+    if (!userId) {
+        throw createError({ statusCode: 401, statusMessage: 'Non authentifié' })
+    }
 
     const query = getQuery(event)
     const version = (query.version as string | undefined)?.trim() || 'default'
