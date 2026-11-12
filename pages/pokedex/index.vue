@@ -21,11 +21,18 @@
                       <summary class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">
                         {{ text.pokedex.types }}
                       </summary>
-                      <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20 grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto w-64">
-                        <label v-for="type in types" :key="type.name" class="cursor-pointer flex justify-center items-center">
-                          <input name="couleur[]" v-model="selectedTypes" :value="type.name" type="checkbox" class="peer sr-only" />
-                          <img :src="type.icon" class="h-10 object-contain border-transparent border-2 peer-checked:border-neutral-900 p-0.5" />
-                        </label>
+
+                      <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20">
+                        <div>
+                          type selection
+                          <button @click="typeMatchMode = typeMatchMode === 'any' ? 'all' : 'any'" class="justify-center p-2 m-2 bg-neutral-300 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-200 transition-all cursor-pointer">{{ typeMatchMode }}</button>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto w-64">
+                          <label v-for="type in types" :key="type.name" class="cursor-pointer flex justify-center items-center">
+                            <input name="couleur[]" v-model="selectedTypes" :value="type.name" type="checkbox" class="peer sr-only" />
+                            <img :src="type.icon" class="h-10 object-contain border-transparent border-2 peer-checked:border-neutral-900 p-0.5" />
+                          </label>
+                        </div>
                       </div>
                     </details>
                   </div>
@@ -166,6 +173,7 @@ const genBound = [0, 151, 251, 386, 493, 649, 721, 809, 905, 1025]
 const getGeneration = (n: number) => genBound.findIndex(bound => n <= bound)
 const toolbarEnable = ref(true)
 const selectedTypes = ref<string[]>([])
+const typeMatchMode = ref<'any' | 'all'>('any')
 
 const { data: types } = useFetch<{ name: string, icon: string }[]>('/api/types')
 const { themeClassesSecondaryBackground } = useLang()
@@ -183,7 +191,11 @@ const filteredPokemons = computed(() => {
     if (gen && getGeneration(p.pokeNumber) !== gen) return false
     if (types.length > 0) {
       const pokeTypes = (p.types ?? []) as string[]
-      if (!types.some(t => pokeTypes.includes(t))) return false
+      if (typeMatchMode.value === 'all') {
+        if (!types.every(t => pokeTypes.includes(t))) return false
+      } else {
+        if (!types.some(t => pokeTypes.includes(t))) return false
+      }
     }
     return true
   })
