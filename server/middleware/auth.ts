@@ -8,6 +8,13 @@ export default defineEventHandler((event) => {
     if (!pathname.startsWith('/api')) return
 
     const token = getCookie(event, 'auth_token')
+    
+    if (!token) {
+        const authHeader = getHeader(event, 'authorization')
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.substring(7)
+        }
+    }
     if (token) {
         try {
             event.context.user = verifyToken(token)
