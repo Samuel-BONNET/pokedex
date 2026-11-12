@@ -1,5 +1,6 @@
 import { prisma } from './prisma'
 import { getOrderedGameNames, findSpriteByOrder } from "./sprite"
+import {SYSTEM_USER_ID} from "./constants.ts";
 
 export interface EvolutionStage {
     id: number
@@ -16,8 +17,8 @@ async function loadStage(pokeNumber: number, idUser: number, orderedNames: strin
     const p = await prisma.pokemon.findUnique({
         where: { pokeNumber },
         include: {
-            statuts: { where: { idUser: { in: [idUser, 0] } }, select: { idUser: true, isOwned: true, isShiny: true } },
-            pokemonPreferences: { where: { idUser: { in: [idUser, 0] } }, select: { idUser: true, currentSprite: true } },
+            statuts: { where: { idUser: { in: [idUser, SYSTEM_USER_ID] } }, select: { idUser: true, isOwned: true, isShiny: true } },
+            pokemonPreferences: { where: { idUser: { in: [idUser, SYSTEM_USER_ID] } }, select: { idUser: true, currentSprite: true } },
         },
     })
     if (!p) return null
@@ -28,7 +29,7 @@ async function loadStage(pokeNumber: number, idUser: number, orderedNames: strin
         nameEn: p.nameEn,
         isOwned: p.statuts.find(s => s.idUser === idUser)?.isOwned ?? false,
         isShiny: p.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
-        currentSprite: p.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(p.availableGames, orderedNames) ?? p.pokemonPreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
+        currentSprite: p.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(p.availableGames, orderedNames) ?? p.pokemonPreferences.find(s => s.idUser === SYSTEM_USER_ID)?.currentSprite ?? null,
     }
 }
 
