@@ -1,10 +1,9 @@
+import { PrismaClient } from '@prisma/client'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import dotenv from 'dotenv'
 import { resolve } from 'path'
 
 dotenv.config({ path: resolve(process.cwd(), '.env') })
-
-import { PrismaClient } from '@prisma/client'
-import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 
 const connectionString = process.env.DATABASE_URL
 
