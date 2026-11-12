@@ -245,7 +245,7 @@ async function importPokemon(start: number, end: number) {
             data: { preferences: { gameOrder: systemOrder, gameTierSizes } }
         })
 
-        if (id % BATCH_SIZE === 0 && id < end) {
+        if (id % BATCH_SIZE === 0 && id < POKEMON_GEN[end-1]!) {
             console.log(`  Batch complete, waiting ${DELAY_BETWEEN_BATCHES}ms...`)
             await delay(DELAY_BETWEEN_BATCHES)
         }
@@ -466,7 +466,7 @@ async function main() {
         case "pokemon":
         case "statut":
             if(GENERATION_CIBLE === undefined) {
-                await importPokemon(1,9)
+                await importPokemon(1,10)
             }
             else{
                 await importPokemon(GENERATION_CIBLE,GENERATION_CIBLE+1)
@@ -489,7 +489,7 @@ async function main() {
             await importTypes()
             await importAbilities()
             if(GENERATION_CIBLE === undefined) {
-                await importPokemon(1,9)
+                await importPokemon(1,10)
             }
             else {
                 await importPokemon(GENERATION_CIBLE, GENERATION_CIBLE+1)
