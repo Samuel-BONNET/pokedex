@@ -1,5 +1,6 @@
 import {getFullEvolutionChain} from "#server/utils/evolution";
 import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
+import {resolveGameAppearances} from "#server/utils/gameCovers";
 
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
@@ -12,7 +13,7 @@ export default defineEventHandler(async (event) => {
         include: {
             statuts: {
                 where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
-                select: { idUser: true, isOwned: true, isShiny: true },
+                select: { idUser: true, isOwned: true, isShiny: true, capturedGame: true },
             },
             pokemonPreferences: {
                 where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
@@ -23,7 +24,10 @@ export default defineEventHandler(async (event) => {
             },
             abilities: {
                 include: { ability: { select: { id: true, nameEn: true, nameFr: true, description: true } } },
-            }
+            },
+            moves: {
+                include: { move: true },
+            },
         },
     })
 
@@ -34,9 +38,12 @@ export default defineEventHandler(async (event) => {
         isOwned: pokemon.statuts.find(s => s.idUser === idUser)?.isOwned ?? false,
         isShiny: pokemon.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
         currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === SYSTEM_USER_ID)?.currentSprite ?? null,
-        evolutionChain: await getFullEvolutionChain(id, idUser),
+        evolutionChain: await getFullEvolutionChain(id, idUser, orderedNames),
+        gameAppearances: await resolveGameAppearances(pokemon.gameVersions),
         statuts: undefined,
         types: pokemon.types.map(t => t.type.nameEn),
+        moves: pokemon.moves,
+        capturedGame: pokemon.statuts.find(s => s.idUser === idUser)?.capturedGame,
         abilities: pokemon.abilities.map(entry => ({
             id: entry.ability.id,
             nameFr: entry.ability.nameFr,

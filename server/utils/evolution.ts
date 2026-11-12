@@ -34,8 +34,8 @@ async function loadStage(pokeNumber: number, idUser: number, orderedNames: strin
 }
 
 
-export async function getFullEvolutionChain(pokeNumber: number, idUser: number): Promise<EvolutionStage[]> {
-    const orderedGames = await getOrderedGameNames(idUser)
+export async function getFullEvolutionChain(pokeNumber: number, idUser: number, orderedGames?: string[]): Promise<EvolutionStage[]> {
+    const orderedNames = orderedGames ?? await getOrderedGameNames(idUser)
 
     const pre: number[] = []
     let pn = pokeNumber
@@ -70,6 +70,6 @@ export async function getFullEvolutionChain(pokeNumber: number, idUser: number):
     }
 
     const chain = [...pre, pokeNumber, ...post]
-    const stages = await Promise.all(chain.map(n => loadStage(n, idUser, orderedGames)))
+    const stages = await Promise.all(chain.map(n => loadStage(n, idUser, orderedNames)))
     return stages.filter((s): s is EvolutionStage => s !== null)
 }
