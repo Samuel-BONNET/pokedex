@@ -5,24 +5,25 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
+      - db
     environment:
-      DATABASE_URL: postgresql://admin:password@postgres:5432/appdb
+      DATABASE_URL: mysql://admin:password@db:3306/appdb
       JWT_SECRET: supersecretkey
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
 
-  postgres:
-    image: postgres:17
+  db:
+    image: mariadb:11.4
     restart: always
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: appdb
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: appdb
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mariadb_data:/var/lib/mysql
 
 volumes:
-  postgres_data:
+  mariadb_data:
