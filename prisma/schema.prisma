@@ -54,6 +54,9 @@ model Pokemon {
   weight         Int?
   stats          Json?
   availableGames Json
+  typeTable      Json?
+  capture_rate   Int?
+  gameVersions   String[]     @default([])
 
   abilities          PokemonAbility[]
   moves              PokemonMove[]
@@ -178,6 +181,7 @@ model Type {
   nameEn     String @db.VarChar(30) @unique
   strength   Json?
   weaknesses Json?
+  immunities Json?
 
   pokemonTypes PokemonType[]
 }
