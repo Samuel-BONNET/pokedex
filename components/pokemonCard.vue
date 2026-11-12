@@ -3,13 +3,13 @@
   <div class="w-36 flex flex-col items-center bg-white p-2 border-4 transition-all select-none font-mono"
        :class="[
          rangeStartEnd
-           ? 'border-red-600 shadow-[3px_3px_0px_0px_rgba(220,38,38,1)] -translate-y-0.5'
+           ? 'border-red-600 shadow-[3px_3px_0px_0px_rgba(135,7,7,1)] -translate-y-0.5'
            : selected
-             ? 'border-blue-600 shadow-[3px_3px_0px_0px_rgba(37,99,235,1)] -translate-y-0.5'
+             ? 'border-blue-600 shadow-[3px_3px_0px_0px_rgba(20,51,184,1)] -translate-y-0.5'
              : pokemon.isShiny
-               ? 'border-amber-400 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5'
+               ? 'border-amber-400 shadow-[3px_3px_0px_0px_rgba(237,141,24,1)] hover:-translate-y-0.5'
                : pokemon.isOwned
-                 ? 'border-neutral-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5'
+                 ? 'border-neutral-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.7)] hover:-translate-y-0.5'
                  : 'border-neutral-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] opacity-75 hover:opacity-100 hover:border-neutral-700']">
     <div class="relative flex justify-between w-full items-center mb-1">
       <span class="text-[10px] font-bold text-neutral-600 bg-neutral-200 px-1 border border-neutral-400">
