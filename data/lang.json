@@ -102,11 +102,7 @@
       "pokeApi": "https://pokeapi.co",
       "pokeApiSprites": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions",
       "loadingPage": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
-      "loginWallpaper": "https://wallpapercave.com/wp/wp2860892.jpg",
-      "loginPanel": {
-        "login": "https://images.alphacoders.com/508/thumb-1920-508993.jpg",
-        "register": "https://i.pinimg.com/1200x/b2/e2/f4/b2e2f42866502add8e97da97d600de04.jpg"
-      }
+      "loginWallpaper": "https://wallpapercave.com/wp/wp2860892.jpg"
     }
   },
   "text": {

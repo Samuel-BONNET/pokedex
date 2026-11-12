@@ -53,11 +53,13 @@ import creditsRaw from '~/credits.md?raw'
 
 const { img, meta, text, themeClassesSecondaryBackground, themeClassesHue } = useLang()
 
+const sections = parseCreditsSections(creditsRaw)
+
 const credits = computed(() => {
-    const lines = creditsRaw.split('\n')
+    const section = sections.find(s => s.title.toLowerCase() === 'Crédits') ?? sections[0]
     return {
-        title: lines.find(l => l.trim().startsWith('#'))?.replace(/^#+\s*/, '') ?? '',
-        lines: lines.filter(l => l.trim() && !l.trim().startsWith('#')),
+        title: section?.title ?? '',
+        lines: (section?.lines ?? []).filter(line => !isHttpUrl(line)),
     }
 })
 

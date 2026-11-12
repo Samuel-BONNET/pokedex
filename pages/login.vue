@@ -5,14 +5,16 @@
 
     <div class="relative z-10 w-3/5 h-screen rounded-r-4xl p-2 drop-shadow-2xl shadow-2xl overflow-hidden bg-white">
       <div class="image-stage h-full">
-        <img :src="img.remote.loginPanel.login"
+        <img :src="loginSrc"
           :alt="text.alt.login"
           class="image-layer w-full h-full object-cover rounded-r-4xl object-[30%_50%]"
-          :class="{ 'is-active': mode === 'login' }" />
-        <img :src="img.remote.loginPanel.register"
+          :class="{ 'is-active': mode === 'login' }"
+          @error="loginImageFailed = true" />
+        <img :src="registerSrc"
           :alt="text.alt.register"
           class="image-layer w-full h-full object-cover rounded-r-4xl object-[30%_50%]"
-          :class="{ 'is-active': mode === 'register' }" />
+          :class="{ 'is-active': mode === 'register' }"
+          @error="registerImageFailed = true" />
       </div>
     </div>
 
@@ -70,6 +72,7 @@
 
 <script setup lang="ts">
 import { Eye3, EyeSlash } from 'reicon-vue';
+import {useAuthImages} from "~/composables/useAuthImages.ts";
 definePageMeta({ layout: false })
 
 const { img, text } = useLang()
@@ -81,7 +84,6 @@ const seePassword = ref(false)
 const email = ref('');
 const password = ref('');
 const error = ref<string | null>(null);
-
 const regEmail = ref('');
 const regPseudo = ref('');
 const regPassword = ref('');
@@ -90,6 +92,16 @@ const regSecretToken = ref('');
 const regError = ref<string | null>(null);
 
 const { login: authLogin, setGuest } = useAuth();
+const { loginImage, registerImage } = useAuthImages();
+
+const loginImageFailed = ref(false)
+const registerImageFailed = ref(false)
+
+watch(loginImage, () => { loginImageFailed.value = false })
+watch(registerImage, () => { registerImageFailed.value = false})
+
+const loginSrc = computed(() => loginImageFailed.value ? img.remote.loginWallpaper : (loginImage.value ?? img.remote.loginWallpaper))
+const registerSrc = computed(() => registerImageFailed.value ? img.remote.loginWallpaper : (registerImage.value ?? img.remote.loginWallpaper))
 
 async function guestLogin() {
   await setGuest()
