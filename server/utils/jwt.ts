@@ -1,13 +1,19 @@
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET!
-
 export function signToken(payload: object) {
-    return jwt.sign(payload, JWT_SECRET, {
+    const secret = process.env.JWT_SECRET
+    if (!secret) {
+        throw new Error('La variable d\'environnement JWT_SECRET est introuvable.')
+    }
+    return jwt.sign(payload, secret, {
         expiresIn: '1h',
     })
 }
 
 export function verifyToken(token: string) {
-    return jwt.verify(token, JWT_SECRET)
+    const secret = process.env.JWT_SECRET
+    if (!secret) {
+        throw new Error('La variable d\'environnement JWT_SECRET est introuvable.')
+    }
+    return jwt.verify(token, secret)
 }
