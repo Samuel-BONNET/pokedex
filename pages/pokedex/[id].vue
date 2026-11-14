@@ -153,20 +153,11 @@
               </div>
 
               <div v-if="display === 9 && pokemon" class="grid grid-cols-4 grid-rows-2 place-content-start place-items-center gap-0 bg-white w-full h-full overflow-y-auto py-0">
-                <NuxtLink
-                    v-for="game in gameDisplay ?? []"
-                    :key="game.variant"
-                    :to="{ path: `/games/${game.id}`, query: { version: game.variant } }"
-                    :title="game.label"
-                    class="block"
-                >
-                  <img
-                      :src="game.cover"
-                      :alt="game.label"
+                <button v-for="game in gameDisplay ?? []" class="hover:brightness-80" @click="changeGameStatut(game.id)">
+                  <img :src="game.cover" :alt="game.label"
                       class="object-contain max-w-16 max-h-16"
-                      :class="!capturedGameIds.has(game.id) && 'grayscale'"
-                  />
-                </NuxtLink>
+                      :class="!capturedGameIds.has(game.id) && 'grayscale'" />
+                </button>
                 <p v-if="!(gameDisplay?.length)" class="text-xs text-slate-500 m-auto">Aucun jeu disponible</p>
               </div>
             </div>
@@ -381,5 +372,21 @@ async function changeShiny() {
     body: { idUser: user.value?.id, isShiny: !pokemon.value.isShiny },
   })
   refresh()
+}
+
+async function changeGameStatut(id: number){
+
+  let capturedGameUpdated
+  if (pokemon.value?.capturedGame?.includes(id)) {
+    capturedGameUpdated = pokemon.value?.capturedGame.filter(ids => ids != id)
+  }
+  else {
+    capturedGameUpdated = [ ...(pokemon.value?.capturedGame ?? []), id ]
+  }
+
+  await $fetch(`/api/statut/${id}`, {
+    method: 'POST',
+    body: { idUser: user.value?.id, capturedGame: capturedGameUpdated }
+  })
 }
 </script>

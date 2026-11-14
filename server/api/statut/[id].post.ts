@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
     if (!idUser) return
     const isOwned = body.isOwned
     const isShiny = body.isShiny
+    const capturedGame = body.capturedGame
 
     const defaultStatut = await prisma.statut.findUnique({
         where: { idPokemon_idUser: { idPokemon, idUser: SYSTEM_USER_ID} }
@@ -24,6 +25,7 @@ export default defineEventHandler(async (event) => {
             idUser,
             isOwned,
             isShiny,
+            capturedGame,
         },
         create: {
             idPokemon,
