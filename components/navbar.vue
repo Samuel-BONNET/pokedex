@@ -5,7 +5,6 @@
       <NuxtLink class="p-3" :class="[themeClassesSecondaryBackground, currentPage === 1 ? 'bg-white' : 'text-white']" to="/pokedex">{{ text.nav.pokedex }}</NuxtLink>
       <NuxtLink class="p-3" :class="[themeClassesSecondaryBackground, currentPage === 2 ? 'bg-white' : 'text-white']" to="/games">{{ text.nav.games }}</NuxtLink>
       <NuxtLink class="p-3" :class="[themeClassesSecondaryBackground, currentPage === 3 ? 'bg-white' : 'text-white']" to="/preferences">{{ text.nav.preferences }}</NuxtLink>
-      <NuxtLink class="p-3" :class="[themeClassesSecondaryBackground, currentPage === 5 ? 'bg-white' : 'text-white']" to="/error">{{ text.nav.error }}</NuxtLink>
     </nav>
   </div>
 </template>
@@ -19,7 +18,6 @@ const pages = [
   { to: '/games', index: 2 },
   { to: '/preferences', index: 3 },
   { to: '/login', index: 4},
-  { to: '/errors', index: 5 },
 ]
 const route = useRoute()
 
