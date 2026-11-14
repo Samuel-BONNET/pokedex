@@ -1,23 +1,24 @@
 <template>
   <section class="flex flex-col text-center mb-12 px-4 sm:px-8 min-h-screen gap-4">
-    <h1 class="text-4xl font-bold mb-6">
+    <h1 class="text-4xl font-bold">
       {{ text.preferences.title }}
     </h1>
 
     <p class="text-lg">
-      {{ text.preferences.intro }}
+      {{ text.preferences.subtitle1 }}<br>
+      {{ text.preferences.subtitle2 }}
     </p>
 
-    <div class="flex flex-col bg-blue-300">
+    <div class="flex flex-col bg-blue-300 mx-5">
       <ul v-for="(tierName, t) in tiers" :key="t" class="flex gap-2 p-2" :class="[t % 2 === 0 ? 'bg-black/90' : 'bg-black/80']" @dragover.prevent="onTierDragOver(t)" @drop="onTierDrop(t)">
         <div class="grid grid-cols-[8rem_1fr] gap-2 p-2">
-          <span class="flex items-center justify-center bg-black/80 text-white text-xl font-bold w-32 min-h-28">
+          <span class="flex items-center justify-center bg-black/80 text-white text-xl font-bold w-32 shadow border border-white/20">
               {{ tierName }}
           </span>
-          <div class="flex flex-wrap items-center gap-2 min-h-28" @dragover.prevent="onTierDragOver(t)" @drop="onTierDrop(t)">
+          <div class="flex flex-wrap items-center gap-2 min-h-22" @dragover.prevent="onTierDragOver(t)" @drop="onTierDrop(t)">
             <li v-for="(g, i) in tierGames[t]" :key="g.id" class="shrink-0" draggable="true" @dragstart="onDragStart(t, i)" @dragover.prevent.stop="onDragOver(t, i)" @drop="onDrop(t, i)" @dragend="onDragEnd">
               <div v-if="overTier === t && overIndex === i && dragTier !== null" class="h-28 border-2 border-dashed border-white rounded-lg" :style="{ width: draggedWidth}" />
-              <img v-else :src="g.currentSprite ?? img.games.defaultCover" ref="myImg" @load="updateWidth($event, i)" class="h-28 w-auto object-contain" :class="{ 'opacity-30': dragTier === t && dragIndex === i }" />
+              <img v-else :src="g.currentSprite ?? img.games.defaultCover" ref="myImg" @load="updateWidth($event, i)" class="h-22 w-auto object-contain" :class="{ 'opacity-30': dragTier === t && dragIndex === i }" />
             </li>
           </div>
         </div>

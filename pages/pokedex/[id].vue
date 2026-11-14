@@ -128,7 +128,7 @@
                 </div>
               </div>
 
-              <div v-if="display === 5 && pokemon" class="flex flex-col bg-white max-w-full h-full overflow-y-auto">
+              <div v-if="display === 5 && pokemon" class="flex flex-col justify-center bg-white max-w-full h-full overflow-y-auto">
                 <div v-for="move in listMove" :key="move.moveId" class="flex flex-row justify-between items-center w-full px-6 py-1">
                   <span>{{ move.move.nameFr }}</span>
                   <img :src="typeIcon(move.move.type)" :alt="move.move.type" class="object-contain max-h-5" />
@@ -136,7 +136,7 @@
                 <p v-if="!listMove.length" class="text-xs text-slate-500 m-auto">Aucune capacité</p>
               </div>
 
-              <div v-if="display === 6 && pokemon" class="flex flex-col bg-white max-w-full h-full overflow-y-auto">
+              <div v-if="display === 6 && pokemon" class="flex flex-col justify-center bg-white max-w-full h-full overflow-y-auto">
                 <div v-for="ability in listAbility" :key="ability.id" class="flex flex-row justify-between items-center w-full px-6 py-1">
                   <span>{{ ability.nameFr }}</span>
                   <span v-if="ability.isHidden" class="text-[9px] text-slate-500">Talent caché</span>

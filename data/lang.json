@@ -258,10 +258,11 @@
     },
     "preferences": {
       "title": "Préférences",
-      "intro": "Choisissez votre ordre de sprites de jeux préférés",
+      "subtitle1": "Choisissez votre ordre de jeux préférés : ",
+      "subtitle2": "Cela modifiera les sprites par defaut coté Pokedex",
       "orderSaved": "Ordre enregistré",
       "orderReset": "Ordre réinitialisé",
-      "tiers": ["Favori", "J'aime beaucoup", "J'apprécie", "Neutre", "Peu utilisé", "Non classé"]
+      "tiers": ["Favori", "J'aime beaucoup", "J'apprécie", "Peu utilisé", "Non classé"]
     },
     "welcome": {
       "title": "Welcome !",
