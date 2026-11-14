@@ -1,7 +1,8 @@
 -- AlterTable
-ALTER TABLE "Pokemon" ADD COLUMN     "capture_rate" INTEGER,
-ADD COLUMN     "gameVersions" TEXT[] DEFAULT ARRAY[]::TEXT[],
-ADD COLUMN     "typeTable" JSONB;
+ALTER TABLE `Pokemon` ADD COLUMN `capture_rate` INTEGER NULL,
+  ADD COLUMN `gameVersions` JSON NOT NULL DEFAULT ('[]'),
+  ADD COLUMN `typeTable` JSON NULL;
+
 
 -- AlterTable
-ALTER TABLE "Type" ADD COLUMN     "immunities" JSONB;
+ALTER TABLE `Type` ADD COLUMN `immunities` JSON NULL;

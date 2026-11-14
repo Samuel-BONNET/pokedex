@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { readdirSync } from 'node:fs'
 import { coversDir, coverPath } from './lang'
 import { prisma } from './prisma'
@@ -83,11 +84,12 @@ async function buildGameCatalog(): Promise<Map<string, GameAppearance>> {
 }
 
 export async function resolveGameAppearances(
-    versions: string[] | null | undefined,
+    versions: Prisma.JsonValue | null | undefined,
 ): Promise<GameAppearance[]> {
   const catalog = await getGameCatalog()
 
   return (Array.isArray(versions) ? versions : [])
+      .filter((version): version is string => typeof version === 'string')
       .map((version) => catalog.get(version))
       .filter((game): game is GameAppearance => game !== undefined)
 }

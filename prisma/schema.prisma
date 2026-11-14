@@ -56,7 +56,7 @@ model Pokemon {
   availableGames Json
   typeTable      Json?
   capture_rate   Int?
-  gameVersions   String[]     @default([])
+  gameVersions   Json     @default("[]")
 
   abilities          PokemonAbility[]
   moves              PokemonMove[]
