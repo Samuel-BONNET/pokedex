@@ -5,12 +5,13 @@ import lang from '../data/lang.json'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {SYSTEM_USER_ID} from "../server/utils/constants";
+import {POKEMON_GEN} from "../utils/pokeGen.ts";
 
 const MOD: string = process.argv[2]!
 const GENERATION_CIBLE: number | undefined = process.argv[3] ? Number(process.argv[3]) : undefined
 const BATCH_SIZE: number = 10
 const DELAY_BETWEEN_BATCHES: number = 1500
-const POKEMON_GEN: number[] = [0,151,251,386,493,649,721,809,905,1025]
+
 
 async function fetchPokemonApi(id: number) {
     return await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(res => {
