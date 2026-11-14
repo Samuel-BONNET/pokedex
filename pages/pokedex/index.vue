@@ -59,30 +59,40 @@
                 </div>
               </div>
 
-              <div class="flex flex-wrap items-center justify-center gap-3 pt-2 border-t-2 border-dashed border-neutral-500 text-xs">
-                <label class="flex flex-col items-center gap-1">
-                  <span class="font-bold">{{ text.pokedex.page }}</span>
-                  <select v-model="cardNumber" class="bg-white border-2 border-neutral-700 px-1 py-0.5 text-xs">
-                    <option :value="50">50</option>
-                    <option :value="200">200</option>
-                    <option :value="500">500</option>
-                    <option :value="1025">1025</option>
-                  </select>
-                </label>
 
-                <label class="flex flex-col items-center gap-1">
-                  <span class="font-bold">{{ text.pokedex.perPage }}</span>
-                  <select v-model="cardsPerRow" class="bg-white border-2 border-neutral-700 px-1 py-0.5 text-xs">
-                    <option :value="5">5x5</option>
-                    <option :value="7">7x7</option>
-                    <option :value="9">9x9</option>
-                  </select>
-                </label>
+              <div class="flex flex-row items-center gap-5 pt-2 border-t-2 border-dashed border-neutral-500">
+                <div class="flex flex-col gap-3 ">
+                  <div class="flex flex-wrap items-center justify-center gap-3 text-xs">
+                    <label class="flex flex-col items-center gap-1">
+                      <span class="font-bold">{{ text.pokedex.page }}</span>
+                      <select v-model="cardNumber" class="bg-white border-2 border-neutral-700 px-1 py-0.5 text-xs">
+                        <option :value="50">50</option>
+                        <option :value="200">200</option>
+                        <option :value="500">500</option>
+                        <option :value="1025">1025</option>
+                      </select>
+                    </label>
+
+                    <label class="flex flex-col items-center gap-1">
+                      <span class="font-bold">{{ text.pokedex.perPage }}</span>
+                      <select v-model="cardsPerRow" class="bg-white border-2 border-neutral-700 px-1 py-0.5 text-xs">
+                        <option :value="5">5x5</option>
+                        <option :value="7">7x7</option>
+                        <option :value="9">9x9</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <button class="bg-neutral-800 text-white border-2 border-neutral-900 px-3 py-1 text-xs active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" @click="toolbarEnable = !toolbarEnable">
+                    {{ toolbarEnable ? text.pokedex.hideToolbar : text.pokedex.showToolbar }}
+                  </button>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <Import />
+                  <Export />
+                </div>
               </div>
-
-              <button class="bg-neutral-800 text-white border-2 border-neutral-900 px-3 py-1 text-xs active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" @click="toolbarEnable = !toolbarEnable">
-                {{ toolbarEnable ? text.pokedex.hideToolbar : text.pokedex.showToolbar }}
-              </button>
 
               <div class="flex flex-wrap items-center justify-center gap-1 pt-2 border-t-2 border-dashed border-neutral-500">
                 <button v-if="totalPages > 2" @click="currentPage = 1" class="px-2 py-1 text-xs bg-white border-2 border-neutral-700 active:translate-y-0.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">

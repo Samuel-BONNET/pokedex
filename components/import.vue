@@ -1,6 +1,5 @@
 <template>
-  <h1>Import CSV</h1>
-  <input type="file" accept=".csv" @change="importCSV" />
+  <input type="file" accept=".csv" @change="importCSV" class="block text-transparent w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer border-2 border-neutral-900 active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" />
   <p v-if="loading">Traitement en cours...</p>
   <p v-if="result">{{ result }}</p>
 </template>
