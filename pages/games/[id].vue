@@ -72,10 +72,19 @@
       <span class="mt-3 text-xl">File Viewer</span>
 
       <div class="flex flex-col w-full px-3 py-2 items-center justify-center gap-4">
-        <div class="flex flex-row flex-wrap items-center justify-center gap-2 w-full">
+        <div class="flex flex-row flex-wrap items-center justify-center gap-5 w-full">
           <div v-for="b in badge">
-            <p>{{ b.earned && b.name }}</p>
+            <img :src="`/img/badge/${b.name}.png`" class="max-w-10" :class="!b.earned && 'grayscale-100 opacity-50'" />
           </div>
+        </div>
+
+        <div>
+          <h4 class="text-lg">
+            Pokedex Regionnal : {{ gameSavePokedex[0]?.caught }} / {{ gameSavePokedex[0]?.total }}
+          </h4>
+          <h4 class="text-lg" v-if="gameSavePokedex[0]?.total !== gameSavePokedex[1]?.total">
+            Pokedex Nationnal : {{ gameSavePokedex[1]?.caught }} / {{ gameSavePokedex[1]?.total }}
+          </h4>
         </div>
 
         <div class="flex flex-row flex-wrap items-center justify-center gap-2 w-full">
@@ -100,6 +109,7 @@ import { versionLabel } from '~/utils/gameVersions'
 import {type Badge, createEngine, type PokemonSummary} from '@pkhex-everywhere/engine'
 import { ref, watch } from 'vue'
 import { getName } from '~/utils/pokeName.ts'
+import { GENERATION_MAP } from "~/utils/pokedexIncluded"
 
 const { user } = useAuth()
 const { img, text, gameName } = useLang()
@@ -113,8 +123,6 @@ const message = ref('')
 const team = ref<PokemonSummary[]>([])
 const boxes = ref<PokemonSummary[]>([])
 const badge = ref<any[]>([])
-
-
 const { data: game } = await useFetch<{
   id: number
   nameEn: string
@@ -123,6 +131,15 @@ const { data: game } = await useFetch<{
   availableJaquettes: { name: string, sprite: string }[]
 }>(`/api/games/${gameId}`, {
   query: { userId: user.value?.id }
+})
+const teamIds: number[] = team.value?.flatMap(poke => poke.speciesId !== null ? [poke.speciesId]: []) ?? [];
+const boxIds: number[] = boxes.value?.flatMap(poke => poke.speciesId !== null ? [poke.speciesId]: []) ?? [];
+const ids = computed<number[]>(() => [...team.value, ...boxes.value].flatMap(p => (p.speciesId !== null ? [p.speciesId] : [])))
+
+const gameSavePokedex = computed(() => {
+  const generation = game.value?.generation
+  if (!generation) return []
+  return [getRegionnalPokedex([... new Set(ids.value)], generation), getNationnalPokedex([... new Set(ids.value)], generation)]
 })
 
 const versionQuery = computed(() => typeof route.query.version === 'string' ? route.query.version : null)
