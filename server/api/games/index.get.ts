@@ -1,30 +1,25 @@
-import { readdirSync } from "node:fs"
-import { coversDir, coverPath } from "../../utils/lang"
-
-const JQ_DIR = coversDir()
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
+import { getCoversByBase } from "../../utils/gameCovers"
 
 export default defineEventHandler(async (event) => {
-    const idUser = Number(getQuery(event).userId ?? 0)
+    const idUser = Number(event.context.user?.userId ?? SYSTEM_USER_ID)
 
     const games = await prisma.game.findMany({
         orderBy: { id: 'asc' },
         include: {
             gamePreferences: {
-                where: { idUser: { in: [idUser, 0] } },
+                where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
                 select: { idUser: true, currentSprite: true }
             },
         },
     })
 
-    const allFiles = readdirSync(JQ_DIR)
+    const coversByBase = getCoversByBase()
 
     return games.map(g => ({
         ...g,
-        currentSprite: g.gamePreferences.find(s => s.idUser === idUser)?.currentSprite ?? g.gamePreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
+        currentSprite: g.gamePreferences.find(s => s.idUser === idUser)?.currentSprite ?? g.gamePreferences.find(s => s.idUser === SYSTEM_USER_ID)?.currentSprite ?? null,
         gamePreferences: undefined,
-        availableJaquettes: allFiles.filter(f => f.startsWith(g.nameEn) && f.endsWith('.png')).map(f => ({
-            name: f.replace('.png', ''),
-            sprite: coverPath(f),
-        })),
+        availableJaquettes: coversByBase.get(g.nameEn) ?? [],
     }))
 })

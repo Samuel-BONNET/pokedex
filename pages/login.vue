@@ -5,14 +5,16 @@
 
     <div class="relative z-10 w-3/5 h-screen rounded-r-4xl p-2 drop-shadow-2xl shadow-2xl overflow-hidden bg-white">
       <div class="image-stage h-full">
-        <img :src="img.remote.loginPanel.login"
+        <img :src="loginSrc"
           :alt="text.alt.login"
           class="image-layer w-full h-full object-cover rounded-r-4xl object-[30%_50%]"
-          :class="{ 'is-active': mode === 'login' }" />
-        <img :src="img.remote.loginPanel.register"
+          :class="{ 'is-active': mode === 'login' }"
+          @error="loginImageFailed = true" />
+        <img :src="registerSrc"
           :alt="text.alt.register"
           class="image-layer w-full h-full object-cover rounded-r-4xl object-[30%_50%]"
-          :class="{ 'is-active': mode === 'register' }" />
+          :class="{ 'is-active': mode === 'register' }"
+          @error="registerImageFailed = true" />
       </div>
     </div>
 
@@ -23,8 +25,13 @@
             <form @submit.prevent="login" class="auth-card">
               <h2 class="text-2xl text-center mb-4 font-bold text-green-600">{{ text.login.connexion.toUpperCase() }}</h2>
               <input v-model="email" :placeholder="text.login.email" type="email" name="email" autocomplete="email" class="field-input" />
-              <input v-model="password" :placeholder="text.login.password" type="password" name="password" autocomplete="current-password" class="field-input" />
-
+              <div class="flex flex-row items-center w-full relative">
+                <input v-model="password" :placeholder="text.login.password" :type="seePassword ? 'text' : 'password'" name="password" autocomplete="current-password" class="field-input w-full pr-10" />
+                <button @click="seePassword = !seePassword" class="absolute right-2 p-1">
+                  <Eye3 v-if="seePassword" :size="24" class="text-slate-800" />
+                  <EyeSlash v-else :size="24" class="text-slate-800" />
+                </button>
+              </div>
                 <div>
                   <a class="flex flex-row justify-center cursor-pointer" @click.prevent="guestLogin" >
                     <p class="mx-2 text-sm text-slate-500 hover:text-blue-600 transition-colors flex items-center">{{ text.login.guest }}</p>
@@ -64,6 +71,8 @@
 </template>
 
 <script setup lang="ts">
+import { Eye3, EyeSlash } from 'reicon-vue';
+import {useAuthImages} from "~/composables/useAuthImages.ts";
 definePageMeta({ layout: false })
 
 const { img, text } = useLang()
@@ -71,11 +80,10 @@ const { img, text } = useLang()
 const route = useRoute()
 
 const mode = ref<'login' | 'register'>(route.query.mode === 'register' ? 'register' : 'login')
-
+const seePassword = ref(false)
 const email = ref('');
 const password = ref('');
 const error = ref<string | null>(null);
-
 const regEmail = ref('');
 const regPseudo = ref('');
 const regPassword = ref('');
@@ -84,9 +92,19 @@ const regSecretToken = ref('');
 const regError = ref<string | null>(null);
 
 const { login: authLogin, setGuest } = useAuth();
+const { loginImage, registerImage } = useAuthImages();
 
-function guestLogin() {
-  setGuest()
+const loginImageFailed = ref(false)
+const registerImageFailed = ref(false)
+
+watch(loginImage, () => { loginImageFailed.value = false })
+watch(registerImage, () => { registerImageFailed.value = false})
+
+const loginSrc = computed(() => loginImageFailed.value ? img.remote.loginWallpaper : (loginImage.value ?? img.remote.loginWallpaper))
+const registerSrc = computed(() => registerImageFailed.value ? img.remote.loginWallpaper : (registerImage.value ?? img.remote.loginWallpaper))
+
+async function guestLogin() {
+  await setGuest()
 }
 
 async function login() {

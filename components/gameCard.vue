@@ -1,6 +1,6 @@
 <template>
   <div class="h-[min(30vw,30rem)] max-h-[30rem] w-full flex flex-col items-center bg-white">
-    <img v-if="game.currentSprite" :src="game.currentSprite" class="w-full h-full object-contain" loading="lazy" />
+    <img v-if="game.currentSprite" :src="game.currentSprite" :alt="variantLabel ?? game.nameEn" :title="variantLabel ?? game.nameEn" class="w-full h-full object-contain" loading="lazy" />
   </div>
 </template>
 
@@ -16,5 +16,6 @@ defineProps<{
     generation:  string
     currentSprite: string | null
   }
+  variantLabel?: string
 }>()
 </script>

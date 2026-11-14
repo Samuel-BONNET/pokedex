@@ -1,7 +1,7 @@
 {
   "meta": {
     "appName": "PokeMind",
-    "defaultTheme": "rouge",
+    "defaultTheme": "vert",
     "themeStorageKey": "pokedex:theme"
   },
   "themes": {
@@ -14,6 +14,7 @@
         "hue": "hue-rotate-[0deg]",
         "themeClassesLogoImageSize": "size-80",
         "themeClassesRightImageSize": "size-75",
+        "zIndexLogoImage": "z-0",
         "positionLogoImage": "-left-2 sm:-left-10 -top-24",
         "positionLeftImage": "-left-2 sm:-left-27 -top-10",
         "positionRightImage": "left-20 sm:left-120 top-10"
@@ -29,6 +30,7 @@
         "hue": "hue-rotate-[140deg]",
         "themeClassesLogoImageSize": "size-50",
         "themeClassesRightImageSize": "size-85",
+        "zIndexLogoImage": "z-0",
         "positionLogoImage": "left-12 sm:left-8 -top-11",
         "positionLeftImage": "left-20 sm:-left-27 -top-35",
         "positionRightImage": "left-15 sm:left-125 top-0"
@@ -37,16 +39,17 @@
     },
     "vert": {
       "classes": {
-        "mainBackground": "bg-green-500",
-        "secondaryBackground": "bg-green-600",
+        "mainBackground": "bg-green-300",
+        "secondaryBackground": "bg-green-500",
         "color": "text-green-500",
         "border": "border-green-500",
         "hue": "hue-rotate-[290deg]",
-        "themeClassesLogoImageSize": "size-150",
-        "themeClassesRightImageSize": "size-80",
-        "positionLogoImage": "-left-2 sm:-left-8 -top-24",
-        "positionLeftImage": "-left-2 sm:-left-8 -top-24",
-        "positionRightImage": "left-20 sm:-left-27 -top-35"
+        "themeClassesLogoImageSize": "scale-[1.07]",
+        "themeClassesRightImageSize": "size-70",
+        "zIndexLogoImage": "z-20",
+        "positionLogoImage": "-left-2 sm:left-7.5 -top-69.5",
+        "positionLeftImage": "-left-2 sm:-left-20 -top-45",
+        "positionRightImage": "left-20 sm:left-155 top-10"
       },
       "backgroundImage": false
     }
@@ -90,25 +93,23 @@
         "mascotLeft": "/img/diverse/pokemon/genesect.png"
       },
       "vert": {
-        "hero": null,
-        "mascotRight": null,
-        "mascotLeft": null
+        "hero": "/img/diverse/pokemon/shaymin.png",
+        "mascotRight": "/img/diverse/pokemon/tortipousse.png",
+        "mascotLeft": "/img/diverse/pokemon/rayquaza.png"
       }
     },
     "remote": {
       "pokeApi": "https://pokeapi.co",
       "pokeApiSprites": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions",
       "loadingPage": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
-      "loginWallpaper": "https://wallpapercave.com/wp/wp2860892.jpg",
-      "loginPanel": {
-        "login": "https://images.alphacoders.com/508/thumb-1920-508993.jpg",
-        "register": "https://i.pinimg.com/1200x/b2/e2/f4/b2e2f42866502add8e97da97d600de04.jpg"
-      }
+      "loginWallpaper": "https://wallpapercave.com/wp/wp2860892.jpg"
     }
   },
   "text": {
     "common": {
       "save": "Sauvegarder",
+      "reset": "Reset",
+      "default": "Defaut",
       "close": "Fermer",
       "error": "Erreur",
       "cancel": "Annuler"
@@ -118,13 +119,15 @@
       "pokedex": "Pokedex",
       "games": "Jeux",
       "preferences": "Préférences",
-      "profil": "Profil"
+      "profil": "Profil",
+      "error": "Error"
     },
     "auth": {
       "login": "Login",
       "register": "Register",
       "logout": "Logout",
-      "profil": "Profil"
+      "profil": "Profil",
+      "settings": "Settings"
     },
     "home": {
       "cards": {
@@ -170,14 +173,15 @@
     "pokedex": {
       "title": "Pokedex",
       "search": {
-        "fr": "Rechercher par nom français",
-        "en": "Rechercher par nom anglais",
+        "fr": "Nom français",
+        "en": "Nom anglais",
         "number": "Numéro pokedex"
       },
       "types": "Types",
+      "generation": "Générations",
       "all": "Toutes",
-      "page": "page",
-      "perPage": "nb Poke par page",
+      "page": "Page",
+      "perPage": "Size",
       "showToolbar": "Voir la toolbar",
       "hideToolbar": "Masquer la toolbar"
     },
@@ -208,7 +212,7 @@
       "intro": "Gérez vos sauvegardes ici",
       "choose": "Choississez un jeu",
       "generation": "Génération",
-      "changeCover": "Changer la jaquette",
+      "changeVersion": "Changer de version",
       "pickFile": "Choisir un fichier .sav",
       "download": "Télécharger",
       "delete": "Supprimer",
@@ -254,9 +258,11 @@
     },
     "preferences": {
       "title": "Préférences",
-      "intro": "Choisissez votre ordre de sprites de jeux préférés",
+      "subtitle1": "Choisissez votre ordre de jeux préférés : ",
+      "subtitle2": "Cela modifiera les sprites par defaut coté Pokedex",
       "orderSaved": "Ordre enregistré",
-      "tiers": ["Favori", "J'aime beaucoup", "J'apprécie", "Neutre", "Peu utilisé"]
+      "orderReset": "Ordre réinitialisé",
+      "tiers": ["Favori", "J'aime beaucoup", "J'apprécie", "Peu utilisé", "Non classé"]
     },
     "welcome": {
       "title": "Welcome !",

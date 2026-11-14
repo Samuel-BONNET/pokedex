@@ -1,5 +1,6 @@
 import * as bcrypt from "bcrypt"
 import { setCookie } from 'h3'
+import { signToken } from '../../utils/jwt'
 
 export default defineEventHandler(async (event) => {
 

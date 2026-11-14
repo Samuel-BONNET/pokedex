@@ -1,12 +1,18 @@
-export default defineEventHandler(async(event) => {
-    const idUser = Number(getQuery(event).userId ?? 0)
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
 
-    if (idUser === 0) return { gameOrder: [] }
+export default defineEventHandler(async (event) => {
+    const idUser = Number(getQuery(event).userId ?? SYSTEM_USER_ID)
 
     const user = await prisma.user.findUnique({
         where: { id: idUser },
         select: { preferences: true },
     })
 
-    return { gameOrder: (user?.preferences as Record<string, number[]>)?.gameOrder ?? [] }
+    const prefs = (user?.preferences ?? {}) as Record<string, unknown>
+
+    return {
+        isEmpty: Object.keys(prefs).length === 0,
+        gameOrder: Array.isArray(prefs.gameOrder) ? prefs.gameOrder : [],
+        gameTierSizes: Array.isArray(prefs.gameTierSizes) ? prefs.gameTierSizes : [],
+    }
 })

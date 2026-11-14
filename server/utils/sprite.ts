@@ -1,4 +1,5 @@
-import lang from '~/data/lang.json'
+import lang from '../../data/lang.json'
+import {SYSTEM_USER_ID} from "./constants";
 
 export function buildPokemonSpriteUrl(
     pokeNumber: number,
@@ -13,7 +14,7 @@ export function buildPokemonSpriteUrl(
 
 const SPRITE_ALIASES: Record<string, string[]> = {
     "gold-silver": ["gold", "silver"],
-    "omega-ruby-alpha-sapphire": ["omegaruby", "alphasapphire"],
+    "omega-ruby-alpha-sapphire": ["omegaruby", "alphasapphire", "omegaruby-alphasapphire"],
     "black-2-white-2": ["black-white"],
     "sun-moon": ["ultra-sun-ultra-moon"],
 }
@@ -21,11 +22,11 @@ const SPRITE_ALIASES: Record<string, string[]> = {
 export async function getOrderedGameNames(idUser: number): Promise<string[]> {
     if (!idUser) return []
     const users = await prisma.user.findMany({
-        where: { id: { in: [idUser, 0] } },
+        where: { id: { in: [idUser, SYSTEM_USER_ID] } },
         select: { id: true, preferences: true },
     })
     const self = users.find(u => u.id === idUser)
-    const system = users.find(u => u.id === 0)
+    const system = users.find(u => u.id === SYSTEM_USER_ID)
 
     const selfOrder = (self?.preferences as Record<string, number[]>)?.gameOrder ?? []
     const systemOrder = (system?.preferences as Record<string, number[]>)?.gameOrder ?? []

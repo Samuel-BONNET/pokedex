@@ -1,8 +1,10 @@
 import {getFullEvolutionChain} from "#server/utils/evolution";
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
+import {resolveGameAppearances} from "#server/utils/gameCovers";
 
 export default defineEventHandler(async (event) => {
     const id = Number(getRouterParam(event, 'id'))
-    const idUser = Number(getQuery(event).userId ?? 1)
+    const idUser = Number(event.context.user?.userId ?? SYSTEM_USER_ID)
 
     const orderedNames = await getOrderedGameNames(idUser)
 
@@ -10,12 +12,21 @@ export default defineEventHandler(async (event) => {
         where: { pokeNumber: id },
         include: {
             statuts: {
-                where: { idUser: { in: [idUser, 0] } },
-                select: { idUser: true, isOwned: true, isShiny: true },
+                where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
+                select: { idUser: true, isOwned: true, isShiny: true, capturedGame: true },
             },
             pokemonPreferences: {
-                where: { idUser: { in: [idUser, 0] } },
+                where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
                 select: { idUser: true, currentSprite: true }
+            },
+            types: {
+                include: { type: { select: { nameEn: true } } },
+            },
+            abilities: {
+                include: { ability: { select: { id: true, nameEn: true, nameFr: true, description: true } } },
+            },
+            moves: {
+                include: { move: true },
             },
         },
     })
@@ -26,8 +37,19 @@ export default defineEventHandler(async (event) => {
         ...pokemon,
         isOwned: pokemon.statuts.find(s => s.idUser === idUser)?.isOwned ?? false,
         isShiny: pokemon.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
-        currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === 0)?.currentSprite ?? null,
-        evolutionChain: await getFullEvolutionChain(id, idUser),
+        currentSprite: pokemon.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(pokemon.availableGames, orderedNames) ?? pokemon.pokemonPreferences.find(s => s.idUser === SYSTEM_USER_ID)?.currentSprite ?? null,
+        evolutionChain: await getFullEvolutionChain(id, idUser, orderedNames),
+        gameAppearances: await resolveGameAppearances(pokemon.gameVersions),
         statuts: undefined,
+        types: pokemon.types.map(t => t.type.nameEn),
+        moves: pokemon.moves,
+        capturedGame: pokemon.statuts.find(s => s.idUser === idUser)?.capturedGame,
+        abilities: pokemon.abilities.map(entry => ({
+            id: entry.ability.id,
+            nameFr: entry.ability.nameFr,
+            nameEn: entry.ability.nameEn,
+            description: entry.ability.description,
+            isHidden: entry.isHidden,
+        })).sort((a, b) => Number(a.isHidden) - Number(b.isHidden))
     }
 })

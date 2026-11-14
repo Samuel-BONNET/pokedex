@@ -17,7 +17,7 @@ const pages = [
   { to: '/pokedex', index: 1 },
   { to: '/games', index: 2 },
   { to: '/preferences', index: 3 },
-  { to: '/login', index: 4}
+  { to: '/login', index: 4},
 ]
 const route = useRoute()
 

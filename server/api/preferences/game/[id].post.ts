@@ -1,8 +1,10 @@
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
+
 export default defineEventHandler(async (event) => {
     const idGame = Number(getRouterParam(event, 'id'))
     const body = await readBody(event)
-    const idUser = body.idUser ?? 0
-    if (idUser === 0 || !body.currentSprite) return
+    const idUser = event.context.user?.userId
+    if (!idUser || !body.currentSprite) return
 
     const result = await prisma.gamePreferences.upsert({
         where: { idGame_idUser: { idGame, idUser } },
@@ -11,7 +13,7 @@ export default defineEventHandler(async (event) => {
     })
 
     const defaultPrefs = await prisma.gamePreferences.findUnique({
-        where: { idGame_idUser: { idGame, idUser: 0 } }
+        where: { idGame_idUser: { idGame, idUser: SYSTEM_USER_ID } }
     })
 
     if (defaultPrefs && result.currentSprite === defaultPrefs.currentSprite) {

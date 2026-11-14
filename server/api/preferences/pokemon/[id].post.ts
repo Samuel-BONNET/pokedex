@@ -1,8 +1,10 @@
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
+
 export default defineEventHandler(async (event) => {
     const idPokemon = Number(getRouterParam(event, 'id'))
     const body = await readBody(event)
-    const idUser = body.idUser ?? 1
-    if (idUser === 0) return
+    const idUser = event.context.user?.userId
+    if (!idUser) return
 
     const result = await prisma.pokemonPreferences.upsert({
         where: { idPokemon_idUser: { idPokemon, idUser } },
@@ -11,7 +13,7 @@ export default defineEventHandler(async (event) => {
     })
 
     const defaultPrefs = await prisma.pokemonPreferences.findUnique({
-        where: {idPokemon_idUser: {idPokemon, idUser: 0}}
+        where: {idPokemon_idUser: {idPokemon, idUser: SYSTEM_USER_ID}}
     })
 
     if (defaultPrefs && result.currentSprite === defaultPrefs.currentSprite) {

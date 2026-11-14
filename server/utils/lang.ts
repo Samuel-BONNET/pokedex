@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import lang from '~/data/lang.json'
+import lang from '../../data/lang.json'
 
 type NameKey = keyof typeof lang.text.games.names
 

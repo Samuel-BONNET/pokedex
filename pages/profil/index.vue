@@ -1,9 +1,5 @@
 <template>
-  <div class="flex flex-col">
-    <h1>Profil</h1>
-    <NuxtLink to="/profil/export">Export CSV</NuxtLink>
-    <NuxtLink to="/profil/import">Import CSV</NuxtLink>
-  </div>
+  <DresseurCard />
 </template>
 
 <style scoped>
@@ -12,5 +8,5 @@
 
 <script setup lang="ts">
 
-import Export from "~/pages/profil/export.vue";
+import Export from "~/components/export.vue";
 </script>

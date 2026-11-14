@@ -1,13 +1,16 @@
+import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
+
 export default defineEventHandler(async (event) => {
     const idPokemon = Number(getRouterParam(event, 'id'))
     const body = await readBody(event)
-    const idUser = body.idUser ?? 1
-    if (idUser === 0) return
+    const idUser = event.context.user?.userId
+    if (!idUser) return
     const isOwned = body.isOwned
     const isShiny = body.isShiny
+    const capturedGame = body.capturedGame
 
     const defaultStatut = await prisma.statut.findUnique({
-        where: { idPokemon_idUser: { idPokemon, idUser: 0} }
+        where: { idPokemon_idUser: { idPokemon, idUser: SYSTEM_USER_ID} }
     })
 
     const result = await prisma.statut.upsert({
@@ -22,6 +25,7 @@ export default defineEventHandler(async (event) => {
             idUser,
             isOwned,
             isShiny,
+            capturedGame,
         },
         create: {
             idPokemon,

@@ -6,16 +6,13 @@ RUN corepack enable
 
 ENV CI=true
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts ./
+COPY prisma/ ./prisma/
 
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm prisma generate
-
-RUN pnpm prisma generate
-RUN pnpm nuxt prepare
 RUN pnpm build
 
 COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh

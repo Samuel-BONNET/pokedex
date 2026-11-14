@@ -14,10 +14,16 @@
     "prisma:studio": "prisma studio",
     "import:pokemon": "tsx scripts/import-pokemon.ts pokemon",
     "import:games": "tsx scripts/import-pokemon.ts games",
+    "import:appearances": "tsx scripts/import-pokemon.ts appearances",
     "import:statut": "tsx scripts/import-pokemon.ts statut",
+    "import:move": "tsx scripts/import-pokemon.ts move",
+    "import:ability": "tsx scripts/import-pokemon.ts ability",
+    "import:type": "tsx scripts/import-pokemon.ts type",
     "import:all": "tsx scripts/import-pokemon.ts all"
   },
   "dependencies": {
+    "@pkhex-everywhere/engine": "^0.26.0",
+    "@prisma/adapter-mariadb": "^7.10.1",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "bcrypt": "^6.0.0",
@@ -26,8 +32,11 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-vue-next": "^1.0.0",
+    "mariadb": "^3.5.5",
+    "mysql2": "^3.24.6",
     "nuxt": "^4.5.2",
     "pg": "^8.23.0",
+    "reicon-vue": "^1.1.104",
     "vue": "^3.5.43",
     "vue-router": "^5.3.1"
   },
