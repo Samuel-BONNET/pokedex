@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
         include: {
             statuts: {
                 where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
-                select: { idUser: true, isOwned: true, isShiny: true },
+                select: { idUser: true, isOwned: true, isShiny: true, capturedGame: true },
             },
             pokemonPreferences: {
                 where: { idUser: { in: [idUser, SYSTEM_USER_ID] } },
@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
         types: p.types.map(t => t.type.nameEn),
         isOwned: p.statuts.find(s => s.idUser === idUser)?.isOwned ?? false,
         isShiny: p.statuts.find(s => s.idUser === idUser)?.isShiny ?? false,
+        capturedGame: p.statuts.find(s => s.idUser === idUser)?.capturedGame ?? [],
         currentSprite: p.pokemonPreferences.find(s => s.idUser === idUser)?.currentSprite ?? findSpriteByOrder(p.availableGames, orderedName) ?? findSpriteByOrder(p.availableGames, orderedNameSys) ?? p.pokemonPreferences.find(s => s.idUser === SYSTEM_USER_ID)?.currentSprite ?? null,
         statuts: undefined,
     }))

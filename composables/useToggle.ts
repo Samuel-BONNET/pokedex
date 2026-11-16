@@ -1,9 +1,9 @@
 export const useToggle = () => {
     const seeAllGames = useState('toggle:seeAllGames', () => true)
 
-    const toggle = () => {
+    const toggleGame = () => {
         seeAllGames.value = !seeAllGames.value
     }
 
-    return { seeAllGames, toggle }
+    return { seeAllGames, toggleGame }
 }

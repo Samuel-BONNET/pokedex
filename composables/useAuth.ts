@@ -38,6 +38,7 @@ export const useAuth = () => {
 
     const isConnected = computed(() => user.value !== null)
     const isGuest = computed(() => user.value?.role === 'GUEST')
+    const isAdmin = computed(() => user.value?.role === 'ADMIN')
 
-    return { user, loading, isConnected, isGuest, fetchUser, login, logout, setGuest }
+    return { user, loading, isConnected, isGuest, isAdmin, fetchUser, login, logout, setGuest }
 }

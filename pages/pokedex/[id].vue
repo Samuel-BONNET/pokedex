@@ -153,10 +153,10 @@
               </div>
 
               <div v-if="display === 9 && pokemon" class="grid grid-cols-4 grid-rows-2 place-content-start place-items-center gap-0 bg-white w-full h-full overflow-y-auto py-0">
-                <button v-for="game in gameDisplay ?? []" class="hover:brightness-80" @click="changeGameStatut(game.id)">
+                <button v-for="game in gameDisplay ?? []" class="hover:brightness-80" @click="changeGameStatut(game.version)">
                   <img :src="game.cover" :alt="game.label"
                       class="object-contain max-w-16 max-h-16"
-                      :class="!capturedGameIds.has(game.id) && 'grayscale'" />
+                      :class="!capturedGameVersions.has(game.version) && 'grayscale'" />
                 </button>
                 <p v-if="!(gameDisplay?.length)" class="text-xs text-slate-500 m-auto">Aucun jeu disponible</p>
               </div>
@@ -227,7 +227,7 @@ const { data: pokemon, refresh } = await useFetch<{
   currentSprite: string
   isOwned: boolean
   isShiny: boolean
-  capturedGame: number[] | null
+  capturedGame: string[] | null
   height: number
   weight: number
   capture_rate: number | null
@@ -268,8 +268,8 @@ const gameDisplay = computed(() => {
   const start = gameIndex.value * GAMES_PER_PAGE
   return (pokemon.value?.gameAppearances ?? []).slice(start, start + GAMES_PER_PAGE)
 })
-const capturedGameIds = computed(() =>
-    new Set((pokemon.value?.capturedGame ?? []).map(Number)),
+const capturedGameVersions = computed(() =>
+    new Set((pokemon.value?.capturedGame ?? []).map(String)),
 )
 const canPrev = computed(() => {
   switch (display.value) {
@@ -374,19 +374,20 @@ async function changeShiny() {
   refresh()
 }
 
-async function changeGameStatut(id: number){
+async function changeGameStatut(version: string){
 
   let capturedGameUpdated
-  if (pokemon.value?.capturedGame?.includes(id)) {
-    capturedGameUpdated = pokemon.value?.capturedGame.filter(ids => ids != id)
+  if (pokemon.value?.capturedGame?.includes(version)) {
+    capturedGameUpdated = pokemon.value?.capturedGame.filter(versions => versions != version)
   }
   else {
-    capturedGameUpdated = [ ...(pokemon.value?.capturedGame ?? []), id ]
+    capturedGameUpdated = [ ...(pokemon.value?.capturedGame ?? []), version ]
   }
 
-  await $fetch(`/api/statut/${id}`, {
+  await $fetch(`/api/statut/${pokemon.value?.pokeNumber}`, {
     method: 'POST',
     body: { idUser: user.value?.id, capturedGame: capturedGameUpdated }
   })
+  await refresh()
 }
 </script>
