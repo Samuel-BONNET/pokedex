@@ -105,8 +105,9 @@
                 <div><span>></span><span>{{ text.stats.speed }}: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "speed")].value }}</span></div>
               </div>
 
-              <div v-if="display === 3 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
-                Faiblesses & resistances
+              <div v-if="display === 3 && pokemon" class="flex flex-col gap-2 justify-center items-center bg-white px-4 py-2 max-w-full h-full overflow-y-auto">
+                <p class="text-xs font-bold my-1 text-black">{{ text.pokedexDetail.typeChart.title }}</p>
+                <PokemonTypeChart :types="pokemon.types" />
               </div>
 
               <div v-if="display === 4 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
@@ -233,7 +234,7 @@ const { data: pokemon, refresh } = await useFetch<{
   capture_rate: number | null
   moves: any[]
   abilities: any[]
-  types: any[]
+  types: string[]
   stats: any[]
   availableGames: AvailableGames[],
   gameAppearances: { id: number; version: string; variant: string; label: string; cover: string }[],

@@ -192,7 +192,16 @@
       "owned": "Pokeball",
       "shiny": "Shiny",
       "prev": "Prev",
-      "next": "Next"
+      "next": "Next",
+      "typeChart": {
+        "title": "Faiblesses & resistances",
+        "quadruple": "×4",
+        "double": "×2",
+        "neutral": "×1",
+        "half": "×0,5",
+        "quarter": "×0,25",
+        "none": "×0"
+      }
     },
     "stats": {
       "hp": "Hp",
