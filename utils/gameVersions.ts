@@ -102,6 +102,14 @@ export function coverVariantForVersion(version: string): string | null {
   return VERSION_TO_COVER_VARIANT[version] ?? null
 }
 
+const VARIANT_TO_VERSION = new Map<string, string>(
+    Object.entries(VERSION_TO_COVER_VARIANT).map(([version, variant]) => [variant, version]),
+)
+
+export function versionFromVariant(variant: string): string {
+  return VARIANT_TO_VERSION.get(variant) ?? variant
+}
+
 export function getBaseFromVariant(name: string): string {
   if (!name) return name
   return COVER_VARIANT_TO_GROUP.get(name) ?? name

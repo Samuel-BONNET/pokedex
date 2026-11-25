@@ -105,8 +105,9 @@
                 <div><span>></span><span>{{ text.stats.speed }}: </span><span>{{ pokemon?.stats[pokemon?.stats.findIndex(stat => stat.name === "speed")].value }}</span></div>
               </div>
 
-              <div v-if="display === 3 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
-                Faiblesses & resistances
+              <div v-if="display === 3 && pokemon" class="flex flex-col gap-2 justify-center items-center bg-white px-4 py-2 max-w-full h-full overflow-y-auto">
+                <p class="text-xs font-bold my-1 text-black">{{ text.pokedexDetail.typeChart.title }}</p>
+                <PokemonTypeChart :types="pokemon.types" />
               </div>
 
               <div v-if="display === 4 && pokemon" class="flex flex-col justify-center items-center bg-white max-w-full h-full">
@@ -153,10 +154,10 @@
               </div>
 
               <div v-if="display === 9 && pokemon" class="grid grid-cols-4 grid-rows-2 place-content-start place-items-center gap-0 bg-white w-full h-full overflow-y-auto py-0">
-                <button v-for="game in gameDisplay ?? []" class="hover:brightness-80" @click="changeGameStatut(game.id)">
+                <button v-for="game in gameDisplay ?? []" class="hover:brightness-80" @click="changeGameStatut(game.version)">
                   <img :src="game.cover" :alt="game.label"
                       class="object-contain max-w-16 max-h-16"
-                      :class="!capturedGameIds.has(game.id) && 'grayscale'" />
+                      :class="!capturedGameVersions.has(game.version) && 'grayscale'" />
                 </button>
                 <p v-if="!(gameDisplay?.length)" class="text-xs text-slate-500 m-auto">Aucun jeu disponible</p>
               </div>
@@ -175,8 +176,8 @@
 
             <div class="flex flex-row justify-between m-2">
               <div class="flex flex-row">
-                <button @click="prevPage" :disabled="!canPrev" class="bg-white rounded-xs border border-black/60 w-10 h-10 hover:bg-slate-700 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"  />
-                <button @click="nextPage" :disabled="!canNext" class="bg-white rounded-xs border border-black/60 w-10 h-10 hover:bg-slate-700 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"  />
+                <button @click="prevPage" :disabled="!canPrev" class="bg-white rounded-l-xs border-2 border-slate-500/50 w-10 h-10 hover:bg-slate-300 active:bg-slate-400 disabled:bg-slate-400 disabled:active:bg-slate-500 disabled:cursor-not-allowed"  />
+                <button @click="nextPage" :disabled="!canNext" class="bg-white rounded-r-xs border-2 border-slate-500/50 w-10 h-10 hover:bg-slate-300 active:bg-slate-400 disabled:bg-slate-400 disabled:active:bg-slate-500 disabled:cursor-not-allowed"  />
               </div>
               <button class="btn bg-yellow-500 rounded-full w-8 h-8" />
             </div>
@@ -227,13 +228,13 @@ const { data: pokemon, refresh } = await useFetch<{
   currentSprite: string
   isOwned: boolean
   isShiny: boolean
-  capturedGame: number[] | null
+  capturedGame: string[] | null
   height: number
   weight: number
   capture_rate: number | null
   moves: any[]
   abilities: any[]
-  types: any[]
+  types: string[]
   stats: any[]
   availableGames: AvailableGames[],
   gameAppearances: { id: number; version: string; variant: string; label: string; cover: string }[],
@@ -250,7 +251,7 @@ const movePage = ref(0)
 const movePageCount = computed(() => Math.max(1, Math.ceil((pokemon.value?.moves.length ?? 0) / PAGE_SIZE)))
 const listMove = computed(() => {
   const start = movePage.value * PAGE_SIZE
-  return (pokemon.value?.moves ?? []).slice(start, start + PAGE_SIZE)
+  return [...(pokemon.value?.moves ?? [])].sort((a, b) => a.move.nameFr.localeCompare(b.move.nameFr, 'fr')).slice(start, start + PAGE_SIZE)
 })
 
 const abilityPage = ref(0)
@@ -268,8 +269,8 @@ const gameDisplay = computed(() => {
   const start = gameIndex.value * GAMES_PER_PAGE
   return (pokemon.value?.gameAppearances ?? []).slice(start, start + GAMES_PER_PAGE)
 })
-const capturedGameIds = computed(() =>
-    new Set((pokemon.value?.capturedGame ?? []).map(Number)),
+const capturedGameVersions = computed(() =>
+    new Set((pokemon.value?.capturedGame ?? []).map(String)),
 )
 const canPrev = computed(() => {
   switch (display.value) {
@@ -374,19 +375,20 @@ async function changeShiny() {
   refresh()
 }
 
-async function changeGameStatut(id: number){
+async function changeGameStatut(version: string){
 
   let capturedGameUpdated
-  if (pokemon.value?.capturedGame?.includes(id)) {
-    capturedGameUpdated = pokemon.value?.capturedGame.filter(ids => ids != id)
+  if (pokemon.value?.capturedGame?.includes(version)) {
+    capturedGameUpdated = pokemon.value?.capturedGame.filter(versions => versions != version)
   }
   else {
-    capturedGameUpdated = [ ...(pokemon.value?.capturedGame ?? []), id ]
+    capturedGameUpdated = [ ...(pokemon.value?.capturedGame ?? []), version ]
   }
 
-  await $fetch(`/api/statut/${id}`, {
+  await $fetch(`/api/statut/${pokemon.value?.pokeNumber}`, {
     method: 'POST',
     body: { idUser: user.value?.id, capturedGame: capturedGameUpdated }
   })
+  await refresh()
 }
 </script>

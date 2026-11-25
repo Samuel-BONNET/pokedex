@@ -1,6 +1,3 @@
-<script setup lang="ts">
-const { img, text, diverse, themeClassesColor, themeClassesBorder, themeClassesPositionLeftImage } = useLang()
-</script>
 <template>
   <div class="relative max-w-6xl mx-auto p-6">
     <section class="flex flex-col lg:flex-row gap-4 lg:gap-2 mb-8">
@@ -62,3 +59,7 @@ const { img, text, diverse, themeClassesColor, themeClassesBorder, themeClassesP
 
   </div>
 </template>
+
+<script setup lang="ts">
+const { img, text, diverse, themeClassesColor, themeClassesBorder, themeClassesPositionLeftImage } = useLang()
+</script>

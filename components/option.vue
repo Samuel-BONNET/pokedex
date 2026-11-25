@@ -17,6 +17,9 @@
         <NuxtLink v-if="isConnected && !isGuest" to="/profil" class="px-3 py-2 bg-white border-2 border-neutral-700 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-100 text-center">
           {{ text.auth.profil }}
         </NuxtLink>
+        <NuxtLink v-if="isAdmin" to="/admin/user" class="px-3 py-2 bg-white border-2 border-neutral-700 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-100 text-center">
+          {{ text.auth.admin}}
+        </NuxtLink>
         <NuxtLink to="/settings" class="px-3 py-2 bg-white border-2 border-neutral-700 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-100 text-center">
           {{ text.auth.settings}}
         </NuxtLink>
@@ -34,7 +37,7 @@ import { Menu } from 'lucide-vue-next'
 import {useAuth} from "~/composables/useAuth.ts";
 
 const { text } = useLang()
-const { isConnected, isGuest } = useAuth()
+const { isConnected, isGuest, isAdmin } = useAuth()
 const root = ref<HTMLElement | null>(null)
 const open = ref(false)
 

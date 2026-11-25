@@ -127,6 +127,7 @@ async function shiny() {
       method: 'POST',
       body: {
         idUser: user.value?.id,
+        isOwned: true,
         isShiny: true,
       }
     })
