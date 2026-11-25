@@ -176,8 +176,8 @@
 
             <div class="flex flex-row justify-between m-2">
               <div class="flex flex-row">
-                <button @click="prevPage" :disabled="!canPrev" class="bg-white rounded-xs border border-black/60 w-10 h-10 hover:bg-slate-700 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"  />
-                <button @click="nextPage" :disabled="!canNext" class="bg-white rounded-xs border border-black/60 w-10 h-10 hover:bg-slate-700 active:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed"  />
+                <button @click="prevPage" :disabled="!canPrev" class="bg-white rounded-l-xs border-2 border-slate-500/50 w-10 h-10 hover:bg-slate-300 active:bg-slate-400 disabled:bg-slate-400 disabled:active:bg-slate-500 disabled:cursor-not-allowed"  />
+                <button @click="nextPage" :disabled="!canNext" class="bg-white rounded-r-xs border-2 border-slate-500/50 w-10 h-10 hover:bg-slate-300 active:bg-slate-400 disabled:bg-slate-400 disabled:active:bg-slate-500 disabled:cursor-not-allowed"  />
               </div>
               <button class="btn bg-yellow-500 rounded-full w-8 h-8" />
             </div>
@@ -251,7 +251,7 @@ const movePage = ref(0)
 const movePageCount = computed(() => Math.max(1, Math.ceil((pokemon.value?.moves.length ?? 0) / PAGE_SIZE)))
 const listMove = computed(() => {
   const start = movePage.value * PAGE_SIZE
-  return (pokemon.value?.moves ?? []).slice(start, start + PAGE_SIZE)
+  return [...(pokemon.value?.moves ?? [])].sort((a, b) => a.move.nameFr.localeCompare(b.move.nameFr, 'fr')).slice(start, start + PAGE_SIZE)
 })
 
 const abilityPage = ref(0)

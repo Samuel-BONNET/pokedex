@@ -3,7 +3,7 @@
     <div class="wallpaper" :style="{ backgroundImage: `url('${img.remote.loginWallpaper}')` }" />
     <NuxtLink to="/" class="absolute m-2 top-0 right-0 flex items-center text-transparent hover:text-black">{{text.login.hub}}<img src="/favicon.ico" class="max-w-8 m-2" /></NuxtLink>
 
-    <div class="relative z-10 w-3/5 h-screen rounded-r-4xl p-2 drop-shadow-2xl shadow-2xl overflow-hidden bg-white">
+    <div class="relative z-10 w-3/6 h-screen rounded-r-4xl p-2 drop-shadow-2xl shadow-2xl overflow-hidden bg-white">
       <div class="image-stage h-full">
         <img :src="loginSrc"
           :alt="text.alt.login"
@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div class="w-2/5 h-screen flex items-center justify-center p-8 overflow-hidden" :class="{ 'order-1': mode === 'register' }">
+    <div class="w-3/6 h-screen flex items-center justify-center p-8 overflow-hidden" :class="{ 'order-1': mode === 'register' }">
       <div class="stage">
         <div class="panel panel-login" :class="{ 'is-active': mode === 'login' }">
           <div class="panel-inner">
@@ -214,7 +214,7 @@ async function register() {
 .image-layer.is-active {
   opacity: 1;
   transform: scale(1);
-  filter: blur(0);
+  filter: blur();
 }
 
 .stage {
