@@ -1,5 +1,5 @@
 <template>
-  <section class="flex flex-col text-center mb-12 px-4 sm:px-8  min-h-screen">
+  <section class="flex flex-col text-center mb-12 px-4 sm:px-8  min-h-screen [overflow-anchor:none]">
     <div v-for="position in (cardNumber > 50 ? 2 : 1)" :key="position">
       <div class="flex flex-row gap-4 justify-center mb-6" v-if="position === 1">
         <div class="flex flex-col justify-center items-center">
@@ -15,34 +15,35 @@
                   <input :placeholder="text.pokedex.search.number" v-model="pokeNumberSearchQuery" class="bg-white border-2 border-neutral-700 px-2 py-1 text-xs outline-none focus:bg-amber-50" />
                 </div>
 
-                <div class="flex flex-row gap-8 justify-center items-center">
-                  <div class="flex flex-col items-center text-md">
-                    <details class="dropdown-checkbox relative w-full">
-                      <summary class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">
-                        {{ text.pokedex.types }}
-                      </summary>
+                <div class="flex flex-col gap-4 justify-center items-center">
+                  <div class="flex flex-row gap-2">
+                    <div class="flex flex-col items-center text-md">
+                      <details class="dropdown-checkbox relative w-full">
+                        <summary class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">
+                          {{ text.pokedex.types }}
+                        </summary>
 
-                      <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20">
-                        <div>
-                          type selection
-                          <button @click="typeMatchMode = typeMatchMode === 'any' ? 'all' : 'any'" class="justify-center p-2 m-2 bg-neutral-300 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-200 transition-all cursor-pointer">{{ typeMatchMode }}</button>
+                        <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20">
+                          <div>
+                            type selection
+                            <button @click="typeMatchMode = typeMatchMode === 'any' ? 'all' : 'any'" class="justify-center p-2 m-2 bg-neutral-300 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-200 transition-all cursor-pointer">{{ typeMatchMode }}</button>
+                          </div>
+                          <div class="grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto overscroll-contain w-64">
+                            <label v-for="type in types" :key="type.name" class="cursor-pointer flex justify-center items-center">
+                              <input name="couleur[]" v-model="selectedTypes" :value="type.name" type="checkbox" class="peer sr-only" />
+                              <img :src="type.icon" class="h-10 object-contain border-transparent border-2 peer-checked:border-neutral-900 p-0.5" />
+                            </label>
+                          </div>
                         </div>
-                        <div class="grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto w-64">
-                          <label v-for="type in types" :key="type.name" class="cursor-pointer flex justify-center items-center">
-                            <input name="couleur[]" v-model="selectedTypes" :value="type.name" type="checkbox" class="peer sr-only" />
-                            <img :src="type.icon" class="h-10 object-contain border-transparent border-2 peer-checked:border-neutral-900 p-0.5" />
-                          </label>
-                        </div>
-                      </div>
-                    </details>
-                  </div>
+                      </details>
+                    </div>
 
-                  <div class="flex flex-col text-md items-center">
+                    <div class="flex flex-col text-md items-center">
                     <details class="dropdown-checkbox relative">
                       <summary class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">
                         {{ generationSearchQuery === 0 ? text.pokedex.generation : 'Gen ' + generationSearchQuery }}
                       </summary>
-                      <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20 grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto w-64">
+                      <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20 grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto overscroll-contain w-64">
 
                         <label class="col-span-4 cursor-pointer flex items-center gap-1 border-b border-neutral-400 pb-1 mb-1">
                           <input type="radio" :value="0" v-model="generationSearchQuery" />
@@ -55,6 +56,64 @@
                         </label>
                       </div>
                     </details>
+                  </div>
+
+                    <div class="flex flex-col text-md items-center">
+                      <details class="dropdown-checkbox relative">
+                        <summary class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">
+                          {{ text.pokedex.games }}
+                        </summary>
+                        <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20 grid grid-cols-4 gap-1 p-2 max-h-60 overflow-y-auto overscroll-contain w-64">
+                          <div class="col-span-4 flex items-center justify-between border-b border-neutral-400 pb-1 mb-1">
+                            <button class="cursor-pointer flex items-center gap-1 text-xs font-bold" @click="gameSearchQuery = []">
+                              {{ text.pokedex.all }}
+                            </button>
+                            <button @click="gameMatchMode = gameMatchMode === 'any' ? 'all' : 'any'" class="px-2 py-1 text-xs font-bold bg-neutral-300 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-200 transition-all cursor-pointer">{{ gameMatchMode }}</button>
+                          </div>
+                          <label v-for="g in mainEntries" :key="g.id" class="cursor-pointer flex items-center justify-center gap-1">
+                            <input type="checkbox" class="peer sr-only" :value="g.variantId" v-model="gameSearchQuery" />
+                            <img :src="g.currentSprite" :alt="g.label" :title="g.label" class="h-10 object-contain" :class="gameSearchQuery.length > 0 && !gameSearchQuery.includes(g.variantId) && 'grayscale'" />
+                          </label>
+                        </div>
+                      </details>
+                    </div>
+
+                    <div class="flex flex-col items-center text-md">
+                      <details class="dropdown-checkbox relative w-full">
+                        <summary class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">
+                          {{ text.pokedex.moves }}{{ selectedMoves.length ? ' (' + selectedMoves.length + ')' : '' }}
+                        </summary>
+                        <div class="absolute left-0 mt-1 bg-neutral-200 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-20 p-2 w-64">
+                          <div class="flex items-center justify-between border-b border-neutral-400 pb-1 mb-1">
+                            <button class="cursor-pointer text-xs font-bold" @click="selectedMoves = []">
+                              {{ text.pokedex.all }}
+                            </button>
+                            <button @click="moveMatchMode = moveMatchMode === 'any' ? 'all' : 'any'"
+                                    class="px-2 py-1 text-xs font-bold bg-neutral-300 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 hover:bg-neutral-200 transition-all cursor-pointer">
+                              {{ moveMatchMode }}
+                            </button>
+                          </div>
+                          <input v-model="moveSearchQuery" :placeholder="text.pokedex.moveSearch"
+                                 class="w-full bg-white border-2 border-neutral-700 px-2 py-1 text-xs outline-none focus:bg-amber-50 mb-1" />
+                          <div ref="moveListEl" class="max-h-60 overflow-y-auto overscroll-contain">
+                            <label v-for="move in visibleMoves" :key="move.id"
+                                   class="relative cursor-pointer flex items-center gap-1 text-xs px-1 py-0.5 hover:bg-neutral-100"
+                                   @mousedown.prevent>
+                              <input v-model="selectedMoves" :value="move.id" type="checkbox" class="peer sr-only" @change="onMoveToggle" />
+                              <span class="truncate peer-checked:bg-neutral-900 peer-checked:text-white" :title="move.nameEn">
+                                {{ move.nameFr }}
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+
+                  </div>
+                  <div class="flex flex-row gap-2">
+                    <button @click="ownedSearchQuery = !ownedSearchQuery" class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">{{ ownedSearchQuery ? 'Voir tous' : 'Voir possédé'}}</button>
+
+                    <button @click="shinySearchQuery = !shinySearchQuery" class="cursor-pointer bg-neutral-200 border-2 border-neutral-700 px-3 py-1 text-xs font-bold hover:bg-neutral-100 select-none">{{ shinySearchQuery ? 'Voir tous' : 'Voir shiny'}}</button>
                   </div>
                 </div>
               </div>
@@ -173,26 +232,35 @@
 </style>
 
 <script setup lang="ts">
-const { text } = useLang()
+import {VERSION_TO_GROUP} from "~/utils/gameVersions.ts";
+
+const { text, gameName } = useLang()
 
 const frenchSearchQuery = ref('')
 const englishSearchQuery = ref('')
 const pokeNumberSearchQuery = ref('')
 const generationSearchQuery = ref(0)
+const gameSearchQuery = ref<string[]>([])
 const genBound = [0, 151, 251, 386, 493, 649, 721, 809, 905, 1025]
 const getGeneration = (n: number) => genBound.findIndex(bound => n <= bound)
 const toolbarEnable = ref(true)
 const selectedTypes = ref<string[]>([])
+const selectedMoves = ref<number[]>([])
 const typeMatchMode = ref<'any' | 'all'>('any')
+const gameMatchMode = ref<'any' | 'all'>('any')
+const moveMatchMode = ref<'any' | 'all'>('any')
+const ownedSearchQuery = ref(false)
+const shinySearchQuery = ref(false)
 
 const { data: types } = useFetch<{ name: string, icon: string }[]>('/api/types')
-const { themeClassesSecondaryBackground } = useLang()
 const filteredPokemons = computed(() => {
   const fr = frenchSearchQuery.value.trim().toLowerCase()
   const en = englishSearchQuery.value.trim().toLowerCase()
   const nb = pokeNumberSearchQuery.value.trim()
   const gen = generationSearchQuery.value
   const types = selectedTypes.value
+  const owned = ownedSearchQuery.value
+  const shiny = shinySearchQuery.value
 
   return (pokemons.value ?? []).filter(p => {
     if (fr && !p.nameFr.toLowerCase().includes(fr)) return false
@@ -207,17 +275,82 @@ const filteredPokemons = computed(() => {
         if (!types.some(t => pokeTypes.includes(t))) return false
       }
     }
-    return true
+
+    const gameNames = selectedGameNames.value
+    if (gameNames.length > 0) {
+      const capturedGroups = new Set(
+          (Array.isArray(p.capturedGame) ? p.capturedGame : [])
+              .filter((v): v is string => typeof v === 'string')
+              .map(v => VERSION_TO_GROUP[v] ?? v)
+      )
+      if (gameMatchMode.value === 'all') {
+        if (!gameNames.every(name => capturedGroups.has(name))) return false
+      } else {
+        if (!gameNames.some(name => capturedGroups.has(name))) return false
+      }
+    }
+    if (owned && !p.isOwned) return false
+    return !(shiny && !p.isShiny);
+
   })
 })
 
-watch([frenchSearchQuery, englishSearchQuery, pokeNumberSearchQuery, generationSearchQuery, selectedTypes], () => { currentPage.value = 1 })
+watch([frenchSearchQuery, englishSearchQuery, pokeNumberSearchQuery, generationSearchQuery, selectedTypes, gameSearchQuery, selectedMoves, moveMatchMode], () => { currentPage.value = 1 }, { deep: true })
 
 const { user } = useAuth()
 const { data: pokemons, refresh } = await useFetch('/api/pokemon', {
-  query: { userId: user.value?.id ?? 1 },
+  query: computed(() => ({
+    userId: user.value?.id ?? 1,
+    moves: selectedMoves.value.join(','),
+    moveMatchMode: moveMatchMode.value,
+  })),
 })
 
+type ApiMove = { id: number; nameEn: string; nameFr: string; type: string }
+const { data: moves } = await useFetch<ApiMove[]>('/api/moves')
+const moveSearchQuery = ref('')
+const visibleMoves = computed(() => {
+  const q = moveSearchQuery.value.trim().toLowerCase()
+  return (moves.value ?? []).filter(m => !q || m.nameEn.toLowerCase().includes(q) || m.nameFr.toLowerCase().includes(q))
+})
+
+type ApiGame = {
+  id: number
+  nameEn: string
+  generation: string
+  currentSprite: string | null
+  availableJaquettes: { name: string, sprite: string }[]
+}
+
+type GameEntry = {
+  id: number
+  nameEn: string
+  generation: string
+  currentSprite: string
+  variantId: string
+  label: string
+}
+
+const { data: games } = await useFetch<ApiGame[]>('/api/games', {
+  query: { userId: user.value?.id }
+})
+
+const mainEntries = computed<GameEntry[]>(() => (games.value ?? [])
+    .filter((g): g is ApiGame & { currentSprite: string } => Boolean(g.currentSprite))
+    .map(g => ({
+      id: g.id,
+      nameEn: g.nameEn,
+      generation: g.generation,
+      currentSprite: g.currentSprite,
+      variantId: g.nameEn,
+      label: gameName(g.nameEn),
+    })))
+
+const selectedGameNames = computed(() =>
+  mainEntries.value
+    .filter(g => gameSearchQuery.value.includes(g.variantId))
+    .map(g => g.nameEn)
+)
 const { cardsPerRow, cardNumber, currentPage } = usePokedexPrefs()
 
 const CARD_WIDTH = 144
@@ -312,5 +445,34 @@ const visiblePages = computed<number[]>(() => {
   const end = Math.min(total, start + maxVisiblePages - 1)
   return Array.from( {length: Math.max(0, end - start + 1) }, (_, index) => start + index)
 })
+
+const moveListEl = ref<HTMLElement | null>(null)
+let savedWindowY = 0
+let savedListTop = 0
+let restoringMoveScroll = false
+
+function onMoveToggle() {
+  savedWindowY = window.scrollY
+  savedListTop = moveListEl.value?.scrollTop ?? 0
+  restoringMoveScroll = true
+}
+
+function restoreMoveScroll() {
+  window.scrollTo({ top: savedWindowY })
+  moveListEl.value?.scrollTo({ top: savedListTop })
+}
+
+watch(selectedMoves, async () => {
+  if (!restoringMoveScroll) return
+  await nextTick()
+  restoreMoveScroll()
+}, { deep: true, flush: 'post' })
+
+watch(pokemons, async () => {
+  if (!restoringMoveScroll) return
+  restoringMoveScroll = false
+  await nextTick()
+  restoreMoveScroll()
+}, { flush: 'post' })
 
 </script>

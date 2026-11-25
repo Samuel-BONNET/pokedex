@@ -178,7 +178,10 @@
         "number": "Numéro pokedex"
       },
       "types": "Types",
+      "moves": "Capacités",
+      "moveSearch": "Rechercher une capacité",
       "generation": "Générations",
+      "games": "Jeux",
       "all": "Toutes",
       "page": "Page",
       "perPage": "Size",
