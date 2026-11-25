@@ -1,10 +1,13 @@
 <template>
-  <input type="file" accept=".csv" @change="importCSV" class="block text-transparent w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer border-2 border-neutral-900 active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" />
+  <button type="file" accept=".csv" @change="importCSV" class="block text-white w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer border-2 border-neutral-900 active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+    <FileSend class="mx-auto" :size="20" />
+  </button>
   <p v-if="loading">Traitement en cours...</p>
   <p v-if="result">{{ result }}</p>
 </template>
 
 <script setup lang="ts">
+import { FileSend } from 'reicon-vue';
 const result = ref<string | null>(null)
 const loading = ref(false)
 
@@ -32,7 +35,6 @@ async function importCSV(event: Event) {
 
     const payload = rows.map(r => ({
       idPokemon: Number(r.idPokemon),
-      idUser: Number(r.idUser),
       isOwned: r.isOwned === 'true',
       isShiny: r.isShiny === 'true',
     }))

@@ -1,7 +1,7 @@
-import {SYSTEM_USER_ID} from "#server/utils/constants.ts";
+import { requireUser } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-    const idUser = Number(getQuery(event).userId ?? SYSTEM_USER_ID)
+    const idUser = requireUser(event)
 
     const statuts = await prisma.statut.findMany({
         where: { idUser },

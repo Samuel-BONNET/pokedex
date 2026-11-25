@@ -123,6 +123,7 @@
       "error": "Error"
     },
     "auth": {
+      "admin": "Admin",
       "login": "Login",
       "register": "Register",
       "logout": "Logout",

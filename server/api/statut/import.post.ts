@@ -1,7 +1,9 @@
+import { requireUser } from '../../utils/auth'
+
 export default defineEventHandler(async (event) => {
+    const idUser = requireUser(event)
     const body = await readBody<{ statuts: Array<{
         idPokemon: number,
-        idUser: number,
         isOwned: boolean,
         isShiny: boolean,
     }> }>(event)
@@ -12,7 +14,7 @@ export default defineEventHandler(async (event) => {
             where: {
                 idPokemon_idUser: {
                     idPokemon: statut.idPokemon,
-                    idUser: statut.idUser,
+                    idUser,
                 }
             },
             update: {
@@ -21,7 +23,7 @@ export default defineEventHandler(async (event) => {
             },
             create: {
                 idPokemon: statut.idPokemon,
-                idUser: statut.idUser,
+                idUser,
                 isOwned: statut.isOwned,
                 isShiny: statut.isShiny,
             }
