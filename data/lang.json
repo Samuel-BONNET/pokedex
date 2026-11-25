@@ -204,6 +204,9 @@
         "none": "×0"
       }
     },
+    "settings": {
+      "title": "Settings"
+    },
     "stats": {
       "hp": "Hp",
       "attack": "Attack",

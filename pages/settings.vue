@@ -1,21 +1,28 @@
 <template>
-  <div>
+  <div class="flex bg-neutral-300 border-4 border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 flex-col  gap-4 w-fit mx-auto text-neutral-900 font-mono">
+    <span class="text-3xl font-bold mx-auto">{{ text.settings.title }}</span>
+
+    <span class="text-xl font-bold">Visual</span>
     <div>
-      <h1>Games</h1>
-      <div class="flex flex-row gap-2 items-center">
-        <h3>See all games</h3>
-        <button class="w-fit px-4 py-2 text-xs font-bold bg-white text-neutral-800 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-0.5 hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none" @click="toggle">{{ seeAllGames ? 'Hide' : 'See' }}</button>
-      </div>
+      <EnableBtn text="See twin games" :action="toggleGame" :enable="seeAllGames" />
     </div>
-    <div>
-      <h1>Pokedex</h1>
-      <p>{{ seeAllGames }}</p>
+
+    <span class="text-xl font-bold">Compte</span>
+
+    <div class="flex flex-col gap-2">
+      <a type="button" @click="" class="text-xs font-bold text-red-600 hover:text-red-700 cursor-pointer underline">
+        Réinitiliser le pokedex
+      </a>
+      <a type="button" @click="" class="text-xs font-bold text-red-600 hover:text-red-700 cursor-pointer underline">
+        Supprimer le compte
+      </a>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const { seeAllGames, toggle } = useToggle()
+const { seeAllGames, toggleGame } = useToggle()
+const { text } = useLang()
 </script>
 
 <style scoped>
