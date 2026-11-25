@@ -251,7 +251,11 @@
         "xd": "XD",
         "x-y": "X / Y",
         "yellow": "Jaune"
-      }
+      },
+      "resync": "Resynchroniser depuis la sauvegarde",
+      "syncing": "Synchronisation...",
+      "syncDone": "Pokédex synchronisé",
+      "noSave": "Aucune sauvegarde à synchroniser"
     },
     "option": {
       "theme": "Thème"

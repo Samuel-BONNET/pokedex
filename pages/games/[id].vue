@@ -7,7 +7,7 @@
         </h1>
       </div>
       <p v-if="game" class="text-xs font-bold text-neutral-600 bg-neutral-200 inline-block px-3 py-0.5 border border-neutral-500 mt-2">
-        {{ text.games.generation }} {{ game.generation }}
+        {{ text.games.generation }} {{ game.generation.split('-')[1]?.toUpperCase() }}
       </p>
     </header>
     <div class="flex flex-col md:flex-row items-center justify-center gap-8">
@@ -26,7 +26,7 @@
             <button v-if="hasMultiple" @click="toggleVersion"
                     :disabled="!user"
                     class="w-full px-4 py-2 text-xs font-bold bg-white text-neutral-800 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-0.5 hover:bg-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
-              {{ text.games.changeVersion }}{{ activeVersionLabel ? ' (' + activeVersionLabel + ')' : '' }}
+              {{ text.games.changeVersion }}
             </button>
           </div>
 
@@ -39,7 +39,7 @@
 
           <a v-if="url !== null"
              :href="url"
-             download
+             :download="'Pokemon'+gameName(game.nameEn)+'.sav'"
              class="text-xs font-bold text-green-700 bg-emerald-100 border border-emerald-500 px-3 py-1 hover:bg-emerald-200 inline-flex items-center justify-center gap-1.5 transition-colors w-full">
             <Download class="w-4 h-4" /> {{ text.games.download }}
           </a>
@@ -55,11 +55,19 @@
             </button>
 
             <button @click="remove"
-                    :disabled="!user"
+                    :disabled="!user || url === null"
                     class="flex-1 px-3 py-2.5 text-xs font-bold bg-white text-red-600 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-0.5 hover:bg-red-50 hover:border-red-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
               {{ text.games.delete }}
             </button>
           </div>
+
+          <button @click="resync"
+                  v-if="url !== null"
+                  :disabled="!user || syncing"
+                  class="w-full px-3 py-2.5 text-xs font-bold bg-amber-100 text-amber-900 border-2 border-neutral-700 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-0.5 hover:bg-amber-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none inline-flex items-center justify-center gap-2">
+            <RefreshCw class="w-4 h-4" :class="syncing ? 'animate-spin' : ''" />
+            {{ syncing ? text.games.syncing : text.games.resync }}
+          </button>
 
           <p v-if="result" class="text-xs font-bold text-neutral-800 bg-amber-100 border border-amber-400 p-2 text-center w-full mt-1">
             {{ result }}
@@ -104,12 +112,11 @@
 </template>
 
 <script setup lang="ts">
-import { Download, FileText } from 'lucide-vue-next'
-import { versionLabel } from '~/utils/gameVersions'
+import { Download, FileText, RefreshCw } from 'lucide-vue-next'
+import { versionFromVariant, versionLabel } from '~/utils/gameVersions'
 import {type Badge, createEngine, type PokemonSummary} from '@pkhex-everywhere/engine'
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { getName } from '~/utils/pokeName.ts'
-import { GENERATION_MAP } from "~/utils/pokedexIncluded"
 
 const { user } = useAuth()
 const { img, text, gameName } = useLang()
@@ -120,9 +127,14 @@ const url = ref<string | null>(null)
 const result = ref<string | null>(null)
 const file = ref<File | null>(null)
 const message = ref('')
+const fileData = ref<ArrayBuffer | null>(null)
 const team = ref<PokemonSummary[]>([])
 const boxes = ref<PokemonSummary[]>([])
 const badge = ref<any[]>([])
+const syncing = ref(false)
+let downloadToken = 0
+let parseToken = 0
+let parseQueue: Promise<void> = Promise.resolve()
 const { data: game } = await useFetch<{
   id: number
   nameEn: string
@@ -132,8 +144,7 @@ const { data: game } = await useFetch<{
 }>(`/api/games/${gameId}`, {
   query: { userId: user.value?.id }
 })
-const teamIds: number[] = team.value?.flatMap(poke => poke.speciesId !== null ? [poke.speciesId]: []) ?? [];
-const boxIds: number[] = boxes.value?.flatMap(poke => poke.speciesId !== null ? [poke.speciesId]: []) ?? [];
+
 const ids = computed<number[]>(() => [...team.value, ...boxes.value].flatMap(p => (p.speciesId !== null ? [p.speciesId] : [])))
 
 const gameSavePokedex = computed(() => {
@@ -189,16 +200,38 @@ function resolveInitialVersion() {
   activeVersionId.value = match?.id ?? versions.value[0]!.id
 }
 
+function clearUrl() {
+  if (url.value) URL.revokeObjectURL(url.value)
+  url.value = null
+}
+
 watch([game, versions], resolveInitialVersion, { immediate: true })
+
+watch(activeVersionId, (id, previous) => {
+  if (!id || id === previous) return
+  parseToken++
+  clearUrl()
+  fileData.value = null
+  team.value = []
+  boxes.value = []
+  badge.value = []
+  void download()
+})
 
 watch(versionQuery, (vq) => {
   if (!vq || !versions.value.length) return
   const match = versions.value.find(v => v.id === vq)
-  if (match && match.id !== activeVersionId.value) {
-    activeVersionId.value = match.id
-    url.value = null
-    void download()
-  }
+  if (match && match.id !== activeVersionId.value) activeVersionId.value = match.id
+})
+
+onMounted(() => {
+  void download()
+})
+
+onBeforeUnmount(() => {
+  downloadToken++
+  parseToken++
+  clearUrl()
 })
 
 const displaySprite = computed(() => {
@@ -212,8 +245,6 @@ function toggleVersion() {
   const next = (idx + 1) % versions.value.length
   activeVersionId.value = versions.value[next]!.id
   void router.replace({ query: { ...route.query, version: activeVersionId.value } })
-  url.value = null
-  void download()
 }
 
 async function upload() {
@@ -233,25 +264,63 @@ async function upload() {
   }
 }
 
-async function download() {
-  if (!activeVersionId.value) return
-  const res = await fetch(`/api/games/${gameId}/save?version=${encodeURIComponent(activeVersionId.value)}`)
-  if (res.ok) {
+async function download(): Promise<'ok' | 'missing' | 'error'> {
+  const variant = activeVersionId.value
+  if (!variant) return 'ok'
+  const token = ++downloadToken
+
+  try {
+    const res = await fetch(`/api/games/${gameId}/save?version=${encodeURIComponent(variant)}`)
+    if (token !== downloadToken) return 'ok'
+
+    if (!res.ok) {
+      clearUrl()
+      fileData.value = null
+      return res.status === 404 ? 'missing' : 'error'
+    }
+
     const blob = await res.blob()
+    if (token !== downloadToken) return 'ok'
+
+    clearUrl()
     url.value = URL.createObjectURL(blob)
-  } else {
-    url.value = null
+    const buffer = await blob.arrayBuffer()
+    fileData.value = buffer
+    await queueParse(buffer)
+    return 'ok'
+  } catch {
+    if (token !== downloadToken) return 'ok'
+    clearUrl()
+    fileData.value = null
+    return 'error'
   }
 }
 
 async function remove() {
-  if (!activeVersionId.value) return
-  await fetch(`/api/games/${gameId}/save?version=${encodeURIComponent(activeVersionId.value)}`, { method: 'DELETE' })
-  result.value = text.games.saveDeleted
-  url.value = null
-}
+  const variant = activeVersionId.value
+  if (!variant) return
 
-void download()
+  downloadToken++
+  parseToken++
+  clearUrl()
+  fileData.value = null
+  team.value = []
+  boxes.value = []
+  badge.value = []
+
+  const res = await fetch(`/api/games/${gameId}/save?version=${encodeURIComponent(variant)}`, { method: 'DELETE' })
+  if (!res.ok) {
+    result.value = text.common.error
+    return
+  }
+
+  await $fetch('/api/statut/sync', {
+    method: 'POST',
+    body: { version: versionFromVariant(variant), pokemons: [], replace: true },
+  })
+
+  result.value = text.games.saveDeleted
+}
 
 const verifierFichier = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -267,25 +336,71 @@ const verifierFichier = (e: Event) => {
   }
 }
 
-const { data: fileData } = await useFetch<ArrayBuffer>(`/api/games/${gameId}/save`, {
-  method : 'GET', query : { version: activeVersionId}, responseType: 'arrayBuffer' })
-
 const engine = createEngine()
 
-watch(fileData, async (newBuffer) => {
-  if (newBuffer) {
-    try {
-      const byteArray = new Uint8Array(newBuffer)
-      await engine.game.load(byteArray)
-      team.value = await engine.party.get() as PokemonSummary[]
-      boxes.value = await engine.box.get() as PokemonSummary[]
-      badge.value = await engine.trainer.badges() as Badge[]
-    } catch (error) {
-      console.error("Erreur PKHeX", error)
-      message.value = "Erreur lors de la lecture du fichier de sauvegarde."
-    }
+async function parseSave(buffer: ArrayBuffer, version: string, token: number) {
+  await engine.game.load(new Uint8Array(buffer))
+  const party = await engine.party.get() as PokemonSummary[]
+  const box = await engine.box.get() as PokemonSummary[]
+  const badges = await engine.trainer.badges() as Badge[]
+
+  if (token !== parseToken) return
+  team.value = party
+  boxes.value = box
+  badge.value = badges
+
+  const shinyBySpecies = new Map<number, boolean>()
+  for (const poke of [...party, ...box]) {
+    if (poke.isEgg || poke.speciesId === null) continue
+    shinyBySpecies.set(poke.speciesId, (shinyBySpecies.get(poke.speciesId) ?? false) || poke.isShiny)
   }
-}, { immediate: true })
+
+  if (token !== parseToken) return
+
+  const sync = await $fetch<{ added: number; removed: number }>('/api/statut/sync', {
+    method: 'POST',
+    body: {
+      version,
+      pokemons: [...shinyBySpecies].map(([pokeNumber, isShiny]) => ({ pokeNumber, isShiny })),
+      replace: true,
+    },
+  })
+
+  if (token !== parseToken) return
+  result.value = `${text.games.syncDone} (+${sync.added} / -${sync.removed})`
+}
+
+function queueParse(buffer: ArrayBuffer): Promise<void> {
+  const variant = activeVersionId.value
+  if (!variant) return parseQueue
+  const token = ++parseToken
+  const version = versionFromVariant(variant)
+
+  parseQueue = parseQueue
+      .then(() => parseSave(buffer, version, token))
+      .catch((error) => {
+        if (token !== parseToken) return
+        console.error('Erreur PKHeX', error)
+        message.value = 'Erreur lors de la lecture du fichier de sauvegarde.'
+        result.value = null
+      })
+
+  return parseQueue
+}
+
+async function resync() {
+  if (!user.value || syncing.value) return
+  syncing.value = true
+  message.value = ''
+  result.value = text.games.syncing
+  try {
+    const status = await download()
+    if (status === 'missing') result.value = text.games.noSave
+    if (status === 'error') result.value = text.common.error
+  } finally {
+    syncing.value = false
+  }
+}
 </script>
 
 <style scoped>
